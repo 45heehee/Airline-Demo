@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Our Fleet — Meridian Air</title>
+<style>
+  :root {
+    --ink: #0E2238;
+    --ink-soft: #1B3654;
+    --paper: #F7F5F0;
+    --paper-dim: #EFEBE2;
+    --brass: #B8924A;
+    --brass-dim: #D9C291;
+    --slate: #5C6B7A;
+    --hairline: #D8D4CB;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: var(--ink);
+  }
+
+  h1, h2, h3 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 400;
+  }
+
+  /* ---------- Header (shared) ---------- */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--hairline);
+    background: var(--paper);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--ink);
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+
+  .logo-text .name {
+    font-family: Georgia, serif;
+    font-size: 19px;
+  }
+
+  .logo-text .tag {
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    color: var(--brass);
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  nav {
+    display: flex;
+    gap: 26px;
+    font-size: 13px;
+    color: var(--slate);
+  }
+
+  nav a { color: var(--slate); text-decoration: none; }
+  nav a.active { color: var(--ink); font-weight: 600; }
+  nav a:hover { color: var(--ink); }
+
+  /* ---------- Page hero ---------- */
+  .page-hero {
+    background: var(--ink);
+    padding: 56px 28px 48px;
+    text-align: center;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: var(--brass);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .page-hero h1 {
+    font-size: clamp(30px, 4.5vw, 44px);
+    color: var(--paper);
+  }
+
+  .page-hero p {
+    color: var(--paper-dim);
+    font-size: 14px;
+    max-width: 560px;
+    margin: 14px auto 0;
+    line-height: 1.6;
+  }
+
+  /* ---------- Manufacturer section ---------- */
+  .manufacturer {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 56px 24px 16px;
+  }
+
+  .manufacturer-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--hairline);
+    padding-bottom: 16px;
+  }
+
+  .manufacturer-header h2 {
+    font-size: 28px;
+  }
+
+  .manufacturer-header .count {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: var(--slate);
+    letter-spacing: 0.05em;
+  }
+
+  /* ---------- Aircraft grid ---------- */
+  .aircraft-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-top: 28px;
+  }
+
+  .aircraft-card {
+    background: #fff;
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .aircraft-image {
+    background: var(--paper-dim);
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .aircraft-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .aircraft-info {
+    padding: 16px 18px 18px;
+  }
+
+  .aircraft-info .model {
+    font-family: Georgia, serif;
+    font-size: 17px;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .aircraft-info .role {
+    font-size: 11.5px;
+    color: var(--brass);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    text-align: center;
+    padding: 30px 20px 40px;
+    font-size: 11.5px;
+    color: var(--slate);
+    border-top: 1px solid var(--hairline);
+    margin-top: 40px;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 760px) {
+    nav { display: none; }
+    .aircraft-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="index.html">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+      <circle cx="13" cy="13" r="12" stroke="#0E2238" stroke-width="1"/>
+      <path d="M13 1 V25 M1 13 H25" stroke="#0E2238" stroke-width="0.6" opacity="0.4"/>
+      <path d="M13 4 C 18 8, 18 18, 13 22 C 8 18, 8 8, 13 4 Z" stroke="#B8924A" stroke-width="1.1" fill="none"/>
+    </svg>
+    <span class="logo-text">
+      <span class="name">Meridian Air</span>
+      <span class="tag">Est. 1962 · Every Longitude</span>
+    </span>
+  </a>
+  <nav>
+    <a href="fleet.html" class="active">Our Fleet</a>
+    <a href="#">International</a>
+    <a href="#">Ultra-Long-Range</a>
+  </nav>
+</header>
+
+<section class="page-hero">
+  <div class="eyebrow">Aircraft &amp; equipment</div>
+  <h1>Our Fleet</h1>
+  <p>Twenty-five aircraft across nine Airbus and sixteen Boeing types — from the short-haul 737 to the long-range A350F.</p>
+</section>
+
+<!-- ========== AIRBUS ========== -->
+<section class="manufacturer">
+  <div class="manufacturer-header">
+    <h2>Airbus</h2>
+    <span class="count">9 TYPES IN SERVICE</span>
+  </div>
+
+  <div class="aircraft-grid">
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/a380.png" alt="Airbus A380"></div>
+      <div class="aircraft-info">
+        <div class="model">A380</div>
+        <div class="role">Flagship double-deck widebody</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/a320.png" alt="Airbus A320"></div>
+      <div class="aircraft-info">
+        <div class="model">A320</div>
+        <div class="role">Short to medium-haul narrowbody</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/a330.png" alt="Airbus A330-900neo"></div>
+      <div class="aircraft-info">
+        <div class="model">A330-900neo</div>
+        <div class="role">Medium to long-haul widebody</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/a330.png" alt="Airbus A330-800neo"></div>
+      <div class="aircraft-info">
+        <div class="model">A330-800neo</div>
+        <div class="role">Long, thin-route widebody</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/a350-900.png" alt="Airbus A350-900"></div>
+      <div class="aircraft-info">
+        <div class="model">A350-900</div>
+        <div class="role">Long-haul widebody</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/a350-900.png" alt="Airbus A350-900ULR"></div>
+      <div class="aircraft-info">
+        <div class="model">A350-900ULR</div>
+        <div class="role">Ultra-long-range widebody</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/a350-1000.png" alt="Airbus A350-1000"></div>
+      <div class="aircraft-info">
+        <div class="model">A350-1000</div>
+        <div class="role">Long-haul widebody, stretched</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/a350-1000.png" alt="Airbus A350-1000ULR"></div>
+      <div class="aircraft-info">
+        <div class="model">A350-1000ULR</div>
+        <div class="role">Ultra-long-range widebody, stretched</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/a350-1000.png" alt="Airbus A350F"></div>
+      <div class="aircraft-info">
+        <div class="model">A350F</div>
+        <div class="role">Freighter</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ========== BOEING ========== -->
+<section class="manufacturer">
+  <div class="manufacturer-header">
+    <h2>Boeing</h2>
+    <span class="count">16 TYPES IN SERVICE</span>
+  </div>
+
+  <div class="aircraft-grid">
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/b777-200.png" alt="Boeing 777-200LR"></div>
+      <div class="aircraft-info">
+        <div class="model">777-200LR</div>
+        <div class="role">Ultra-long-range widebody</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/b777-200.png" alt="Boeing 777-200ER"></div>
+      <div class="aircraft-info">
+        <div class="model">777-200ER</div>
+        <div class="role">Long-range widebody</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/b787-9.png" alt="Boeing 787-8"></div>
+      <div class="aircraft-info">
+        <div class="model">787-8</div>
+        <div class="role">Long-haul widebody</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/b787-9.png" alt="Boeing 787-9"></div>
+      <div class="aircraft-info">
+        <div class="model">787-9</div>
+        <div class="role">Long-haul widebody, stretched</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/b787-sketch.png" alt="Boeing 787-10"></div>
+      <div class="aircraft-info">
+        <div class="model">787-10</div>
+        <div class="role">Long-haul widebody, longest 787</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/b777-300er.png" alt="Boeing 777-300ER"></div>
+      <div class="aircraft-info">
+        <div class="model">777-300ER</div>
+        <div class="role">Long-range widebody, 4-door layout</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/b777-9.png" alt="Boeing 777-9"></div>
+      <div class="aircraft-info">
+        <div class="model">777-9</div>
+        <div class="role">Next-generation widebody, 5-door layout</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/b737-base.png" alt="Boeing 737-600"></div>
+      <div class="aircraft-info">
+        <div class="model">737-600</div>
+        <div class="role">Short-haul narrowbody</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/b737-base.png" alt="Boeing 737-700"></div>
+      <div class="aircraft-info">
+        <div class="model">737-700</div>
+        <div class="role">Short-haul narrowbody</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/b737-base.png" alt="Boeing 737-800"></div>
+      <div class="aircraft-info">
+        <div class="model">737-800</div>
+        <div class="role">Short to medium-haul narrowbody</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/b737-base.png" alt="Boeing 737-900"></div>
+      <div class="aircraft-info">
+        <div class="model">737-900</div>
+        <div class="role">Short to medium-haul narrowbody</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/b737-900er.png" alt="Boeing 737-900ER"></div>
+      <div class="aircraft-info">
+        <div class="model">737-900ER</div>
+        <div class="role">Medium-haul narrowbody, extended range</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/b737-max.png" alt="Boeing 737 MAX 8"></div>
+      <div class="aircraft-info">
+        <div class="model">737 MAX 8</div>
+        <div class="role">Short to medium-haul narrowbody</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/b737-max.png" alt="Boeing 737 MAX 8-200"></div>
+      <div class="aircraft-info">
+        <div class="model">737 MAX 8-200</div>
+        <div class="role">High-density short-haul narrowbody</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/b737-max.png" alt="Boeing 737 MAX 9"></div>
+      <div class="aircraft-info">
+        <div class="model">737 MAX 9</div>
+        <div class="role">Medium-haul narrowbody, stretched</div>
+      </div>
+    </div>
+
+    <div class="aircraft-card">
+      <div class="aircraft-image"><img src="images/b737-max.png" alt="Boeing 737 MAX 10"></div>
+      <div class="aircraft-info">
+        <div class="model">737 MAX 10</div>
+        <div class="role">Medium-haul narrowbody, longest MAX</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  Meridian Air — demo site for illustration only · Aircraft images are for visual reference only
+</footer>
+
+</body>
+</html>
