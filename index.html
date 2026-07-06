@@ -1,1 +1,498 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Meridian Air — Every Longitude</title>
+<style>
+  :root {
+    --ink: #0E2238;
+    --ink-soft: #1B3654;
+    --paper: #F7F5F0;
+    --paper-dim: #EFEBE2;
+    --brass: #B8924A;
+    --brass-dim: #D9C291;
+    --slate: #5C6B7A;
+    --hairline: #D8D4CB;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: var(--ink);
+  }
+
+  h1, h2, h3 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 400;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--hairline);
+    background: var(--paper);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--ink);
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+
+  .logo-text .name {
+    font-family: Georgia, serif;
+    font-size: 19px;
+  }
+
+  .logo-text .tag {
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    color: var(--brass);
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  nav {
+    display: flex;
+    gap: 26px;
+    font-size: 13px;
+    color: var(--slate);
+  }
+
+  nav a { color: var(--slate); text-decoration: none; }
+  nav a.active { color: var(--ink); font-weight: 600; }
+  nav a:hover { color: var(--ink); }
+
+  .hero {
+    background: var(--ink);
+    background-image: linear-gradient(90deg, rgba(184,146,74,0.06) 1px, transparent 1px);
+    background-size: 48px 100%;
+    padding: 64px 28px 0;
+    text-align: center;
+    position: relative;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: var(--brass);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .hero h1 {
+    font-size: clamp(32px, 5vw, 52px);
+    color: var(--paper);
+    max-width: 720px;
+    margin: 0 auto;
+    line-height: 1.2;
+  }
+
+  .hero p.sub {
+    color: var(--paper-dim);
+    font-size: 15px;
+    max-width: 520px;
+    margin: 16px auto 0;
+    line-height: 1.6;
+  }
+
+  .board-wrap {
+    max-width: 680px;
+    margin: 40px auto 0;
+    padding: 0 20px;
+  }
+
+  .board {
+    background: #081726;
+    border: 1px solid var(--ink-soft);
+    border-radius: 6px;
+    padding: 18px 20px 8px;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.5);
+  }
+
+  .board-header {
+    display: grid;
+    grid-template-columns: 70px 1fr 56px 96px;
+    gap: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--brass-dim);
+    text-transform: uppercase;
+    padding: 0 10px 10px;
+    border-bottom: 1px solid rgba(217,194,145,0.15);
+    margin-bottom: 4px;
+  }
+
+  .board-row {
+    display: grid;
+    grid-template-columns: 70px 1fr 56px 96px;
+    gap: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    color: #F0C878;
+    padding: 9px 10px;
+    border-bottom: 1px solid rgba(217,194,145,0.08);
+    text-align: left;
+  }
+
+  .board-row:last-child { border-bottom: none; }
+
+  .board-row .status.on-time { color: #8FD19E; }
+  .board-row .status.boarding { color: #F0C878; }
+  .board-row .status.departed { color: #7C8CA0; }
+
+  .flap {
+    display: inline-block;
+    animation: flap-in 0.5s steps(6) both;
+  }
+
+  @keyframes flap-in {
+    0%   { opacity: 0; transform: translateY(-6px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .board-row:nth-child(2) .flap { animation-delay: 0.05s; }
+  .board-row:nth-child(3) .flap { animation-delay: 0.15s; }
+  .board-row:nth-child(4) .flap { animation-delay: 0.25s; }
+  .board-row:nth-child(5) .flap { animation-delay: 0.35s; }
+  .board-row:nth-child(6) .flap { animation-delay: 0.45s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flap { animation: none; }
+  }
+
+  .ticket-wrap {
+    max-width: 900px;
+    margin: -34px auto 0;
+    padding: 0 20px 60px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .ticket {
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    box-shadow: 0 20px 40px -18px rgba(14,34,56,0.35);
+    padding: 28px 28px 24px;
+  }
+
+  .ticket-label {
+    font-size: 10.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ticket-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: repeating-linear-gradient(90deg, var(--hairline) 0 6px, transparent 6px 12px);
+  }
+
+  form.search-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr auto;
+    gap: 16px;
+    align-items: end;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field label {
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--slate);
+  }
+
+  .field select,
+  .field input {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    border: none;
+    border-bottom: 1.5px solid var(--hairline);
+    background: transparent;
+    padding: 6px 2px;
+  }
+
+  .field select:focus,
+  .field input:focus {
+    outline: none;
+    border-bottom-color: var(--brass);
+  }
+
+  .search-btn {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--paper);
+    background: var(--ink);
+    border: none;
+    border-radius: 4px;
+    padding: 12px 22px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .search-btn:hover { background: var(--ink-soft); }
+  .search-btn:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+  .search-note {
+    margin-top: 16px;
+    font-size: 12.5px;
+    color: var(--slate);
+    display: none;
+  }
+
+  .search-note.show { display: block; }
+
+  @media (max-width: 860px) {
+    form.search-form { grid-template-columns: 1fr 1fr; }
+    .search-btn { grid-column: 1 / -1; }
+  }
+
+  .routes {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 70px;
+  }
+
+  .routes-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--hairline);
+    padding-bottom: 16px;
+  }
+
+  .routes-header h2 { font-size: 26px; }
+
+  .routes-header .count {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: var(--slate);
+    letter-spacing: 0.05em;
+  }
+
+  .routes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 28px;
+  }
+
+  .route-card {
+    background: #fff;
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    padding: 26px 22px;
+    text-decoration: none;
+    color: var(--ink);
+    display: block;
+    transition: border-color 0.15s ease;
+  }
+
+  .route-card:hover { border-color: var(--brass); }
+
+  .route-card .role {
+    font-size: 11px;
+    color: var(--brass);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .route-card h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .route-card p {
+    font-size: 13px;
+    color: var(--slate);
+    line-height: 1.5;
+  }
+
+  footer {
+    text-align: center;
+    padding: 30px 20px 40px;
+    font-size: 11.5px;
+    color: var(--slate);
+    border-top: 1px solid var(--hairline);
+  }
+
+  @media (max-width: 760px) {
+    nav { display: none; }
+    .board-header, .board-row { grid-template-columns: 56px 1fr 44px 76px; font-size: 11px; }
+    .routes-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="index.html">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+      <circle cx="13" cy="13" r="12" stroke="#0E2238" stroke-width="1"/>
+      <path d="M13 1 V25 M1 13 H25" stroke="#0E2238" stroke-width="0.6" opacity="0.4"/>
+      <path d="M13 4 C 18 8, 18 18, 13 22 C 8 18, 8 8, 13 4 Z" stroke="#B8924A" stroke-width="1.1" fill="none"/>
+    </svg>
+    <span class="logo-text">
+      <span class="name">Meridian Air</span>
+      <span class="tag">Est. 1962 · Every Longitude</span>
+    </span>
+  </a>
+  <nav>
+    <a href="fleet.html">Our Fleet</a>
+    <a href="international.html">International</a>
+    <a href="ultra-long-range.html">Ultra-Long-Range</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">Meridian Air</div>
+  <h1>Every longitude has a gate, a crew, and a way home.</h1>
+  <p class="sub">Twenty-five aircraft, six continents, one departure board that never stops turning.</p>
+
+  <div class="board-wrap">
+    <div class="board">
+      <div class="board-header">
+        <span>Flight</span>
+        <span>Destination</span>
+        <span>Gate</span>
+        <span>Status</span>
+      </div>
+
+      <div class="board-row">
+        <span class="flap">MA 104</span>
+        <span class="flap">LONDON HEATHROW</span>
+        <span class="flap">A12</span>
+        <span class="flap status on-time">ON TIME</span>
+      </div>
+      <div class="board-row">
+        <span class="flap">MA 208</span>
+        <span class="flap">SINGAPORE CHANGI</span>
+        <span class="flap">B4</span>
+        <span class="flap status boarding">BOARDING</span>
+      </div>
+      <div class="board-row">
+        <span class="flap">MA 356</span>
+        <span class="flap">SÃO PAULO GRU</span>
+        <span class="flap">C7</span>
+        <span class="flap status on-time">ON TIME</span>
+      </div>
+      <div class="board-row">
+        <span class="flap">MA 512</span>
+        <span class="flap">TOKYO HANEDA</span>
+        <span class="flap">A3</span>
+        <span class="flap status departed">DEPARTED</span>
+      </div>
+      <div class="board-row">
+        <span class="flap">MA 019</span>
+        <span class="flap">DUBAI INTL</span>
+        <span class="flap">B9</span>
+        <span class="flap status on-time">ON TIME</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ticket-wrap">
+  <div class="ticket">
+    <div class="ticket-label">Search flights</div>
+    <form class="search-form" id="search-form">
+      <div class="field">
+        <label for="from">From</label>
+        <input type="text" id="from" name="from" placeholder="City or airport" required />
+      </div>
+      <div class="field">
+        <label for="to">To</label>
+        <input type="text" id="to" name="to" placeholder="City or airport" required />
+      </div>
+      <div class="field">
+        <label for="depart">Depart</label>
+        <input type="date" id="depart" name="depart" required />
+      </div>
+      <div class="field">
+        <label for="passengers">Passengers</label>
+        <select id="passengers" name="passengers">
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5+</option>
+        </select>
+      </div>
+      <button type="submit" class="search-btn">Search Flights</button>
+    </form>
+    <p class="search-note" id="search-note">This is a demo site — flight search isn't connected to live inventory yet.</p>
+  </div>
+</div>
+
+<section class="routes">
+  <div class="routes-header">
+    <h2>Where to next</h2>
+    <span class="count">3 WAYS TO EXPLORE</span>
+  </div>
+
+  <div class="routes-grid">
+    <a class="route-card" href="fleet.html">
+      <div class="role">Aircraft &amp; equipment</div>
+      <h3>Our Fleet</h3>
+      <p>Nine Airbus and sixteen Boeing types, from the short-haul 737 to the double-deck A380.</p>
+    </a>
+    <a class="route-card" href="international.html">
+      <div class="role">Route network</div>
+      <h3>International</h3>
+      <p>Scheduled service linking six continents through our hub-and-spoke network.</p>
+    </a>
+    <a class="route-card" href="ultra-long-range.html">
+      <div class="role">Route network</div>
+      <h3>Ultra-Long-Range</h3>
+      <p>Nonstop service on our longest routes, flown by the ULR-equipped fleet.</p>
+    </a>
+  </div>
+</section>
+
+<footer>
+  Meridian Air — demo site for illustration only · Not a real airline
+</footer>
+
+<script>
+  document.getElementById('search-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    document.getElementById('search-note').classList.add('show');
+  });
+</script>
+
+</body>
+</html>
