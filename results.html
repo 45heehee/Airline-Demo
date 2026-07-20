@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flight Results — Meridian Air</title>
+<style>
+  :root {
+    --ink: #0E2238; --ink-soft: #1B3654; --paper: #F7F5F0; --paper-dim: #EFEBE2;
+    --brass: #B8924A; --brass-dim: #D9C291; --slate: #5C6B7A; --hairline: #D8D4CB;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--paper); font-family: 'Helvetica Neue', Arial, sans-serif; color: var(--ink); }
+  h1, h2, h3 { font-family: Georgia, 'Times New Roman', serif; font-weight: 400; }
+
+  header { display:flex; align-items:center; justify-content:space-between; padding:20px 28px; border-bottom:1px solid var(--hairline); background:var(--paper); }
+  .logo { display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink); }
+  .logo-text { display:flex; flex-direction:column; line-height:1; }
+  .logo-text .name { font-family:Georgia,serif; font-size:19px; }
+  .logo-text .tag { font-size:9.5px; letter-spacing:0.18em; color:var(--brass); text-transform:uppercase; margin-top:2px; }
+  nav { display:flex; gap:26px; font-size:13px; color:var(--slate); }
+  nav a { color:var(--slate); text-decoration:none; }
+  nav a:hover { color:var(--ink); }
+
+  .results-hero { background:var(--ink); padding:30px 28px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+  .route-summary { color:var(--paper); font-family:Georgia,serif; font-size:22px; }
+  .search-meta { color:var(--paper-dim); font-size:12.5px; margin-top:4px; }
+  .modify-link { color:var(--brass); font-size:12.5px; text-decoration:none; border:1px solid var(--brass-dim); padding:8px 16px; border-radius:3px; white-space:nowrap; }
+  .modify-link:hover { background: rgba(184,146,74,0.12); }
+
+  .content { max-width:980px; margin:0 auto; padding:28px 24px 70px; }
+
+  .sort-bar { display:flex; align-items:center; gap:10px; margin-bottom:22px; }
+  .sort-bar .label { font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--slate); margin-right:4px; }
+  .sort-btn { background:#fff; border:1px solid var(--hairline); border-radius:20px; padding:7px 15px; font-size:12.5px; color:var(--slate); cursor:pointer; }
+  .sort-btn.active { background:var(--ink); color:var(--paper); border-color:var(--ink); }
+
+  .flight-list { display:flex; flex-direction:column; gap:16px; }
+  .flight-card { background:#fff; border:1px solid var(--hairline); border-radius:5px; padding:20px 22px; }
+
+  .flight-main { display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; padding-bottom:16px; border-bottom:1px solid var(--hairline); margin-bottom:16px; }
+  .flight-times { display:flex; align-items:center; gap:14px; }
+  .flight-times .time { font-family:'Courier New',monospace; font-size:20px; color:var(--ink); }
+  .route-line { display:flex; align-items:center; gap:8px; color:var(--slate); }
+  .route-line .dot { width:5px; height:5px; border-radius:50%; background:var(--brass); }
+  .route-line .duration { font-size:11.5px; white-space:nowrap; }
+  .flight-meta { text-align:right; }
+  .flight-number { font-family:'Courier New',monospace; font-size:12.5px; color:var(--slate); }
+  .flight-aircraft { font-size:13.5px; color:var(--ink); margin-top:2px; }
+
+  .fare-ladder { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .fare-pill { display:flex; flex-direction:column; align-items:center; gap:4px; padding:12px 8px; border-radius:4px; border:1px solid var(--hairline); background:var(--paper); cursor:pointer; font-family:inherit; }
+  .fare-pill:hover:not(.unavailable) { border-color:var(--brass); background:#fff; }
+  .fare-pill:first-child:not(.unavailable) { border-color:var(--brass-dim); background:#FBF6EC; }
+  .fare-label { font-size:11px; letter-spacing:0.03em; color:var(--slate); }
+  .fare-price { font-family:'Courier New',monospace; font-size:15px; color:var(--ink); }
+  .fare-pill.unavailable { opacity:0.4; cursor:default; }
+  .fare-pill.unavailable .fare-price { color:var(--slate); }
+
+  footer { text-align:center; padding:30px 20px 40px; font-size:11.5px; color:var(--slate); border-top:1px solid var(--hairline); }
+
+  @media (max-width:760px) {
+    nav { display:none; }
+    .fare-ladder { grid-template-columns:repeat(2,1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="index.html">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+      <circle cx="13" cy="13" r="12" stroke="#0E2238" stroke-width="1"/>
+      <path d="M13 1 V25 M1 13 H25" stroke="#0E2238" stroke-width="0.6" opacity="0.4"/>
+      <path d="M13 4 C 18 8, 18 18, 13 22 C 8 18, 8 8, 13 4 Z" stroke="#B8924A" stroke-width="1.1" fill="none"/>
+    </svg>
+    <span class="logo-text">
+      <span class="name">Meridian Air</span>
+      <span class="tag">Est. 1962 · Every Longitude</span>
+    </span>
+  </a>
+  <nav>
+    <a href="fleet.html">Our Fleet</a>
+    <a href="international.html">International</a>
+    <a href="ultra-long-range.html">Ultra-Long-Range</a>
+  </nav>
+</header>
+
+<section class="results-hero">
+  <div>
+    <div class="route-summary" id="route-summary">—</div>
+    <div class="search-meta" id="search-meta">—</div>
+  </div>
+  <a class="modify-link" href="index.html">Modify search</a>
+</section>
+
+<div class="content">
+  <div class="sort-bar">
+    <span class="label">Sort</span>
+    <button class="sort-btn active" data-sort="price-asc">Price: Low to High</button>
+    <button class="sort-btn" data-sort="price-desc">Price: High to Low</button>
+    <button class="sort-btn" data-sort="duration">Duration</button>
+  </div>
+
+  <div class="flight-list" id="flight-list"></div>
+</div>
+
+<footer>Meridian Air — demo site for illustration only · Not a real airline · Prices shown are not real</footer>
+
+<script src="booking.js"></script>
+<script>
+  const params = new URLSearchParams(location.search);
+  const from = params.get('from') || 'New York';
+  const to = params.get('to') || 'London';
+  const depart = params.get('depart') || '';
+  const passengers = params.get('passengers') || '1';
+
+  document.getElementById('route-summary').textContent = from + ' → ' + to;
+  document.getElementById('search-meta').textContent =
+    maFormatDate(depart) + ' · ' + maPassengerCount(passengers) + ' passenger' + (maPassengerCount(passengers) === 1 ? '' : 's');
+
+  const results = maGenerateFlights(from, to, depart, passengers);
+  let sortMode = 'price-asc';
+  const CLASS_ORDER = ['economy', 'premium', 'business', 'first'];
+
+  function renderCard(f) {
+    const pills = CLASS_ORDER.map(c => {
+      const meta = MA_CLASS_META[c];
+      if (!f.classes.includes(c)) {
+        return `<div class="fare-pill unavailable"><span class="fare-label">${meta.label}</span><span class="fare-price">—</span></div>`;
+      }
+      return `<button class="fare-pill" onclick="selectFlight('${f.id}','${c}')">
+                <span class="fare-label">${meta.label}</span>
+                <span class="fare-price">$${f.prices[c].toLocaleString()}</span>
+              </button>`;
+    }).join('');
+
+    return `
+    <div class="flight-card">
+      <div class="flight-main">
+        <div class="flight-times">
+          <div class="time">${maFormatTime(f.depMinutes)}</div>
+          <div class="route-line">
+            <span class="dot"></span>
+            <span class="duration">${maFormatDuration(f.durMinutes)} · ${f.stops ? f.stops + ' stop' : 'Nonstop'}</span>
+            <span class="dot"></span>
+          </div>
+          <div class="time">${maFormatTime(f.arrMinutes)}${f.arrDayOffset ? ' +' + f.arrDayOffset : ''}</div>
+        </div>
+        <div class="flight-meta">
+          <div class="flight-number">${f.flightNumber}</div>
+          <div class="flight-aircraft">${f.aircraft}</div>
+        </div>
+      </div>
+      <div class="fare-ladder">${pills}</div>
+    </div>`;
+  }
+
+  function render() {
+    let flights = [...results.flights];
+    if (sortMode === 'price-asc') flights.sort((a, b) => a.prices.economy - b.prices.economy);
+    if (sortMode === 'price-desc') flights.sort((a, b) => b.prices.economy - a.prices.economy);
+    if (sortMode === 'duration') flights.sort((a, b) => a.durMinutes - b.durMinutes);
+    document.getElementById('flight-list').innerHTML = flights.map(renderCard).join('');
+  }
+
+  function selectFlight(id, cabin) {
+    const flight = results.flights.find(f => f.id === id);
+    maSaveSelection({ from, to, depart, passengers, flight, cabin, price: flight.prices[cabin] });
+    location.href = 'seats.html';
+  }
+
+  document.querySelectorAll('.sort-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      sortMode = btn.dataset.sort;
+      render();
+    });
+  });
+
+  render();
+</script>
+
+</body>
+</html>
