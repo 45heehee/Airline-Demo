@@ -454,7 +454,6 @@
       </div>
       <button type="submit" class="search-btn">Search Flights</button>
     </form>
-    <p class="search-note" id="search-note">This is a demo site — flight search isn't connected to live inventory yet.</p>
   </div>
 </div>
 
@@ -490,7 +489,14 @@
 <script>
   document.getElementById('search-form').addEventListener('submit', function (e) {
     e.preventDefault();
-    document.getElementById('search-note').classList.add('show');
+    const from = document.getElementById('from').value.trim();
+    const to = document.getElementById('to').value.trim();
+    const depart = document.getElementById('depart').value;
+    let passengers = document.getElementById('passengers').value;
+    passengers = passengers === '5+' ? '5' : passengers;
+
+    const params = new URLSearchParams({ from, to, depart, passengers });
+    window.location.href = 'results.html?' + params.toString();
   });
 </script>
 
