@@ -1,55 +1,209 @@
-/* Meridian Air — shared booking logic used by results.html, seats.html, checkout.html */
+/* Meridian Air — shared booking logic */
 
-const MA_CITY_DB = {
-  // narrow-body / short-haul network
-  'new york': {code:'JFK', tier:'narrow'}, 'jfk': {code:'JFK', tier:'narrow'},
-  'toronto': {code:'YYZ', tier:'narrow'}, 'yyz': {code:'YYZ', tier:'narrow'},
-  'chicago': {code:'ORD', tier:'narrow'}, 'ord': {code:'ORD', tier:'narrow'},
-  // wide-body / medium-haul network
-  'london': {code:'LHR', tier:'wide'}, 'lhr': {code:'LHR', tier:'wide'},
-  'paris': {code:'CDG', tier:'wide'}, 'cdg': {code:'CDG', tier:'wide'},
-  'frankfurt': {code:'FRA', tier:'wide'}, 'fra': {code:'FRA', tier:'wide'},
-  'rome': {code:'FCO', tier:'wide'}, 'fco': {code:'FCO', tier:'wide'},
-  'amsterdam': {code:'AMS', tier:'wide'}, 'ams': {code:'AMS', tier:'wide'},
-  'seoul': {code:'ICN', tier:'wide'}, 'icn': {code:'ICN', tier:'wide'},
-  'sao paulo': {code:'GRU', tier:'wide'}, 'são paulo': {code:'GRU', tier:'wide'}, 'gru': {code:'GRU', tier:'wide'},
-  'mexico city': {code:'MEX', tier:'wide'}, 'mex': {code:'MEX', tier:'wide'},
-  'bogota': {code:'BOG', tier:'wide'}, 'bogotá': {code:'BOG', tier:'wide'}, 'bog': {code:'BOG', tier:'wide'},
-  'cairo': {code:'CAI', tier:'wide'}, 'cai': {code:'CAI', tier:'wide'},
-  'johannesburg': {code:'JNB', tier:'wide'}, 'jnb': {code:'JNB', tier:'wide'},
-  // flagship / long & ultra-long-haul network
-  'tokyo': {code:'HND', tier:'flagship'}, 'hnd': {code:'HND', tier:'flagship'},
-  'singapore': {code:'SIN', tier:'flagship'}, 'sin': {code:'SIN', tier:'flagship'},
-  'hong kong': {code:'HKG', tier:'flagship'}, 'hkg': {code:'HKG', tier:'flagship'},
-  'sydney': {code:'SYD', tier:'flagship'}, 'syd': {code:'SYD', tier:'flagship'},
-  'dubai': {code:'DXB', tier:'flagship'}, 'dxb': {code:'DXB', tier:'flagship'},
-  'doha': {code:'DOH', tier:'flagship'}, 'doh': {code:'DOH', tier:'flagship'},
-  'auckland': {code:'AKL', tier:'flagship'}, 'akl': {code:'AKL', tier:'flagship'},
-  'perth': {code:'PER', tier:'flagship'}, 'per': {code:'PER', tier:'flagship'},
-  'houston': {code:'IAH', tier:'flagship'}, 'iah': {code:'IAH', tier:'flagship'}
+/* ── 1. AIRPORTS ─────────────────────────────────────────────────────── */
+const MA_AIRPORTS = [
+  {city:"New York",       code:"JFK", country:"United States",  region:"North America"},
+  {city:"Toronto",        code:"YYZ", country:"Canada",          region:"North America"},
+  {city:"Los Angeles",    code:"LAX", country:"United States",  region:"North America"},
+  {city:"Chicago",        code:"ORD", country:"United States",  region:"North America"},
+  {city:"Mexico City",    code:"MEX", country:"Mexico",          region:"North America"},
+  {city:"Vancouver",      code:"YVR", country:"Canada",          region:"North America"},
+  {city:"Houston",        code:"IAH", country:"United States",  region:"North America"},
+  {city:"Miami",          code:"MIA", country:"United States",  region:"North America"},
+  {city:"Atlanta",        code:"ATL", country:"United States",  region:"North America"},
+  {city:"Dallas",         code:"DFW", country:"United States",  region:"North America"},
+  {city:"Denver",         code:"DEN", country:"United States",  region:"North America"},
+  {city:"San Francisco",  code:"SFO", country:"United States",  region:"North America"},
+  {city:"São Paulo",      code:"GRU", country:"Brazil",          region:"South America"},
+  {city:"Bogotá",         code:"BOG", country:"Colombia",        region:"South America"},
+  {city:"Buenos Aires",   code:"EZE", country:"Argentina",       region:"South America"},
+  {city:"Lima",           code:"LIM", country:"Peru",            region:"South America"},
+  {city:"Santiago",       code:"SCL", country:"Chile",           region:"South America"},
+  {city:"Rio de Janeiro", code:"GIG", country:"Brazil",          region:"South America"},
+  {city:"London",         code:"LHR", country:"United Kingdom",  region:"Europe"},
+  {city:"Paris",          code:"CDG", country:"France",          region:"Europe"},
+  {city:"Frankfurt",      code:"FRA", country:"Germany",         region:"Europe"},
+  {city:"Amsterdam",      code:"AMS", country:"Netherlands",     region:"Europe"},
+  {city:"Rome",           code:"FCO", country:"Italy",           region:"Europe"},
+  {city:"Madrid",         code:"MAD", country:"Spain",           region:"Europe"},
+  {city:"Istanbul",       code:"IST", country:"Turkey",          region:"Europe"},
+  {city:"Munich",         code:"MUC", country:"Germany",         region:"Europe"},
+  {city:"Zurich",         code:"ZRH", country:"Switzerland",     region:"Europe"},
+  {city:"Barcelona",      code:"BCN", country:"Spain",           region:"Europe"},
+  {city:"Dubai",          code:"DXB", country:"UAE",             region:"Middle East"},
+  {city:"Doha",           code:"DOH", country:"Qatar",           region:"Middle East"},
+  {city:"Abu Dhabi",      code:"AUH", country:"UAE",             region:"Middle East"},
+  {city:"Riyadh",         code:"RUH", country:"Saudi Arabia",    region:"Middle East"},
+  {city:"Jeddah",         code:"JED", country:"Saudi Arabia",    region:"Middle East"},
+  {city:"Cairo",          code:"CAI", country:"Egypt",           region:"Africa"},
+  {city:"Johannesburg",   code:"JNB", country:"South Africa",    region:"Africa"},
+  {city:"Lagos",          code:"LOS", country:"Nigeria",         region:"Africa"},
+  {city:"Nairobi",        code:"NBO", country:"Kenya",           region:"Africa"},
+  {city:"Addis Ababa",    code:"ADD", country:"Ethiopia",        region:"Africa"},
+  {city:"New Delhi",      code:"DEL", country:"India",           region:"South Asia"},
+  {city:"Mumbai",         code:"BOM", country:"India",           region:"South Asia"},
+  {city:"Bangalore",      code:"BLR", country:"India",           region:"South Asia"},
+  {city:"Hyderabad",      code:"HYD", country:"India",           region:"South Asia"},
+  {city:"Chennai",        code:"MAA", country:"India",           region:"South Asia"},
+  {city:"Colombo",        code:"CMB", country:"Sri Lanka",       region:"South Asia"},
+  {city:"Dhaka",          code:"DAC", country:"Bangladesh",      region:"South Asia"},
+  {city:"Tokyo",          code:"HND", country:"Japan",           region:"East Asia"},
+  {city:"Beijing",        code:"PEK", country:"China",           region:"East Asia"},
+  {city:"Shanghai",       code:"PVG", country:"China",           region:"East Asia"},
+  {city:"Seoul",          code:"ICN", country:"South Korea",     region:"East Asia"},
+  {city:"Hong Kong",      code:"HKG", country:"Hong Kong",       region:"East Asia"},
+  {city:"Guangzhou",      code:"CAN", country:"China",           region:"East Asia"},
+  {city:"Shenzhen",       code:"SZX", country:"China",           region:"East Asia"},
+  {city:"Singapore",      code:"SIN", country:"Singapore",       region:"Southeast Asia"},
+  {city:"Bangkok",        code:"BKK", country:"Thailand",        region:"Southeast Asia"},
+  {city:"Kuala Lumpur",   code:"KUL", country:"Malaysia",        region:"Southeast Asia"},
+  {city:"Jakarta",        code:"CGK", country:"Indonesia",       region:"Southeast Asia"},
+  {city:"Manila",         code:"MNL", country:"Philippines",     region:"Southeast Asia"},
+  {city:"Ho Chi Minh City",code:"SGN",country:"Vietnam",         region:"Southeast Asia"},
+  {city:"Sydney",         code:"SYD", country:"Australia",       region:"Oceania"},
+  {city:"Auckland",       code:"AKL", country:"New Zealand",     region:"Oceania"},
+  {city:"Perth",          code:"PER", country:"Australia",       region:"Oceania"},
+  {city:"Melbourne",      code:"MEL", country:"Australia",       region:"Oceania"},
+  {city:"Brisbane",       code:"BNE", country:"Australia",       region:"Oceania"}
+];
+
+/* Build fast lookup maps */
+const MA_BY_CODE = {};
+const MA_BY_NAME = {};
+MA_AIRPORTS.forEach(a => {
+  MA_BY_CODE[a.code.toUpperCase()] = a;
+  MA_BY_NAME[a.city.toLowerCase()] = a;
+  /* common aliases */
+  if (a.city === "São Paulo")      MA_BY_NAME["sao paulo"]     = a;
+  if (a.city === "Bogotá")         MA_BY_NAME["bogota"]         = a;
+  if (a.city === "New Delhi")      MA_BY_NAME["delhi"]          = a;
+  if (a.city === "Dallas")         MA_BY_NAME["dallas fort worth"] = a;
+  if (a.city === "Ho Chi Minh City") MA_BY_NAME["ho chi minh"] = a;
+});
+
+/* ── 2. REGION-PAIR TABLE ────────────────────────────────────────────── */
+/*  Keys are sorted alphabetically so lookup is order-independent.
+    tier: 1 = narrow/short-haul (<3.5h), 2 = wide/medium (3.5–8h), 3 = flagship (>8h) */
+const MA_REGION_PAIRS = {
+  "Africa|Africa":               {minKm:500,  maxKm:4500,  minH:1,   maxH:6,   tier:2},
+  "Africa|East Asia":            {minKm:8500, maxKm:11500, minH:10,  maxH:13.5,tier:3},
+  "Africa|Europe":               {minKm:1500, maxKm:6500,  minH:3,   maxH:8,   tier:2},
+  "Africa|Middle East":          {minKm:1500, maxKm:5500,  minH:3,   maxH:7,   tier:2},
+  "Africa|North America":        {minKm:9500, maxKm:12500, minH:12,  maxH:15,  tier:3},
+  "Africa|Oceania":              {minKm:9000, maxKm:12500, minH:11,  maxH:15,  tier:3},
+  "Africa|South America":        {minKm:3000, maxKm:8500,  minH:4,   maxH:10,  tier:2},
+  "Africa|South Asia":           {minKm:3500, maxKm:6500,  minH:5,   maxH:8,   tier:2},
+  "Africa|Southeast Asia":       {minKm:7000, maxKm:9500,  minH:8.5, maxH:11.5,tier:3},
+  "East Asia|East Asia":         {minKm:800,  maxKm:3500,  minH:1.5, maxH:5,   tier:1},
+  "East Asia|Europe":            {minKm:8500, maxKm:10500, minH:10,  maxH:13,  tier:3},
+  "East Asia|Middle East":       {minKm:6500, maxKm:9000,  minH:8,   maxH:11,  tier:3},
+  "East Asia|North America":     {minKm:9000, maxKm:12000, minH:11,  maxH:14,  tier:3},
+  "East Asia|Oceania":           {minKm:6000, maxKm:9500,  minH:8,   maxH:11.5,tier:3},
+  "East Asia|South America":     {minKm:16000,maxKm:19000, minH:19,  maxH:22,  tier:3},
+  "East Asia|South Asia":        {minKm:3500, maxKm:6500,  minH:5,   maxH:8,   tier:2},
+  "East Asia|Southeast Asia":    {minKm:2000, maxKm:5000,  minH:3,   maxH:6.5, tier:2},
+  "Europe|Europe":               {minKm:500,  maxKm:3500,  minH:1,   maxH:4.5, tier:1},
+  "Europe|Middle East":          {minKm:2500, maxKm:5500,  minH:4,   maxH:7,   tier:2},
+  "Europe|North America":        {minKm:5500, maxKm:7500,  minH:7,   maxH:9,   tier:2},
+  "Europe|Oceania":              {minKm:14000,maxKm:17500, minH:17,  maxH:21,  tier:3},
+  "Europe|South America":        {minKm:8000, maxKm:11000, minH:10,  maxH:13,  tier:3},
+  "Europe|South Asia":           {minKm:5500, maxKm:8000,  minH:7,   maxH:10,  tier:2},
+  "Europe|Southeast Asia":       {minKm:9000, maxKm:12000, minH:11,  maxH:14,  tier:3},
+  "Middle East|Middle East":     {minKm:300,  maxKm:3000,  minH:1,   maxH:4,   tier:1},
+  "Middle East|North America":   {minKm:9500, maxKm:11500, minH:12,  maxH:14,  tier:3},
+  "Middle East|Oceania":         {minKm:9000, maxKm:12500, minH:11,  maxH:15,  tier:3},
+  "Middle East|South America":   {minKm:11000,maxKm:13000, minH:13,  maxH:16,  tier:3},
+  "Middle East|South Asia":      {minKm:1500, maxKm:4000,  minH:3,   maxH:5.5, tier:1},
+  "Middle East|Southeast Asia":  {minKm:5000, maxKm:7500,  minH:6.5, maxH:9.5, tier:2},
+  "North America|North America": {minKm:500,  maxKm:4500,  minH:1,   maxH:6,   tier:1},
+  "North America|Oceania":       {minKm:10500,maxKm:14000, minH:13,  maxH:17,  tier:3},
+  "North America|South America": {minKm:3500, maxKm:9000,  minH:5,   maxH:11,  tier:2},
+  "North America|South Asia":    {minKm:11000,maxKm:13000, minH:14,  maxH:16,  tier:3},
+  "North America|Southeast Asia":{minKm:12000,maxKm:14500, minH:15,  maxH:18,  tier:3},
+  "Oceania|Oceania":             {minKm:500,  maxKm:5500,  minH:1,   maxH:7,   tier:2},
+  "South America|South America": {minKm:1000, maxKm:5000,  minH:1.5, maxH:7,   tier:2},
+  "South America|South Asia":    {minKm:14000,maxKm:16000, minH:17,  maxH:19,  tier:3},
+  "South America|Southeast Asia":{minKm:15500,maxKm:18500, minH:18,  maxH:21,  tier:3},
+  "South America|Oceania":       {minKm:11000,maxKm:14000, minH:13,  maxH:16,  tier:3},
+  "South Asia|South Asia":       {minKm:500,  maxKm:3000,  minH:1,   maxH:4.5, tier:1},
+  "South Asia|Southeast Asia":   {minKm:2000, maxKm:4500,  minH:3,   maxH:6,   tier:2},
+  "South Asia|Oceania":          {minKm:6000, maxKm:11000, minH:8,   maxH:13,  tier:3},
+  "Southeast Asia|Southeast Asia":{minKm:300, maxKm:3500,  minH:1,   maxH:4.5, tier:1},
+  "Southeast Asia|Oceania":      {minKm:3500, maxKm:8000,  minH:5,   maxH:10,  tier:2}
 };
 
+function maRegionPairKey(r1, r2) {
+  return [r1, r2].sort().join('|');
+}
+
+function maLookupRegionPair(r1, r2) {
+  return MA_REGION_PAIRS[maRegionPairKey(r1, r2)] || null;
+}
+
+/* ── 3. AIRCRAFT BY TIER ─────────────────────────────────────────────── */
 const MA_AIRCRAFT = {
-  narrow:   ['Airbus A320', 'Boeing 737-800', 'Boeing 737-900ER'],
-  wide:     ['Airbus A330-900neo', 'Boeing 787-9', 'Boeing 777-200ER'],
-  flagship: ['Airbus A350-900', 'Boeing 777-300ER', 'Boeing 787-10', 'Airbus A350-1000']
+  1: ['Airbus A320', 'Boeing 737-800', 'Boeing 737-900ER', 'Boeing 737 MAX 8', 'Boeing 737 MAX 9'],
+  2: ['Airbus A330-900neo', 'Boeing 787-8', 'Boeing 787-9', 'Airbus A321neo'],
+  3: ['Airbus A350-900', 'Airbus A350-1000', 'Boeing 777-300ER', 'Boeing 787-10', 'Boeing 777-9', 'Airbus A380']
 };
 
 const MA_CLASSES = {
-  narrow:   ['economy', 'business'],
-  wide:     ['economy', 'premium', 'business'],
-  flagship: ['economy', 'premium', 'business', 'first']
+  1: ['economy', 'business'],
+  2: ['economy', 'premium', 'business'],
+  3: ['economy', 'premium', 'business', 'first']
 };
 
 const MA_CLASS_META = {
-  economy:  { label: 'Economy',          mult: 1 },
-  premium:  { label: 'Premium Economy',  mult: 1.55 },
-  business: { label: 'Business',         mult: 2.6 },
-  first:    { label: 'First',            mult: 4.3 }
+  economy:  { label: 'Economy',         mult: 1 },
+  premium:  { label: 'Premium Economy', mult: 1.55 },
+  business: { label: 'Business',        mult: 2.6 },
+  first:    { label: 'First',           mult: 4.3 }
 };
 
+/* Tier label strings for display */
+const MA_TIER_LABEL = {
+  1: 'Short-haul',
+  2: 'Medium-haul',
+  3: 'Long-haul'
+};
+
+/* ── 4. LOOKUP HELPERS ───────────────────────────────────────────────── */
 function maNormalize(str) { return (str || '').trim().toLowerCase(); }
 
+function maFindAirport(input) {
+  const s = maNormalize(input);
+  /* try IATA code first */
+  if (MA_BY_CODE[s.toUpperCase()]) return MA_BY_CODE[s.toUpperCase()];
+  /* try city name */
+  if (MA_BY_NAME[s]) return MA_BY_NAME[s];
+  /* partial match */
+  return MA_AIRPORTS.find(a => a.city.toLowerCase().includes(s) || s.includes(a.city.toLowerCase())) || null;
+}
+
+function maResolveTier(from, to) {
+  const f = maFindAirport(from);
+  const t = maFindAirport(to);
+  if (f && t) {
+    const pair = maLookupRegionPair(f.region, t.region);
+    if (pair) return pair.tier;
+  }
+  /* fallback: hash-based */
+  const roll = maHash(maNormalize(from) + '|' + maNormalize(to)) % 10;
+  if (roll < 3) return 1;
+  if (roll < 8) return 2;
+  return 3;
+}
+
+function maRouteInfo(from, to) {
+  const f = maFindAirport(from);
+  const t = maFindAirport(to);
+  if (!f || !t) return null;
+  const pair = maLookupRegionPair(f.region, t.region);
+  if (!pair) return null;
+  return { fromAirport: f, toAirport: t, pair };
+}
+
+/* ── 5. HASH / RNG ───────────────────────────────────────────────────── */
 function maHash(str) {
   let h = 0;
   for (let i = 0; i < str.length; i++) { h = (h << 5) - h + str.charCodeAt(i); h |= 0; }
@@ -58,7 +212,7 @@ function maHash(str) {
 
 function maSeededRandom(seed) {
   let t = seed >>> 0;
-  return function () {
+  return function() {
     t = (t + 0x6D2B79F5) | 0;
     let r = Math.imul(t ^ (t >>> 15), 1 | t);
     r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
@@ -66,19 +220,7 @@ function maSeededRandom(seed) {
   };
 }
 
-function maResolveTier(from, to) {
-  const tiers = ['narrow', 'wide', 'flagship'];
-  const f = MA_CITY_DB[maNormalize(from)];
-  const t = MA_CITY_DB[maNormalize(to)];
-  if (f && t) return tiers[Math.max(tiers.indexOf(f.tier), tiers.indexOf(t.tier))];
-  if (f) return f.tier;
-  if (t) return t.tier;
-  const roll = maHash(maNormalize(from) + '|' + maNormalize(to)) % 10;
-  if (roll < 3) return 'narrow';
-  if (roll < 8) return 'wide';
-  return 'flagship';
-}
-
+/* ── 6. FLIGHT GENERATION ───────────────────────────────────────────── */
 function maGenerateFlights(from, to, depart, passengers) {
   const tier = maResolveTier(from, to);
   const aircraftList = MA_AIRCRAFT[tier];
@@ -86,9 +228,24 @@ function maGenerateFlights(from, to, depart, passengers) {
   const seed = maHash(maNormalize(from) + '|' + maNormalize(to) + '|' + (depart || ''));
   const rand = maSeededRandom(seed);
 
-  const durMinBase = tier === 'narrow' ? (90 + rand() * 150)
-                    : tier === 'wide'   ? (300 + rand() * 240)
-                    : (600 + rand() * 480);
+  /* Derive realistic duration from region-pair table */
+  const info = maRouteInfo(from, to);
+  let durMinBase;
+  if (info) {
+    const minM = info.pair.minH * 60;
+    const maxM = info.pair.maxH * 60;
+    durMinBase = minM + rand() * (maxM - minM);
+  } else {
+    durMinBase = tier === 1 ? (90 + rand() * 120)
+               : tier === 2 ? (240 + rand() * 240)
+               : (480 + rand() * 480);
+  }
+
+  /* Derive realistic distance */
+  let distKm = null;
+  if (info) {
+    distKm = Math.round(info.pair.minKm + rand() * (info.pair.maxKm - info.pair.minKm));
+  }
 
   const flightCount = 3 + Math.floor(rand() * 2);
   const flights = [];
@@ -96,22 +253,21 @@ function maGenerateFlights(from, to, depart, passengers) {
   for (let i = 0; i < flightCount; i++) {
     const aircraft = aircraftList[Math.floor(rand() * aircraftList.length)];
     const durMinutes = Math.round(durMinBase + (rand() * 40 - 20));
-    const stops = (tier === 'narrow' && rand() < 0.35) ? 1 : 0;
+    const stops = (tier === 1 && rand() < 0.35) ? 1 : 0;
     const depMinutes = Math.round((5 + rand() * 17) * 60 / 5) * 5;
     const arrMinutes = (depMinutes + durMinutes) % (24 * 60);
     const arrDayOffset = Math.floor((depMinutes + durMinutes) / (24 * 60));
     const basePriceEconomy = Math.round(
-      (tier === 'narrow' ? 90 : tier === 'wide' ? 480 : 780) +
-      rand() * (tier === 'narrow' ? 160 : tier === 'wide' ? 420 : 900)
+      (tier === 1 ? 90 : tier === 2 ? 480 : 780) +
+      rand() * (tier === 1 ? 160 : tier === 2 ? 420 : 900)
     );
     const flightNumber = 'MA ' + (100 + Math.floor(rand() * 800));
-
     const prices = {};
     classes.forEach(c => { prices[c] = Math.round(basePriceEconomy * MA_CLASS_META[c].mult / 5) * 5; });
 
     flights.push({
       id: 'f' + i + '-' + seed,
-      flightNumber, aircraft, tier, stops, durMinutes,
+      flightNumber, aircraft, tier, stops, durMinutes, distKm,
       depMinutes, arrMinutes, arrDayOffset, classes, prices
     });
   }
@@ -120,6 +276,7 @@ function maGenerateFlights(from, to, depart, passengers) {
   return { tier, from, to, depart, passengers, flights };
 }
 
+/* ── 7. FORMATTING ───────────────────────────────────────────────────── */
 function maFormatTime(mins) {
   mins = ((mins % (24 * 60)) + 24 * 60) % (24 * 60);
   let h = Math.floor(mins / 60); const m = mins % 60;
@@ -147,37 +304,35 @@ function maPassengerCount(p) {
   return isNaN(n) ? 1 : n;
 }
 
-/* ---------- Seat maps ---------- */
+/* ── 8. SEAT MAPS ────────────────────────────────────────────────────── */
 function maSeatConfig(tier, cabin) {
   const layouts = {
     economy:  { cols: ['A','B','C','D','E','F','G','H'], aisleAfter: 2, aisleAfter2: 6 },
-    premium:  { cols: ['A','B','C','D','E','F','G'],       aisleAfter: 2, aisleAfter2: 5 },
-    business: { cols: ['A','C','D','F'],                    aisleAfter: 1, aisleAfter2: 3 },
-    first:    { cols: ['A','K'],                            aisleAfter: 1 }
+    premium:  { cols: ['A','B','C','D','E','F','G'],     aisleAfter: 2, aisleAfter2: 5 },
+    business: { cols: ['A','C','D','F'],                  aisleAfter: 1, aisleAfter2: 3 },
+    first:    { cols: ['A','K'],                          aisleAfter: 1 }
   };
   const narrowLayouts = {
     economy:  { cols: ['A','B','C','D','E','F'], aisleAfter: 3 },
     business: { cols: ['A','B','C','D','E','F'], aisleAfter: 3 }
   };
-  const base = tier === 'narrow' ? narrowLayouts[cabin] : layouts[cabin];
-
+  const base = tier === 1 ? (narrowLayouts[cabin] || narrowLayouts.economy) : (layouts[cabin] || layouts.economy);
   const rowCounts = {
-    narrow:   { economy: 24, business: 4 },
-    wide:     { economy: 26, premium: 5, business: 6 },
-    flagship: { economy: 30, premium: 6, business: 7, first: 4 }
+    1: { economy: 24, business: 4 },
+    2: { economy: 26, premium: 5,  business: 6 },
+    3: { economy: 30, premium: 6,  business: 7, first: 4 }
   };
   const startRows = {
-    narrow:   { economy: 7,  business: 1 },
-    wide:     { economy: 15, premium: 9,  business: 1 },
-    flagship: { economy: 18, premium: 11, business: 4, first: 1 }
+    1: { economy: 7,  business: 1 },
+    2: { economy: 15, premium: 9,  business: 1 },
+    3: { economy: 18, premium: 11, business: 4, first: 1 }
   };
-
   return {
     cols: base.cols,
     aisleAfter: base.aisleAfter,
     aisleAfter2: base.aisleAfter2 || null,
-    rows: rowCounts[tier][cabin],
-    startRow: startRows[tier][cabin]
+    rows: (rowCounts[tier] || rowCounts[2])[cabin] || 20,
+    startRow: (startRows[tier] || startRows[2])[cabin] || 1
   };
 }
 
@@ -195,9 +350,9 @@ function maGenerateSeats(seed, config) {
   return rows;
 }
 
-/* ---------- sessionStorage helpers ---------- */
-function maSaveSelection(obj) { sessionStorage.setItem('ma_selection', JSON.stringify(obj)); }
-function maLoadSelection() { try { return JSON.parse(sessionStorage.getItem('ma_selection')); } catch (e) { return null; } }
-function maSaveSeat(seat) { sessionStorage.setItem('ma_seat', JSON.stringify(seat)); }
-function maLoadSeat() { try { return JSON.parse(sessionStorage.getItem('ma_seat')); } catch (e) { return null; } }
-function maClearBooking() { sessionStorage.removeItem('ma_selection'); sessionStorage.removeItem('ma_seat'); }
+/* ── 9. SESSION STORAGE ──────────────────────────────────────────────── */
+function maSaveSelection(obj)  { try { sessionStorage.setItem('ma_selection', JSON.stringify(obj)); } catch(e){} }
+function maLoadSelection()     { try { return JSON.parse(sessionStorage.getItem('ma_selection')); } catch(e){ return null; } }
+function maSaveSeat(seat)      { try { sessionStorage.setItem('ma_seat', JSON.stringify(seat)); } catch(e){} }
+function maLoadSeat()          { try { return JSON.parse(sessionStorage.getItem('ma_seat')); } catch(e){ return null; } }
+function maClearBooking()      { try { sessionStorage.removeItem('ma_selection'); sessionStorage.removeItem('ma_seat'); } catch(e){} }
