@@ -101,15 +101,14 @@
   { city: "Barcelona", code: "BCN", country: "Spain", region: "Europe", airport: "Josep Tarradellas Barcelona-El Prat Airport" },
   { city: "Doha", code: "DOH", country: "Qatar", region: "Middle East", airport: "Hamad International Airport" },
   { city: "Riyadh", code: "RUH", country: "Saudi Arabia", region: "Middle East", airport: "King Khalid International Airport" },
-  { city: "Jeddah", code: "JED", country: "Saudi Arabia", region: "Middle East", airport: "King Abdulaziz International Airport" },
+    { city: "Jeddah", code: "JED", country: "Saudi Arabia", region: "Middle East", airport: "King Abdulaziz International Airport" },
   { city: "Muscat", code: "MCT", country: "Oman", region: "Middle East", airport: "Muscat International Airport" }
-];
-
 ];
 
 /* Build fast lookup maps */
 const MA_BY_CODE = {};
 const MA_BY_NAME = {};
+
 MA_AIRPORTS.forEach(a => {
   MA_BY_CODE[a.code.toUpperCase()] = a;
   MA_BY_NAME[a.city.toLowerCase()] = a;
