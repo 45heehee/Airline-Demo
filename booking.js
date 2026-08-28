@@ -109,7 +109,7 @@
 const MA_BY_CODE = {};
 const MA_BY_NAME = {};
 
-MA_AIRPORTS.forEach(a => {
+window.MA_AIRPORTS.forEach(a => {
   MA_BY_CODE[a.code.toUpperCase()] = a;
   MA_BY_NAME[a.city.toLowerCase()] = a;
   /* common aliases */
@@ -216,7 +216,7 @@ function maFindAirport(input) {
   /* try city name */
   if (MA_BY_NAME[s]) return MA_BY_NAME[s];
   /* partial match */
-  return MA_AIRPORTS.find(a => a.city.toLowerCase().includes(s) || s.includes(a.city.toLowerCase())) || null;
+  return window.MA_AIRPORTS.find(a => a.city.toLowerCase().includes(s) || s.includes(a.city.toLowerCase())) || null;
 }
 
 function maResolveTier(from, to) {
