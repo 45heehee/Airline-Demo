@@ -1,7 +1,7 @@
 /* Meridian Air — shared booking logic */
 
 /* ── 1. AIRPORTS ─────────────────────────────────────────────────────── */
- const MA_AIRPORTS = [
+ window.MA_AIRPORTS = [
   { city: "Atlanta", code: "ATL", country: "United States", region: "North America", airport: "Hartsfield-Jackson Atlanta International Airport" },
   { city: "Beijing", code: "PEK", country: "China", region: "East Asia", airport: "Beijing Capital International Airport" },
   { city: "Los Angeles", code: "LAX", country: "United States", region: "North America", airport: "Los Angeles International Airport" },
