@@ -582,9 +582,51 @@
     return acc;
   }, {});
 
-  const featured = featuredCodes
-    .map(code => airports.find(a => a.code === code))
-    .filter(Boolean);
+const featured = buildFeaturedAirports(airports);
+
+function buildFeaturedAirports(allAirports) {
+  const preferredRegions = [
+    "North America",
+    "Europe",
+    "Middle East",
+    "South Asia",
+    "East Asia",
+    "Southeast Asia",
+    "Oceania",
+    "South America",
+    "Africa"
+  ];
+
+  const regionBuckets = preferredRegions.map(region =>
+    allAirports
+      .filter(a => a.region === region)
+      .sort((a, b) => a.city.localeCompare(b.city))
+  );
+
+  const picks = [];
+
+  regionBuckets.forEach(bucket => {
+    if (bucket.length) picks.push(bucket[0]);
+  });
+
+  const usedCodes = new Set(picks.map(a => a.code));
+
+  const extras = allAirports
+    .filter(a => !usedCodes.has(a.code))
+    .sort((a, b) => {
+      const regionCompare = a.region.localeCompare(b.region);
+      if (regionCompare !== 0) return regionCompare;
+      return a.city.localeCompare(b.city);
+    });
+
+  for (const airport of extras) {
+    if (picks.length >= 12) break;
+    picks.push(airport);
+  }
+
+  return picks.slice(0, 12);
+}
+
 
   function renderHeroStats() {
     const totalAirports = airports.length;
