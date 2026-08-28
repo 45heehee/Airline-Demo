@@ -572,7 +572,7 @@
     GRU: { x: 210, y: 278, label: 'São Paulo' }
   };
 
-  const airports = Array.isArray(MA_AIRPORTS) ? MA_AIRPORTS : [];
+ const airports = Array.isArray(window.MA_AIRPORTS) ? window.MA_AIRPORTS : [];
   const regions = [...new Set(airports.map(a => a.region))].sort((a, b) => a.localeCompare(b));
 
   const grouped = regions.reduce((acc, region) => {
