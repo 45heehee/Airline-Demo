@@ -586,48 +586,81 @@ const featured = buildFeaturedAirports(airports);
 
 function buildFeaturedAirports(allAirports) {
   const preferredRegions = [
-    "North America",
-    "Europe",
-    "Middle East",
-    "South Asia",
-    "East Asia",
-    "Southeast Asia",
-    "Oceania",
-    "South America",
-    "Africa"
+    'North America',
+    'South America',
+    'Europe',
+    'Middle East',
+    'Africa',
+    'South Asia',
+    'East Asia',
+    'Southeast Asia',
+    'Oceania'
   ];
 
-  const regionBuckets = preferredRegions.map(region =>
-    allAirports
-      .filter(a => a.region === region)
-      .sort((a, b) => a.city.localeCompare(b.city))
-  );
+  const priorityCodes = [
+    'JFK', 'LAX', 'YYZ',
+    'GRU', 'EZE',
+    'LHR', 'CDG', 'FCO',
+    'DOH', 'DXB', 'MCT',
+    'JNB', 'CAI', 'NBO',
+    'DEL', 'BLR', 'BOM',
+    'PEK', 'HND', 'ICN',
+    'SIN', 'BKK', 'CGK',
+    'SYD', 'AKL'
+  ];
 
+  const byCode = new Map(allAirports.map(airport => [airport.code, airport]));
   const picks = [];
+  const usedCodes = new Set();
 
-  regionBuckets.forEach(bucket => {
-    if (bucket.length) picks.push(bucket[0]);
-  });
+  for (const region of preferredRegions) {
+    const regionalPriority = priorityCodes
+      .map(code => byCode.get(code))
+      .filter(airport => airport && airport.region === region && !usedCodes.has(airport.code));
 
-  const usedCodes = new Set(picks.map(a => a.code));
+    if (regionalPriority.length) {
+      picks.push(regionalPriority[0]);
+      usedCodes.add(regionalPriority[0].code);
+      continue;
+    }
 
-  const extras = allAirports
-    .filter(a => !usedCodes.has(a.code))
-    .sort((a, b) => {
-      const regionCompare = a.region.localeCompare(b.region);
-      if (regionCompare !== 0) return regionCompare;
-      return a.city.localeCompare(b.city);
-    });
+    const regionalFallback = allAirports
+      .filter(airport => airport.region === region && !usedCodes.has(airport.code))
+      .sort((a, b) => a.city.localeCompare(b.city))[0];
+
+    if (regionalFallback) {
+      picks.push(regionalFallback);
+      usedCodes.add(regionalFallback.code);
+    }
+  }
+  const extras = priorityCodes
+    .map(code => byCode.get(code))
+    .filter(airport => airport && !usedCodes.has(airport.code));
 
   for (const airport of extras) {
     if (picks.length >= 12) break;
     picks.push(airport);
+    usedCodes.add(airport.code);
+  }
+
+  if (picks.length < 12) {
+    const remaining = allAirports
+      .filter(airport => !usedCodes.has(airport.code))
+      .sort((a, b) => {
+        const regionCompare = a.region.localeCompare(b.region);
+        if (regionCompare !== 0) return regionCompare;
+        return a.city.localeCompare(b.city);
+      });
+
+    for (const airport of remaining) {
+      if (picks.length >= 12) break;
+      picks.push(airport);
+      usedCodes.add(airport.code);
+    }
   }
 
   return picks.slice(0, 12);
 }
-
-
   function renderHeroStats() {
     const totalAirports = airports.length;
     const totalRegions = regions.length;
@@ -685,7 +718,7 @@ function buildFeaturedAirports(allAirports) {
         <div class="destination-content">
           <div class="destination-region">${dest.region}</div>
           <div class="destination-city">${dest.city}</div>
-          <div class="destination-airport">${dest.country}<br>${dest.code} · Meridian Air gateway</div>
+          <div class="destination-airport">${dest.airport}<br>${dest.code} · ${dest.country}</div>
         </div>
       </article>
     `).join('');
