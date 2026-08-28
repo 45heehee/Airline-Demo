@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Our Destinations — Meridian Air</title>
+<style>
+  :root {
+    --ink: #0A2A43;
+    --ink-soft: #11486B;
+    --paper: #F3FBFD;
+    --paper-dim: #DDF4F7;
+    --brass: #12B8C8;
+    --brass-dim: #74D9E3;
+    --slate: #4E7288;
+    --hairline: #C6E7EE;
+    --white: #ffffff;
+    --shadow: 0 24px 60px -24px rgba(10, 42, 67, 0.35);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: var(--ink);
+    line-height: 1.6;
+  }
+
+  h1, h2, h3 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 400;
+    line-height: 1.15;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; display: block; }
+
+  .container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--hairline);
+    background: var(--paper);
+    position: sticky;
+    top: 0;
+    z-index: 30;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--ink);
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+
+  .logo-text .name {
+    font-family: Georgia, serif;
+    font-size: 19px;
+  }
+
+  .logo-text .tag {
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    color: var(--brass);
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  nav {
+    display: flex;
+    gap: 26px;
+    font-size: 13px;
+    color: var(--slate);
+  }
+
+  nav a { color: var(--slate); text-decoration: none; }
+  nav a:hover,
+  nav a.active { color: var(--ink); }
+
+  .hero {
+    background:
+      radial-gradient(circle at top left, rgba(18, 184, 200, 0.22), transparent 30%),
+      linear-gradient(135deg, var(--ink) 0%, var(--ink-soft) 58%, #0f7584 100%);
+    color: var(--white);
+    padding: 72px 0 56px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .hero-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 30px;
+    align-items: center;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: var(--brass-dim);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .hero h1 {
+    font-size: clamp(34px, 5vw, 58px);
+    max-width: 680px;
+    margin-bottom: 18px;
+  }
+
+  .hero p {
+    color: rgba(255,255,255,0.86);
+    max-width: 620px;
+    font-size: 15px;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+
+  .hero-stat {
+    border: 1px solid rgba(255,255,255,0.16);
+    background: rgba(255,255,255,0.08);
+    padding: 12px 14px;
+    border-radius: 10px;
+    min-width: 130px;
+    backdrop-filter: blur(8px);
+  }
+
+  .hero-stat strong {
+    display: block;
+    font-size: 22px;
+    color: var(--white);
+    font-family: Georgia, serif;
+  }
+
+  .hero-stat span {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.72);
+  }
+
+  .map-panel {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(8px);
+  }
+
+  .map-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: rgba(255,255,255,0.92);
+    margin-bottom: 14px;
+    font-size: 13px;
+  }
+
+  .map-title span:last-child {
+    color: var(--brass-dim);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .world-map {
+    width: 100%;
+    height: auto;
+  }
+
+  .map-dot {
+    fill: var(--brass);
+    stroke: rgba(255,255,255,0.85);
+    stroke-width: 1.4;
+  }
+
+  .map-label {
+    fill: rgba(255,255,255,0.9);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+
+  .section {
+    padding: 56px 0;
+  }
+
+  .section-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 26px;
+  }
+
+  .section-head h2 {
+    font-size: clamp(28px, 3.6vw, 40px);
+  }
+
+  .section-head p {
+    color: var(--slate);
+    max-width: 640px;
+    font-size: 14px;
+  }
+
+  .region-tabs {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .region-btn {
+    border: 1px solid var(--hairline);
+    background: var(--white);
+    color: var(--slate);
+    border-radius: 999px;
+    padding: 9px 15px;
+    font-size: 12.5px;
+    cursor: pointer;
+    transition: 0.18s ease;
+  }
+
+  .region-btn:hover,
+  .region-btn.active {
+    border-color: var(--brass);
+    background: #eafcfd;
+    color: var(--ink);
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 34px;
+  }
+
+  .destination-card {
+    position: relative;
+    min-height: 320px;
+    border-radius: 18px;
+    overflow: hidden;
+    background:
+      linear-gradient(180deg, rgba(5,18,31,0.08) 0%, rgba(5,18,31,0.76) 74%, rgba(5,18,31,0.92) 100%),
+      var(--bg, linear-gradient(135deg, #6ba7df, #19344f));
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: flex-end;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+  }
+
+  .destination-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 28px 70px -28px rgba(10, 42, 67, 0.5);
+  }
+
+  .destination-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,0.22), transparent 24%),
+      radial-gradient(circle at 80% 12%, rgba(255,255,255,0.18), transparent 20%);
+    mix-blend-mode: screen;
+    opacity: 0.4;
+  }
+
+  .destination-content {
+    position: relative;
+    z-index: 1;
+    padding: 18px;
+    width: 100%;
+    color: var(--white);
+  }
+
+  .destination-region {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--brass-dim);
+    margin-bottom: 8px;
+  }
+
+  .destination-city {
+    font-size: 30px;
+    font-family: Georgia, serif;
+    margin-bottom: 4px;
+  }
+
+  .destination-airport {
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.88);
+  }
+
+  .directory {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+
+  .region-card {
+    background: var(--white);
+    border: 1px solid var(--hairline);
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 18px 40px -28px rgba(10, 42, 67, 0.18);
+  }
+
+  .region-card h3 {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .region-count {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin-bottom: 16px;
+  }
+
+  .city-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .city-pill {
+    border: 1px solid var(--hairline);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 7px 11px;
+    font-size: 12px;
+  }
+
+  .network-strip {
+    background: linear-gradient(180deg, #ffffff 0%, var(--paper-dim) 100%);
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .network-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    padding: 18px 0;
+  }
+
+  .network-item {
+    padding: 10px 0;
+  }
+
+  .network-item strong {
+    display: block;
+    font-family: Georgia, serif;
+    font-size: 28px;
+    color: var(--ink);
+  }
+
+  .network-item span {
+    color: var(--slate);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  footer {
+    text-align: center;
+    padding: 34px 20px 40px;
+    font-size: 11.5px;
+    color: var(--slate);
+    border-top: 1px solid var(--hairline);
+  }
+
+  @media (max-width: 1080px) {
+    .hero-grid,
+    .feature-grid,
+    .directory,
+    .network-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 760px) {
+    nav { display: none; }
+    header { padding: 18px 20px; }
+    .hero { padding: 58px 0 42px; }
+    .hero-grid,
+    .feature-grid,
+    .directory,
+    .network-grid {
+      grid-template-columns: 1fr;
+    }
+    .container { padding: 0 18px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="index.html">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+      <circle cx="13" cy="13" r="12" stroke="#0A2A43" stroke-width="1"/>
+      <path d="M13 1 V25 M1 13 H25" stroke="#0A2A43" stroke-width="0.6" opacity="0.4"/>
+      <path d="M13 4 C 18 8, 18 18, 13 22 C 8 18, 8 8, 13 4 Z" stroke="#12B8C8" stroke-width="1.1" fill="none"/>
+    </svg>
+    <span class="logo-text">
+      <span class="name">Meridian Air</span>
+      <span class="tag">Est. 1962 · Every Longitude</span>
+    </span>
+  </a>
+
+  <nav>
+    <a href="fleet.html">Our Fleet</a>
+    <a href="international.html" class="active">International</a>
+    <a href="destinations.html">Destinations</a>
+    <a href="ultra-long-range.html">Ultra-Long-Range</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <div class="eyebrow">Meridian Air Network</div>
+      <h1>Our Destinations</h1>
+      <p>
+        From flagship capitals to rising commercial centers, Meridian Air links travelers
+        across Europe, the Middle East, Africa, Asia, Oceania, and the Americas through
+        a curated long-haul and regional network.
+      </p>
+
+      <div class="hero-stats" id="hero-stats"></div>
+    </div>
+
+    <div class="map-panel">
+      <div class="map-title">
+        <span>Global route overview</span>
+        <span>Live network demo</span>
+      </div>
+
+      <svg class="world-map" viewBox="0 0 760 390" role="img" aria-label="Stylized world map showing Meridian Air destinations">
+        <rect x="0" y="0" width="760" height="390" rx="14" fill="rgba(255,255,255,0.03)"/>
+        <g opacity="0.2" fill="#d8f7fb">
+          <path d="M58 118l45-30 39 4 26 16 33-3 22 12 18 26-9 17-34 5-17 18 11 24-18 17-40-8-28-26-20-7-24-30 6-35z"/>
+          <path d="M260 106l28-22 47 4 26 17 38-3 34 11 28-10 26 18 7 21-24 18-38 6-10 21-22 9-31-8-24 16-26-3-32-22-29 3-14-18 6-31z"/>
+          <path d="M468 102l44-18 56 4 34 22 30 2 28 18-8 21-28 16-2 25-20 17-33 3-12 18-23 5-26-20-16-24 3-26-24-17z"/>
+          <path d="M590 252l33-12 34 6 18 19-8 23-28 14-31-6-19-18z"/>
+          <path d="M305 247l35-10 30 14 10 29-19 18-39 2-24-15-6-24z"/>
+        </g>
+
+        <g stroke="rgba(116,217,227,0.45)" stroke-width="1.4" fill="none">
+          <path d="M152 140 C 248 122, 310 126, 372 146"/>
+          <path d="M372 146 C 450 132, 528 132, 566 150"/>
+          <path d="M566 150 C 604 164, 644 218, 640 260"/>
+          <path d="M372 146 C 328 178, 300 212, 310 254"/>
+          <path d="M152 140 C 120 184, 114 226, 144 262"/>
+        </g>
+
+        <g id="map-dots"></g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="network-strip">
+  <div class="container">
+    <div class="network-grid" id="network-grid"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow" style="color: var(--brass);">Featured gateways</div>
+        <h2>Signature destinations</h2>
+      </div>
+      <p>
+        Explore a selection of Meridian Air cities spanning finance, culture, technology,
+        and leisure markets across the network.
+      </p>
+    </div>
+
+    <div class="feature-grid" id="feature-grid"></div>
+  </div>
+</section>
+
+<section class="section" style="padding-top: 10px;">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow" style="color: var(--brass);">Browse by region</div>
+        <h2>Destination directory</h2>
+      </div>
+      <p>
+        Every region below is populated from the Meridian Air airport data in your booking
+        system, so the destinations page stays aligned with the rest of the demo website.
+      </p>
+    </div>
+
+    <div class="region-tabs" id="region-tabs"></div>
+    <div class="directory" id="directory"></div>
+  </div>
+</section>
+
+<footer>
+  Meridian Air — demo site for illustration only · International network shown for demonstration purposes
+</footer>
+
+<script src="booking.js"></script>
+<script>
+  const featuredCodes = ['LHR', 'DXB', 'SIN', 'SYD', 'JFK', 'HND', 'CDG', 'JNB'];
+
+  const featureThemes = {
+    LHR: 'linear-gradient(135deg, #94b8d8 0%, #445f87 48%, #101726 100%)',
+    DXB: 'linear-gradient(135deg, #c7d9ff 0%, #be9c74 42%, #5e3a29 100%)',
+    SIN: 'linear-gradient(135deg, #74c2dd 0%, #3c5873 44%, #162130 100%)',
+    SYD: 'linear-gradient(135deg, #ffbf8e 0%, #7a89b8 50%, #20283d 100%)',
+    JFK: 'linear-gradient(135deg, #5ea1df 0%, #283b65 52%, #0c1425 100%)',
+    HND: 'linear-gradient(135deg, #f8d6b0 0%, #bf7f72 44%, #4d3044 100%)',
+    CDG: 'linear-gradient(135deg, #f2cba7 0%, #8c7ea0 52%, #283047 100%)',
+    JNB: 'linear-gradient(135deg, #e9c277 0%, #8e5f4d 45%, #2c2533 100%)'
+  };
+
+  const mapPositions = {
+    JFK: { x: 146, y: 145, label: 'New York' },
+    LHR: { x: 350, y: 128, label: 'London' },
+    CDG: { x: 358, y: 138, label: 'Paris' },
+    DXB: { x: 474, y: 168, label: 'Dubai' },
+    JNB: { x: 422, y: 270, label: 'Johannesburg' },
+    DEL: { x: 535, y: 166, label: 'Delhi' },
+    HND: { x: 652, y: 144, label: 'Tokyo' },
+    SIN: { x: 578, y: 222, label: 'Singapore' },
+    SYD: { x: 665, y: 286, label: 'Sydney' },
+    GRU: { x: 210, y: 278, label: 'São Paulo' }
+  };
+
+  const airports = Array.isArray(MA_AIRPORTS) ? MA_AIRPORTS : [];
+  const regions = [...new Set(airports.map(a => a.region))].sort((a, b) => a.localeCompare(b));
+
+  const grouped = regions.reduce((acc, region) => {
+    acc[region] = airports
+      .filter(a => a.region === region)
+      .sort((a, b) => a.city.localeCompare(b.city));
+    return acc;
+  }, {});
+
+  const featured = featuredCodes
+    .map(code => airports.find(a => a.code === code))
+    .filter(Boolean);
+
+  function renderHeroStats() {
+    const totalAirports = airports.length;
+    const totalRegions = regions.length;
+    const featuredRegions = [...new Set(featured.map(a => a.region))].length;
+
+    const stats = [
+      { value: totalAirports, label: 'destinations in network' },
+      { value: totalRegions, label: 'world regions served' },
+      { value: featuredRegions, label: 'regions in spotlight' }
+    ];
+
+    document.getElementById('hero-stats').innerHTML = stats.map(stat => `
+      <div class="hero-stat">
+        <strong>${stat.value}</strong>
+        <span>${stat.label}</span>
+      </div>
+    `).join('');
+  }
+
+  function renderMapDots() {
+    const map = document.getElementById('map-dots');
+    const codes = Object.keys(mapPositions);
+
+    map.innerHTML = codes.map(code => {
+      const p = mapPositions[code];
+      return `
+        <g>
+          <circle class="map-dot" cx="${p.x}" cy="${p.y}" r="5.2"></circle>
+          <circle cx="${p.x}" cy="${p.y}" r="11" fill="rgba(18,184,200,0.18)"></circle>
+          <text class="map-label" x="${p.x + 10}" y="${p.y - 10}">${p.label}</text>
+        </g>
+      `;
+    }).join('');
+  }
+
+  function renderNetworkStrip() {
+    const items = [
+      { value: airports.length, label: 'Airports in system' },
+      { value: regions.length, label: 'Regions connected' },
+      { value: featured.length, label: 'Featured long-haul gateways' },
+      { value: new Set(airports.map(a => a.country)).size, label: 'Countries represented' }
+    ];
+
+    document.getElementById('network-grid').innerHTML = items.map(item => `
+      <div class="network-item">
+        <strong>${item.value}</strong>
+        <span>${item.label}</span>
+      </div>
+    `).join('');
+  }
+
+  function renderFeatured() {
+    document.getElementById('feature-grid').innerHTML = featured.map(dest => `
+      <article class="destination-card" style="--bg:${featureThemes[dest.code] || 'linear-gradient(135deg,#7ab8d6,#163650)'}">
+        <div class="destination-content">
+          <div class="destination-region">${dest.region}</div>
+          <div class="destination-city">${dest.city}</div>
+          <div class="destination-airport">${dest.country}<br>${dest.code} · Meridian Air gateway</div>
+        </div>
+      </article>
+    `).join('');
+  }
+
+  function renderTabs(active = 'All') {
+    const tabs = ['All', ...regions];
+    document.getElementById('region-tabs').innerHTML = tabs.map(tab => `
+      <button class="region-btn ${tab === active ? 'active' : ''}" data-region="${tab}">
+        ${tab}
+      </button>
+    `).join('');
+
+    document.querySelectorAll('.region-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        renderTabs(btn.dataset.region);
+        renderDirectory(btn.dataset.region);
+      });
+    });
+  }
+
+  function renderDirectory(active = 'All') {
+    const showRegions = active === 'All' ? regions : [active];
+
+    document.getElementById('directory').innerHTML = showRegions.map(region => {
+      const cities = grouped[region] || [];
+      return `
+        <section class="region-card">
+          <h3>${region}</h3>
+          <div class="region-count">${cities.length} destinations</div>
+          <div class="city-list">
+            ${cities.map(city => `
+              <span class="city-pill">${city.city} · ${city.code}</span>
+            `).join('')}
+          </div>
+        </section>
+      `;
+    }).join('');
+  }
+
+  renderHeroStats();
+  renderMapDots();
+  renderNetworkStrip();
+  renderFeatured();
+  renderTabs();
+  renderDirectory();
+</script>
+
+</body>
+</html>
