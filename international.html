@@ -142,6 +142,7 @@
     font-size: 15px;
   }
 
+  /* ── hero stats: rendered by JS into #hero-stats ── */
   .hero-stats {
     display: flex;
     gap: 12px;
@@ -172,6 +173,7 @@
     color: rgba(255,255,255,0.72);
   }
 
+  /* ── map panel ── */
   .map-panel {
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.14);
@@ -179,6 +181,24 @@
     padding: 18px;
     box-shadow: var(--shadow);
     backdrop-filter: blur(8px);
+  }
+
+  /* swap-ready map stage: replace .map-bg-image src when your image is ready */
+  .map-stage {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 10px;
+  }
+
+  .map-bg-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    opacity: 0;      /* hidden until a real image is provided */
+    position: absolute;
+    inset: 0;
+    object-fit: cover;
   }
 
   .map-title {
@@ -200,6 +220,7 @@
   .world-map {
     width: 100%;
     height: auto;
+    display: block;
   }
 
   .map-dot {
@@ -214,6 +235,7 @@
     letter-spacing: 0.04em;
   }
 
+  /* ── sections ── */
   .section {
     padding: 56px 0;
   }
@@ -328,6 +350,7 @@
     color: rgba(255,255,255,0.88);
   }
 
+  /* ── directory ── */
   .directory {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -370,6 +393,7 @@
     font-size: 12px;
   }
 
+  /* ── network strip ── */
   .network-strip {
     background: linear-gradient(180deg, #ffffff 0%, var(--paper-dim) 100%);
     border-top: 1px solid var(--hairline);
@@ -466,6 +490,7 @@
         a curated long-haul and regional network.
       </p>
 
+      <!-- hero stats injected here by renderHeroStats() -->
       <div class="hero-stats" id="hero-stats"></div>
     </div>
 
@@ -475,26 +500,35 @@
         <span>Live network demo</span>
       </div>
 
-      <svg class="world-map" viewBox="0 0 760 390" role="img" aria-label="Stylized world map showing Meridian Air destinations">
-        <rect x="0" y="0" width="760" height="390" rx="14" fill="rgba(255,255,255,0.03)"/>
-        <g opacity="0.2" fill="#d8f7fb">
-          <path d="M58 118l45-30 39 4 26 16 33-3 22 12 18 26-9 17-34 5-17 18 11 24-18 17-40-8-28-26-20-7-24-30 6-35z"/>
-          <path d="M260 106l28-22 47 4 26 17 38-3 34 11 28-10 26 18 7 21-24 18-38 6-10 21-22 9-31-8-24 16-26-3-32-22-29 3-14-18 6-31z"/>
-          <path d="M468 102l44-18 56 4 34 22 30 2 28 18-8 21-28 16-2 25-20 17-33 3-12 18-23 5-26-20-16-24 3-26-24-17z"/>
-          <path d="M590 252l33-12 34 6 18 19-8 23-28 14-31-6-19-18z"/>
-          <path d="M305 247l35-10 30 14 10 29-19 18-39 2-24-15-6-24z"/>
-        </g>
+      <!--
+        MAP SWAP INSTRUCTIONS:
+        When your custom world map image is ready, add it as:
+          <img class="map-bg-image" src="images/meridian-world-map.png" alt="Meridian Air world map" />
+        and remove the opacity:0 from .map-bg-image in the CSS above.
+        The SVG dot layer (id="map-dots") will overlay on top automatically.
+      -->
+      <div class="map-stage">
+        <svg class="world-map" viewBox="0 0 760 390" role="img" aria-label="Stylized world map showing Meridian Air destinations">
+          <rect x="0" y="0" width="760" height="390" rx="14" fill="rgba(255,255,255,0.03)"/>
+          <g opacity="0.2" fill="#d8f7fb">
+            <path d="M58 118l45-30 39 4 26 16 33-3 22 12 18 26-9 17-34 5-17 18 11 24-18 17-40-8-28-26-20-7-24-30 6-35z"/>
+            <path d="M260 106l28-22 47 4 26 17 38-3 34 11 28-10 26 18 7 21-24 18-38 6-10 21-22 9-31-8-24 16-26-3-32-22-29 3-14-18 6-31z"/>
+            <path d="M468 102l44-18 56 4 34 22 30 2 28 18-8 21-28 16-2 25-20 17-33 3-12 18-23 5-26-20-16-24 3-26-24-17z"/>
+            <path d="M590 252l33-12 34 6 18 19-8 23-28 14-31-6-19-18z"/>
+            <path d="M305 247l35-10 30 14 10 29-19 18-39 2-24-15-6-24z"/>
+          </g>
 
-        <g stroke="rgba(116,217,227,0.45)" stroke-width="1.4" fill="none">
-          <path d="M152 140 C 248 122, 310 126, 372 146"/>
-          <path d="M372 146 C 450 132, 528 132, 566 150"/>
-          <path d="M566 150 C 604 164, 644 218, 640 260"/>
-          <path d="M372 146 C 328 178, 300 212, 310 254"/>
-          <path d="M152 140 C 120 184, 114 226, 144 262"/>
-        </g>
+          <g stroke="rgba(116,217,227,0.45)" stroke-width="1.4" fill="none">
+            <path d="M152 140 C 248 122, 310 126, 372 146"/>
+            <path d="M372 146 C 450 132, 528 132, 566 150"/>
+            <path d="M566 150 C 604 164, 644 218, 640 260"/>
+            <path d="M372 146 C 328 178, 300 212, 310 254"/>
+            <path d="M152 140 C 120 184, 114 226, 144 262"/>
+          </g>
 
-        <g id="map-dots"></g>
-      </svg>
+          <g id="map-dots"></g>
+        </svg>
+      </div>
     </div>
   </div>
 </section>
@@ -546,19 +580,36 @@
 
 <script src="booking.js"></script>
 <script>
-  const featuredCodes = ['LHR', 'DXB', 'SIN', 'SYD', 'JFK', 'HND', 'CDG', 'JNB'];
-
+  /* ── colour themes for featured cards ─────────────────────────────── */
   const featureThemes = {
-    LHR: 'linear-gradient(135deg, #94b8d8 0%, #445f87 48%, #101726 100%)',
-    DXB: 'linear-gradient(135deg, #c7d9ff 0%, #be9c74 42%, #5e3a29 100%)',
-    SIN: 'linear-gradient(135deg, #74c2dd 0%, #3c5873 44%, #162130 100%)',
-    SYD: 'linear-gradient(135deg, #ffbf8e 0%, #7a89b8 50%, #20283d 100%)',
     JFK: 'linear-gradient(135deg, #5ea1df 0%, #283b65 52%, #0c1425 100%)',
-    HND: 'linear-gradient(135deg, #f8d6b0 0%, #bf7f72 44%, #4d3044 100%)',
+    LAX: 'linear-gradient(135deg, #f4c67a 0%, #a06240 48%, #2a1a10 100%)',
+    YYZ: 'linear-gradient(135deg, #89c4e1 0%, #2e5f8a 48%, #0d1f30 100%)',
+    GRU: 'linear-gradient(135deg, #8bd46e 0%, #2d6e3c 48%, #0a1f10 100%)',
+    EZE: 'linear-gradient(135deg, #b8d9f4 0%, #3460a0 50%, #0c1e3a 100%)',
+    LHR: 'linear-gradient(135deg, #94b8d8 0%, #445f87 48%, #101726 100%)',
     CDG: 'linear-gradient(135deg, #f2cba7 0%, #8c7ea0 52%, #283047 100%)',
-    JNB: 'linear-gradient(135deg, #e9c277 0%, #8e5f4d 45%, #2c2533 100%)'
+    FCO: 'linear-gradient(135deg, #f7c97e 0%, #b87840 48%, #2a1a0e 100%)',
+    DOH: 'linear-gradient(135deg, #e8d09a 0%, #c0824a 44%, #3a1a10 100%)',
+    DXB: 'linear-gradient(135deg, #c7d9ff 0%, #be9c74 42%, #5e3a29 100%)',
+    MCT: 'linear-gradient(135deg, #f6c97c 0%, #8a6040 48%, #1e0f06 100%)',
+    JNB: 'linear-gradient(135deg, #e9c277 0%, #8e5f4d 45%, #2c2533 100%)',
+    CAI: 'linear-gradient(135deg, #f5d88a 0%, #b08050 44%, #2a1a06 100%)',
+    NBO: 'linear-gradient(135deg, #c8e89a 0%, #5a8840 48%, #0a1f06 100%)',
+    DEL: 'linear-gradient(135deg, #f4b080 0%, #a0583a 46%, #2a1008 100%)',
+    BLR: 'linear-gradient(135deg, #f4d090 0%, #b08040 46%, #281800 100%)',
+    BOM: 'linear-gradient(135deg, #f8c06a 0%, #c07838 46%, #30160a 100%)',
+    PEK: 'linear-gradient(135deg, #e89e9e 0%, #8e4040 48%, #200a0a 100%)',
+    HND: 'linear-gradient(135deg, #f8d6b0 0%, #bf7f72 44%, #4d3044 100%)',
+    ICN: 'linear-gradient(135deg, #a8d8f0 0%, #3870b0 50%, #0c2240 100%)',
+    SIN: 'linear-gradient(135deg, #74c2dd 0%, #3c5873 44%, #162130 100%)',
+    BKK: 'linear-gradient(135deg, #f8d890 0%, #c89840 46%, #2a1e00 100%)',
+    CGK: 'linear-gradient(135deg, #9cd49a 0%, #3a7840 48%, #0a1e06 100%)',
+    SYD: 'linear-gradient(135deg, #ffbf8e 0%, #7a89b8 50%, #20283d 100%)',
+    AKL: 'linear-gradient(135deg, #a8e4d8 0%, #3880a0 50%, #0a2030 100%)'
   };
 
+  /* ── map dot positions for selected hubs ───────────────────────────── */
   const mapPositions = {
     JFK: { x: 146, y: 145, label: 'New York' },
     LHR: { x: 350, y: 128, label: 'London' },
@@ -572,8 +623,9 @@
     GRU: { x: 210, y: 278, label: 'São Paulo' }
   };
 
- const airports = Array.isArray(window.MA_AIRPORTS) ? window.MA_AIRPORTS : [];
-  const regions = [...new Set(airports.map(a => a.region))].sort((a, b) => a.localeCompare(b));
+  /* ── load airports from booking.js ─────────────────────────────────── */
+  const airports = Array.isArray(window.MA_AIRPORTS) ? window.MA_AIRPORTS : [];
+  const regions  = [...new Set(airports.map(a => a.region))].sort((a, b) => a.localeCompare(b));
 
   const grouped = regions.reduce((acc, region) => {
     acc[region] = airports
@@ -582,138 +634,134 @@
     return acc;
   }, {});
 
-const featured = buildFeaturedAirports(airports);
-
-function buildFeaturedAirports(allAirports) {
-  const preferredRegions = [
-    'North America',
-    'South America',
-    'Europe',
-    'Middle East',
-    'Africa',
-    'South Asia',
-    'East Asia',
-    'Southeast Asia',
-    'Oceania'
-  ];
-
-  const priorityCodes = [
-    'JFK', 'LAX', 'YYZ',
-    'GRU', 'EZE',
-    'LHR', 'CDG', 'FCO',
-    'DOH', 'DXB', 'MCT',
-    'JNB', 'CAI', 'NBO',
-    'DEL', 'BLR', 'BOM',
-    'PEK', 'HND', 'ICN',
-    'SIN', 'BKK', 'CGK',
-    'SYD', 'AKL'
-  ];
-
-  const byCode = new Map(allAirports.map(airport => [airport.code, airport]));
-  const picks = [];
-  const usedCodes = new Set();
-
-  for (const region of preferredRegions) {
-    const regionalPriority = priorityCodes
-      .map(code => byCode.get(code))
-      .filter(airport => airport && airport.region === region && !usedCodes.has(airport.code));
-
-    if (regionalPriority.length) {
-      picks.push(regionalPriority[0]);
-      usedCodes.add(regionalPriority[0].code);
-      continue;
-    }
-
-    const regionalFallback = allAirports
-      .filter(airport => airport.region === region && !usedCodes.has(airport.code))
-      .sort((a, b) => a.city.localeCompare(b.city))[0];
-
-    if (regionalFallback) {
-      picks.push(regionalFallback);
-      usedCodes.add(regionalFallback.code);
-    }
-  }
-  const extras = priorityCodes
-    .map(code => byCode.get(code))
-    .filter(airport => airport && !usedCodes.has(airport.code));
-
-  for (const airport of extras) {
-    if (picks.length >= 12) break;
-    picks.push(airport);
-    usedCodes.add(airport.code);
-  }
-
-  if (picks.length < 12) {
-    const remaining = allAirports
-      .filter(airport => !usedCodes.has(airport.code))
-      .sort((a, b) => {
-        const regionCompare = a.region.localeCompare(b.region);
-        if (regionCompare !== 0) return regionCompare;
-        return a.city.localeCompare(b.city);
-      });
-
-    for (const airport of remaining) {
-      if (picks.length >= 12) break;
-      picks.push(airport);
-      usedCodes.add(airport.code);
-    }
-  }
-
-  return picks.slice(0, 12);
-}
-  function renderHeroStats() {
-    const totalAirports = airports.length;
-    const totalRegions = regions.length;
-    const featuredRegions = [...new Set(featured.map(a => a.region))].length;
-
-    const stats = [
-      { value: totalAirports, label: 'destinations in network' },
-      { value: totalRegions, label: 'world regions served' },
-      { value: featuredRegions, label: 'regions in spotlight' }
+  /* ── balanced featured selection from all 101 airports ─────────────── */
+  function buildFeaturedAirports(allAirports) {
+    const preferredRegions = [
+      'North America', 'South America', 'Europe',
+      'Middle East', 'Africa', 'South Asia',
+      'East Asia', 'Southeast Asia', 'Oceania'
     ];
 
-    document.getElementById('hero-stats').innerHTML = stats.map(stat => `
+    const priorityCodes = [
+      'JFK', 'LAX', 'YYZ',
+      'GRU', 'EZE',
+      'LHR', 'CDG', 'FCO',
+      'DOH', 'DXB', 'MCT',
+      'JNB', 'CAI', 'NBO',
+      'DEL', 'BLR', 'BOM',
+      'PEK', 'HND', 'ICN',
+      'SIN', 'BKK', 'CGK',
+      'SYD', 'AKL'
+    ];
+
+    const byCode      = new Map(allAirports.map(a => [a.code, a]));
+    const picks       = [];
+    const usedCodes   = new Set();
+
+    /* one top gateway per region first */
+    for (const region of preferredRegions) {
+      const hit = priorityCodes
+        .map(c => byCode.get(c))
+        .find(a => a && a.region === region && !usedCodes.has(a.code));
+
+      if (hit) {
+        picks.push(hit);
+        usedCodes.add(hit.code);
+        continue;
+      }
+
+      /* fallback: first city alphabetically in that region */
+      const fallback = allAirports
+        .filter(a => a.region === region && !usedCodes.has(a.code))
+        .sort((a, b) => a.city.localeCompare(b.city))[0];
+
+      if (fallback) {
+        picks.push(fallback);
+        usedCodes.add(fallback.code);
+      }
+    }
+
+    /* fill remaining slots up to 12 from priority list */
+    for (const code of priorityCodes) {
+      if (picks.length >= 12) break;
+      const a = byCode.get(code);
+      if (a && !usedCodes.has(a.code)) {
+        picks.push(a);
+        usedCodes.add(a.code);
+      }
+    }
+
+    /* final fill from remaining airports sorted by region then city */
+    if (picks.length < 12) {
+      const remaining = allAirports
+        .filter(a => !usedCodes.has(a.code))
+        .sort((a, b) => {
+          const rc = a.region.localeCompare(b.region);
+          return rc !== 0 ? rc : a.city.localeCompare(b.city);
+        });
+      for (const a of remaining) {
+        if (picks.length >= 12) break;
+        picks.push(a);
+        usedCodes.add(a.code);
+      }
+    }
+
+    return picks.slice(0, 12);
+  }
+
+  const featured = buildFeaturedAirports(airports);
+
+  /* ── render functions ───────────────────────────────────────────────── */
+
+  function renderHeroStats() {
+    const el = document.getElementById('hero-stats');
+    if (!el) return;
+    const stats = [
+      { value: airports.length,                                label: 'destinations in network' },
+      { value: regions.length,                                 label: 'world regions served' },
+      { value: new Set(airports.map(a => a.country)).size,     label: 'countries represented' }
+    ];
+    el.innerHTML = stats.map(s => `
       <div class="hero-stat">
-        <strong>${stat.value}</strong>
-        <span>${stat.label}</span>
+        <strong>${s.value}</strong>
+        <span>${s.label}</span>
       </div>
     `).join('');
   }
 
   function renderMapDots() {
-    const map = document.getElementById('map-dots');
-    const codes = Object.keys(mapPositions);
-
-    map.innerHTML = codes.map(code => {
-      const p = mapPositions[code];
-      return `
-        <g>
-          <circle class="map-dot" cx="${p.x}" cy="${p.y}" r="5.2"></circle>
-          <circle cx="${p.x}" cy="${p.y}" r="11" fill="rgba(18,184,200,0.18)"></circle>
-          <text class="map-label" x="${p.x + 10}" y="${p.y - 10}">${p.label}</text>
-        </g>
-      `;
-    }).join('');
+    const el = document.getElementById('map-dots');
+    if (!el) return;
+    el.innerHTML = Object.entries(mapPositions).map(([code, p]) => `
+      <g>
+        <circle class="map-dot" cx="${p.x}" cy="${p.y}" r="5.2"></circle>
+        <circle cx="${p.x}" cy="${p.y}" r="11" fill="rgba(18,184,200,0.18)"></circle>
+        <text class="map-label" x="${p.x + 10}" y="${p.y - 10}">${p.label}</text>
+      </g>
+    `).join('');
   }
 
   function renderNetworkStrip() {
+    const el = document.getElementById('network-grid');
+    if (!el) return;
     const items = [
-      { value: airports.length, label: 'Airports in system' },
-      { value: regions.length, label: 'Regions connected' },
-      { value: featured.length, label: 'Featured long-haul gateways' },
-      { value: new Set(airports.map(a => a.country)).size, label: 'Countries represented' }
+      { value: airports.length,                              label: 'Airports in system' },
+      { value: regions.length,                               label: 'Regions connected' },
+      { value: new Set(airports.map(a => a.country)).size,   label: 'Countries represented' },
+      { value: featured.length,                              label: 'Featured gateways' }
     ];
-
-    document.getElementById('network-grid').innerHTML = items.map(item => `
+    el.innerHTML = items.map(i => `
       <div class="network-item">
-        <strong>${item.value}</strong>
-        <span>${item.label}</span>
+        <strong>${i.value}</strong>
+        <span>${i.label}</span>
       </div>
     `).join('');
   }
 
   function renderFeatured() {
-    document.getElementById('feature-grid').innerHTML = featured.map(dest => `
+    const el = document.getElementById('feature-grid');
+    if (!el) return;
+    el.innerHTML = featured.map(dest => `
       <article class="destination-card" style="--bg:${featureThemes[dest.code] || 'linear-gradient(135deg,#7ab8d6,#163650)'}">
         <div class="destination-content">
           <div class="destination-region">${dest.region}</div>
@@ -725,14 +773,15 @@ function buildFeaturedAirports(allAirports) {
   }
 
   function renderTabs(active = 'All') {
-    const tabs = ['All', ...regions];
-    document.getElementById('region-tabs').innerHTML = tabs.map(tab => `
+    const el = document.getElementById('region-tabs');
+    if (!el) return;
+    el.innerHTML = ['All', ...regions].map(tab => `
       <button class="region-btn ${tab === active ? 'active' : ''}" data-region="${tab}">
         ${tab}
       </button>
     `).join('');
 
-    document.querySelectorAll('.region-btn').forEach(btn => {
+    el.querySelectorAll('.region-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         renderTabs(btn.dataset.region);
         renderDirectory(btn.dataset.region);
@@ -741,24 +790,24 @@ function buildFeaturedAirports(allAirports) {
   }
 
   function renderDirectory(active = 'All') {
+    const el = document.getElementById('directory');
+    if (!el) return;
     const showRegions = active === 'All' ? regions : [active];
-
-    document.getElementById('directory').innerHTML = showRegions.map(region => {
+    el.innerHTML = showRegions.map(region => {
       const cities = grouped[region] || [];
       return `
         <section class="region-card">
           <h3>${region}</h3>
-          <div class="region-count">${cities.length} destinations</div>
+          <div class="region-count">${cities.length} destination${cities.length !== 1 ? 's' : ''}</div>
           <div class="city-list">
-            ${cities.map(city => `
-              <span class="city-pill">${city.city} · ${city.code}</span>
-            `).join('')}
+            ${cities.map(c => `<span class="city-pill">${c.city} · ${c.code}</span>`).join('')}
           </div>
         </section>
       `;
     }).join('');
   }
 
+  /* ── init ───────────────────────────────────────────────────────────── */
   renderHeroStats();
   renderMapDots();
   renderNetworkStrip();
