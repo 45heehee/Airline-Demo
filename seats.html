@@ -1,1 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Seats & Extras — Meridian Air</title>
+<style>
+  :root {
+    --ink: #0A2A43;
+    --ink-soft: #11486B;
+    --paper: #F3FBFD;
+    --paper-dim: #DDF4F7;
+    --brass: #12B8C8;
+    --brass-dim: #74D9E3;
+    --slate: #4E7288;
+    --hairline: #C6E7EE;
+    --ok: #1C7C54;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Helvetica Neue", Arial, sans-serif;
+  }
+
+  h1, h2, h3 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--hairline);
+    background: var(--paper);
+  }
+
+  .logo {
+    text-decoration: none;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+
+  .logo-text .name {
+    font-family: Georgia, serif;
+    font-size: 19px;
+  }
+
+  .logo-text .tag {
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    color: var(--brass);
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  nav {
+    display: flex;
+    gap: 26px;
+    font-size: 13px;
+  }
+
+  nav a {
+    color: var(--slate);
+    text-decoration: none;
+  }
+
+  .hero {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 34px 28px;
+  }
+
+  .hero .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin-bottom: 10px;
+  }
+
+  .hero h1 {
+    font-size: clamp(28px, 4vw, 42px);
+    margin-bottom: 10px;
+  }
+
+  .hero p {
+    color: var(--paper-dim);
+    font-size: 14px;
+  }
+
+  .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 24px 70px;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 22px;
+  }
+
+  .panel {
+    background: #fff;
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .summary-card {
+    position: sticky;
+    top: 20px;
+  }
+
+  .kicker {
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin-bottom: 12px;
+  }
+
+  .summary-grid {
+    display: grid;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    border-bottom: 1px solid var(--hairline);
+    padding-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .summary-row strong {
+    color: var(--ink);
+  }
+
+  .price-total {
+    font-size: 24px;
+    color: var(--ink);
+    margin-top: 14px;
+  }
+
+  .section-title {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .section-copy {
+    color: var(--slate);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 18px;
+  }
+
+  .upgrade-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .upgrade-card {
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    background: var(--paper);
+    padding: 16px;
+    cursor: pointer;
+  }
+
+  .upgrade-card.active {
+    border-color: var(--brass);
+    background: #eefbfc;
+  }
+
+  .upgrade-card h3 {
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+
+  .upgrade-card p {
+    font-size: 13px;
+    color: var(--slate);
+    line-height: 1.5;
+  }
+
+  .upgrade-price {
+    margin-top: 10px;
+    font-family: "Courier New", monospace;
+    font-size: 15px;
+    color: var(--ink);
+  }
+
+  .toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 16px;
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    margin-bottom: 24px;
+    background: var(--paper);
+  }
+
+  .toggle-row label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+  }
+
+  .toggle-row small {
+    color: var(--slate);
+    font-size: 12px;
+  }
+
+  .seat-map {
+    margin-top: 16px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .seat-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .row-label {
+    width: 28px;
+    font-size: 12px;
+    color: var(--slate);
+    text-align: right;
+    margin-right: 8px;
+  }
+
+  .seat {
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    border: 1px solid var(--hairline);
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+    font-size: 12px;
+  }
+
+  .seat:hover { border-color: var(--brass); }
+  .seat.occupied {
+    background: #d7e3e8;
+    color: #7b909c;
+    cursor: not-allowed;
+  }
+  .seat.selected {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+
+  .aisle {
+    width: 18px;
+  }
+
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--slate);
+  }
+
+  .legend span::before {
+    content: "";
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    margin-right: 6px;
+    vertical-align: -1px;
+    border: 1px solid var(--hairline);
+    background: #fff;
+  }
+
+  .legend .lg-selected::before {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .legend .lg-occupied::before {
+    background: #d7e3e8;
+  }
+
+  .actions {
+    margin-top: 28px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-block;
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    padding: 12px 18px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    background: #fff;
+    color: var(--ink);
+  }
+
+  .btn-primary {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+
+  .mini-note {
+    font-size: 12px;
+    color: var(--slate);
+    margin-top: 8px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 24px;
+    border-top: 1px solid var(--hairline);
+    font-size: 12px;
+    color: var(--slate);
+  }
+
+  @media (max-width: 900px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+
+    .summary-card {
+      position: static;
+    }
+
+    .upgrade-grid {
+      grid-template-columns: 1fr;
+    }
+
+    nav {
+      display: none;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="index.html">
+    <div style="width:18px;height:18px;border:2px solid var(--brass);border-radius:50%; position:relative;">
+      <div style="position:absolute;left:7px;top:-5px;width:2px;height:26px;background:var(--brass);"></div>
+    </div>
+    <div class="logo-text">
+      <span class="name">Meridian Air</span>
+      <span class="tag">Every Longitude</span>
+    </div>
+  </a>
+
+  <nav>
+    <a href="fleet.html">Our Fleet</a>
+    <a href="international.html">International</a>
+    <a href="ultra-long-range.html">Ultra-Long-Range</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">Journey Customization</div>
+  <h1>Seats & Extras</h1>
+  <p id="hero-meta">Loading your selected journey...</p>
+</section>
+
+<main class="wrap">
+  <div class="layout">
+    <aside class="panel summary-card">
+      <div class="kicker">Your itinerary</div>
+      <h2 id="summary-route">Route</h2>
+
+      <div class="summary-grid">
+        <div class="summary-row"><span>Date</span><strong id="summary-date">—</strong></div>
+        <div class="summary-row"><span>Flight</span><strong id="summary-flight">—</strong></div>
+        <div class="summary-row"><span>Aircraft</span><strong id="summary-aircraft">—</strong></div>
+        <div class="summary-row"><span>Passengers</span><strong id="summary-passengers">—</strong></div>
+        <div class="summary-row"><span>Cabin</span><strong id="summary-cabin">—</strong></div>
+        <div class="summary-row"><span>Seat</span><strong id="summary-seat">Not selected</strong></div>
+        <div class="summary-row"><span>Lounge</span><strong id="summary-lounge">No</strong></div>
+      </div>
+
+      <div class="price-total" id="total-price">$0</div>
+      <div class="mini-note">Demo pricing only. No real booking is processed.</div>
+    </aside>
+
+    <section class="panel">
+      <div class="kicker">Optional upgrades</div>
+      <h2 class="section-title">Upgrade Class?</h2>
+      <p class="section-copy">Choose a higher cabin or keep your selected fare.</p>
+
+      <div class="upgrade-grid" id="upgrade-grid"></div>
+
+      <div class="kicker">Premium comfort</div>
+      <h2 class="section-title">Want a lounge?</h2>
+      <div class="toggle-row">
+        <label for="lounge-toggle">
+          <strong>Add lounge access</strong>
+          <small>$45 per passenger · available at selected departure airports</small>
+        </label>
+        <input type="checkbox" id="lounge-toggle" />
+      </div>
+
+      <div class="kicker">Choose your place onboard</div>
+      <h2 class="section-title">Seat Selection</h2>
+      <p class="section-copy">Pick one available seat before continuing.</p>
+
+      <div id="seat-map" class="seat-map"></div>
+
+      <div class="legend">
+        <span>Available</span>
+        <span class="lg-selected">Selected</span>
+        <span class="lg-occupied">Occupied</span>
+      </div>
+
+      <div class="actions">
+        <a class="btn" href="results.html">Back to results</a>
+        <button class="btn btn-primary" id="continue-btn">Continue booking</button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>Meridian Air — demo site for illustration only · Not a real airline · Prices shown are not real</footer>
+
+<script src="booking.js"></script>
+<script>
+  const selection = maLoadSelection();
+
+  if (!selection || !selection.flight) {
+    location.href = 'index.html';
+  }
+
+  const classMeta = {
+    economy: { label: 'Economy', extra: 0 },
+    premium: { label: 'Premium Economy', extra: 180 },
+    business: { label: 'Business', extra: 620 },
+    first: { label: 'First', extra: 1400 }
+  };
+
+  let chosenCabin = selection.cabin;
+  let chosenSeat = null;
+  let lounge = false;
+
+  document.getElementById('summary-route').textContent = selection.from + ' → ' + selection.to;
+  document.getElementById('summary-date').textContent = maFormatDate(selection.depart);
+  document.getElementById('summary-flight').textContent = selection.flight.flightNumber;
+  document.getElementById('summary-aircraft').textContent = selection.flight.aircraft;
+  document.getElementById('summary-passengers').textContent = selection.passengers;
+  document.getElementById('hero-meta').textContent =
+    maFormatDate(selection.depart) + ' · ' + selection.flight.flightNumber + ' · ' + selection.flight.aircraft;
+
+  function cabinOptions() {
+    const current = selection.flight.classes || ['economy'];
+    return current.map(c => {
+      const price = selection.flight.prices[c];
+      return { code: c, label: classMeta[c].label, price };
+    });
+  }
+
+  function renderCabins() {
+    const grid = document.getElementById('upgrade-grid');
+    grid.innerHTML = cabinOptions().map(opt => `
+      <div class="upgrade-card ${chosenCabin === opt.code ? 'active' : ''}" data-cabin="${opt.code}">
+        <h3>${opt.label}</h3>
+        <p>${opt.code === selection.cabin ? 'Currently selected fare.' : 'Upgrade to enjoy a more premium cabin experience.'}</p>
+        <div class="upgrade-price">$${opt.price.toLocaleString()}</div>
+      </div>
+    `).join('');
+
+    document.querySelectorAll('.upgrade-card').forEach(card => {
+      card.addEventListener('click', () => {
+        chosenCabin = card.dataset.cabin;
+        renderCabins();
+        renderSummary();
+        renderSeats();
+      });
+    });
+  }
+
+  function renderSummary() {
+    const cabinLabel = classMeta[chosenCabin]?.label || chosenCabin;
+    const basePrice = selection.flight.prices[chosenCabin] || selection.price || 0;
+    const paxCount = Number(selection.passengers) || 1;
+    const loungeTotal = lounge ? 45 * paxCount : 0;
+    const total = basePrice + loungeTotal;
+
+    document.getElementById('summary-cabin').textContent = cabinLabel;
+    document.getElementById('summary-seat').textContent = chosenSeat || 'Not selected';
+    document.getElementById('summary-lounge').textContent = lounge ? 'Added' : 'No';
+    document.getElementById('total-price').textContent = '$' + total.toLocaleString();
+  }
+
+  function renderSeats() {
+    const config = maSeatConfig(selection.flight.tier, chosenCabin);
+    const rows = maGenerateSeats(selection.flight.id + '-' + chosenCabin, config);
+    const map = document.getElementById('seat-map');
+
+    map.innerHTML = rows.map(row => {
+      const cols = config.cols;
+      return `
+        <div class="seat-row">
+          <div class="row-label">${row.rowNum}</div>
+          ${cols.map((col, idx) => {
+            const seat = row.seatsByCol[col];
+            const aisle = (idx === 1 || idx === cols.length - 2) ? '<div class="aisle"></div>' : '';
+            const cls = seat.occupied ? 'seat occupied' : ('seat' + (chosenSeat === seat.id ? ' selected' : ''));
+            return `
+              <button class="${cls}" data-seat="${seat.id}" ${seat.occupied ? 'disabled' : ''}>${col}</button>
+              ${aisle}
+            `;
+          }).join('')}
+        </div>
+      `;
+    }).join('');
+
+    map.querySelectorAll('.seat:not(.occupied)').forEach(btn => {
+      btn.addEventListener('click', () => {
+        chosenSeat = btn.dataset.seat;
+        renderSummary();
+        renderSeats();
+      });
+    });
+  }
+
+  document.getElementById('lounge-toggle').addEventListener('change', (e) => {
+    lounge = e.target.checked;
+    renderSummary();
+  });
+
+  document.getElementById('continue-btn').addEventListener('click', () => {
+    if (!chosenSeat) {
+      alert('Please select a seat first.');
+      return;
+    }
+
+    const finalPrice = (selection.flight.prices[chosenCabin] || selection.price || 0) +
+      (lounge ? (45 * (Number(selection.passengers) || 1)) : 0);
+
+    maSaveSelection({
+      ...selection,
+      cabin: chosenCabin,
+      price: finalPrice,
+      lounge
+    });
+
+    maSaveSeat({
+      seat: chosenSeat,
+      cabin: chosenCabin,
+      lounge
+    });
+
+    location.href = 'confirmation.html';
+  });
+
+  renderCabins();
+  renderSummary();
+  renderSeats();
+</script>
+
+</body>
+</html>
 
