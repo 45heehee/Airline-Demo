@@ -1,0 +1,84 @@
+/* ── 9. SESSION STORAGE ──────────────────────────────────────────────── */
+function maSaveSelection(obj)  { try { sessionStorage.setItem('ma_selection', JSON.stringify(obj)); } catch(e){} }
+function maLoadSelection()     { try { return JSON.parse(sessionStorage.getItem('ma_selection')); } catch(e){ return null; } }
+
+function maSaveSeat(seat)      { try { sessionStorage.setItem('ma_seat', JSON.stringify(seat)); } catch(e){} }
+function maLoadSeat()          { try { return JSON.parse(sessionStorage.getItem('ma_seat')); } catch(e){ return null; } }
+
+function maSaveSeats(seats)    { try { sessionStorage.setItem('ma_seats', JSON.stringify(seats || [])); } catch(e){} }
+function maLoadSeats()         { try { return JSON.parse(sessionStorage.getItem('ma_seats')) || []; } catch(e){ return []; } }
+
+function maSavePassengers(passengers) {
+  try { sessionStorage.setItem('ma_passengers_list', JSON.stringify(passengers || [])); } catch(e){}
+}
+function maLoadPassengers() {
+  try { return JSON.parse(sessionStorage.getItem('ma_passengers_list')) || []; } catch(e){ return []; }
+}
+
+function maSaveConfirmedBooking(obj) {
+  try { sessionStorage.setItem('ma_confirmed_booking', JSON.stringify(obj)); } catch(e){}
+}
+function maLoadConfirmedBooking() {
+  try { return JSON.parse(sessionStorage.getItem('ma_confirmed_booking')); } catch(e){ return null; }
+}
+
+function maMinutesUntilFlight(dateStr, depMinutes) {
+  if (!dateStr && depMinutes == null) return null;
+  const now = new Date();
+  const flight = new Date(dateStr + 'T00:00:00');
+  flight.setHours(Math.floor(depMinutes / 60), depMinutes % 60, 0, 0);
+  return Math.round((flight.getTime() - now.getTime()) / 60000);
+}
+
+function maBuildConfirmedBooking() {
+  const selection = maLoadSelection();
+  if (!selection) return null;
+
+  const passengersRequested = maPassengerCount(selection.passengers);
+  let seats = maLoadSeats();
+  const singleSeat = maLoadSeat();
+
+  if ((!seats || !seats.length) && singleSeat) seats = [singleSeat];
+
+  const passengers = maLoadPassengers();
+  const totalPrice = (selection.price || 0) * passengersRequested;
+  const minutesLeft = maMinutesUntilFlight(selection.depart, selection.depMinutes);
+
+  return {
+    bookingRef: 'MA' + Math.floor(100000 + Math.random() * 900000),
+    confirmedAt: new Date().toISOString(),
+    paymentStatus: 'Paid',
+    selection,
+    passengersRequested,
+    passengers,
+    seats,
+    totalPrice,
+    minutesLeft
+  };
+}
+
+function maSaveFreshConfirmation() {
+  const booking = maBuildConfirmedBooking();
+  if (booking) maSaveConfirmedBooking(booking);
+  return booking;
+}
+
+function maFlightReminderMessage(booking) {
+  if (!booking || booking.minutesLeft == null) return '';
+  const hours = Math.floor(booking.minutesLeft / 60);
+
+  if (booking.minutesLeft <= 0) return 'Your Meridian Air flight is now departing soon.';
+  if (booking.minutesLeft <= 60) return 'Your flight is in less than 1 hour.';
+  if (booking.minutesLeft <= 300) return 'Your flight is in ' + hours + ' hours.';
+  return '';
+}
+
+function maClearBooking() {
+  try {
+    sessionStorage.removeItem('ma_selection');
+    sessionStorage.removeItem('ma_seat');
+    sessionStorage.removeItem('ma_seats');
+    sessionStorage.removeItem('ma_passengers_list');
+    sessionStorage.removeItem('ma_confirmed_booking');
+  } catch(e){}
+}
