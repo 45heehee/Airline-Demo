@@ -727,7 +727,8 @@
     const stats = [
       { value: airports.length,                              label: 'destinations in network' },
       { value: regions.length,                               label: 'world regions served' },
-      { value: new Set(airports.map(a => a.country)).size,   label: 'countries represented' }
+      { value: new Set(airports.map(a => a.country)).size,   label: 'countries represented' },
+      { value: '3,090 NM',                                   label: 'max network span' }
     ];
     el.innerHTML = stats.map(s => `
       <div class="hero-stat">
