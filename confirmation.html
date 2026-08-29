@@ -1,84 +1,744 @@
-/* ── 9. SESSION STORAGE ──────────────────────────────────────────────── */
-function maSaveSelection(obj)  { try { sessionStorage.setItem('ma_selection', JSON.stringify(obj)); } catch(e){} }
-function maLoadSelection()     { try { return JSON.parse(sessionStorage.getItem('ma_selection')); } catch(e){ return null; } }
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Confirmed — Meridian Air</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Design Tokens ─────────────────────────────────────── */
+    :root {
+      --ink:       #0A2A43;
+      --ink-soft:  #11486B;
+      --paper:     #F3FBFD;
+      --paper-dim: #DDF4F7;
+      --brass:     #12B8C8;
+      --brass-dim: #74D9E3;
+      --slate:     #4E7288;
+      --hairline:  #C6E7EE;
 
-function maSaveSeat(seat)      { try { sessionStorage.setItem('ma_seat', JSON.stringify(seat)); } catch(e){} }
-function maLoadSeat()          { try { return JSON.parse(sessionStorage.getItem('ma_seat')); } catch(e){ return null; } }
+      --text-xs:   clamp(0.75rem,  0.7rem  + 0.25vw, 0.875rem);
+      --text-sm:   clamp(0.875rem, 0.8rem  + 0.35vw, 1rem);
+      --text-base: clamp(1rem,     0.95rem + 0.25vw, 1.125rem);
+      --text-lg:   clamp(1.125rem, 1rem    + 0.75vw, 1.5rem);
+      --text-xl:   clamp(1.5rem,   1.2rem  + 1.25vw, 2.25rem);
+      --text-2xl:  clamp(2rem,     1.2rem  + 2.5vw,  3.5rem);
 
-function maSaveSeats(seats)    { try { sessionStorage.setItem('ma_seats', JSON.stringify(seats || [])); } catch(e){} }
-function maLoadSeats()         { try { return JSON.parse(sessionStorage.getItem('ma_seats')) || []; } catch(e){ return []; } }
+      --space-1:  0.25rem;
+      --space-2:  0.5rem;
+      --space-3:  0.75rem;
+      --space-4:  1rem;
+      --space-6:  1.5rem;
+      --space-8:  2rem;
+      --space-10: 2.5rem;
+      --space-12: 3rem;
+      --space-16: 4rem;
 
-function maSavePassengers(passengers) {
-  try { sessionStorage.setItem('ma_passengers_list', JSON.stringify(passengers || [])); } catch(e){}
-}
-function maLoadPassengers() {
-  try { return JSON.parse(sessionStorage.getItem('ma_passengers_list')) || []; } catch(e){ return []; }
-}
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+      --radius-full: 9999px;
 
-function maSaveConfirmedBooking(obj) {
-  try { sessionStorage.setItem('ma_confirmed_booking', JSON.stringify(obj)); } catch(e){}
-}
-function maLoadConfirmedBooking() {
-  try { return JSON.parse(sessionStorage.getItem('ma_confirmed_booking')); } catch(e){ return null; }
-}
+      --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
 
-function maMinutesUntilFlight(dateStr, depMinutes) {
-  if (!dateStr && depMinutes == null) return null;
-  const now = new Date();
-  const flight = new Date(dateStr + 'T00:00:00');
-  flight.setHours(Math.floor(depMinutes / 60), depMinutes % 60, 0, 0);
-  return Math.round((flight.getTime() - now.getTime()) / 60000);
-}
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body:    'Inter', 'Helvetica Neue', sans-serif;
+    }
 
-function maBuildConfirmedBooking() {
-  const selection = maLoadSelection();
-  if (!selection) return null;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  const passengersRequested = maPassengerCount(selection.passengers);
-  let seats = maLoadSeats();
-  const singleSeat = maLoadSeat();
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+    }
 
-  if ((!seats || !seats.length) && singleSeat) seats = [singleSeat];
+    body {
+      min-height: 100dvh;
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      background: var(--ink);
+      color: var(--paper);
+      line-height: 1.6;
+    }
 
-  const passengers = maLoadPassengers();
-  const totalPrice = (selection.price || 0) * passengersRequested;
-  const minutesLeft = maMinutesUntilFlight(selection.depart, selection.depMinutes);
+    img { display: block; max-width: 100%; }
+    button { cursor: pointer; background: none; border: none; font: inherit; color: inherit; }
+    a { color: inherit; text-decoration: none; transition: color var(--transition); }
 
-  return {
-    bookingRef: 'MA' + Math.floor(100000 + Math.random() * 900000),
-    confirmedAt: new Date().toISOString(),
-    paymentStatus: 'Paid',
-    selection,
-    passengersRequested,
-    passengers,
-    seats,
-    totalPrice,
-    minutesLeft
-  };
-}
+    /* ── Nav ──────────────────────────────────────────────── */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-4) var(--space-8);
+      border-bottom: 1px solid rgba(198,231,238,0.12);
+      background: rgba(10,42,67,0.92);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
 
-function maSaveFreshConfirmation() {
-  const booking = maBuildConfirmedBooking();
-  if (booking) maSaveConfirmedBooking(booking);
-  return booking;
-}
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      color: var(--paper);
+    }
 
-function maFlightReminderMessage(booking) {
-  if (!booking || booking.minutesLeft == null) return '';
-  const hours = Math.floor(booking.minutesLeft / 60);
+    .nav-logo svg { color: var(--brass); flex-shrink: 0; }
 
-  if (booking.minutesLeft <= 0) return 'Your Meridian Air flight is now departing soon.';
-  if (booking.minutesLeft <= 60) return 'Your flight is in less than 1 hour.';
-  if (booking.minutesLeft <= 300) return 'Your flight is in ' + hours + ' hours.';
-  return '';
-}
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: var(--space-6);
+      list-style: none;
+    }
 
-function maClearBooking() {
-  try {
-    sessionStorage.removeItem('ma_selection');
-    sessionStorage.removeItem('ma_seat');
-    sessionStorage.removeItem('ma_seats');
-    sessionStorage.removeItem('ma_passengers_list');
-    sessionStorage.removeItem('ma_confirmed_booking');
-  } catch(e){}
-}
+    .nav-links a {
+      font-size: var(--text-sm);
+      color: rgba(243,251,253,0.7);
+      transition: color var(--transition);
+    }
+
+    .nav-links a:hover { color: var(--brass); }
+
+    /* ── Hero banner ──────────────────────────────────────── */
+    .confirm-hero {
+      background: linear-gradient(135deg, var(--ink-soft) 0%, var(--ink) 60%);
+      padding: var(--space-16) var(--space-8) var(--space-10);
+      text-align: center;
+      border-bottom: 1px solid rgba(18,184,200,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .confirm-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(18,184,200,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .check-ring {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(18,184,200,0.12);
+      border: 2px solid rgba(18,184,200,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-6);
+      animation: pop 0.45s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    @keyframes pop {
+      from { transform: scale(0.6); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    .confirm-hero h1 {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      color: var(--paper);
+      margin-bottom: var(--space-2);
+    }
+
+    .confirm-hero p {
+      font-size: var(--text-base);
+      color: rgba(243,251,253,0.65);
+      max-width: 48ch;
+      margin: 0 auto var(--space-4);
+      text-wrap: pretty;
+    }
+
+    .booking-ref-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      background: rgba(18,184,200,0.12);
+      border: 1px solid rgba(18,184,200,0.3);
+      border-radius: var(--radius-full);
+      padding: var(--space-2) var(--space-6);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--brass-dim);
+    }
+
+    .booking-ref-pill span { color: rgba(243,251,253,0.5); font-weight: 400; }
+
+    /* ── Main layout ──────────────────────────────────────── */
+    .page-body {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: var(--space-10) var(--space-6) var(--space-16);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+
+    /* ── Cards ───────────────────────────────────────────── */
+    .card {
+      background: var(--ink-soft);
+      border: 1px solid rgba(198,231,238,0.1);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-6);
+      border-bottom: 1px solid rgba(198,231,238,0.08);
+      background: rgba(10,42,67,0.3);
+    }
+
+    .card-header svg { color: var(--brass); flex-shrink: 0; }
+
+    .card-header h2 {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--brass-dim);
+    }
+
+    .card-body {
+      padding: var(--space-6);
+    }
+
+    /* ── Flight summary ───────────────────────────────────── */
+    .flight-route {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+
+    .airport-col { display: flex; flex-direction: column; }
+    .airport-col.right { text-align: right; align-items: flex-end; }
+
+    .airport-code {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--paper);
+      letter-spacing: 0.04em;
+    }
+
+    .airport-city {
+      font-size: var(--text-xs);
+      color: rgba(243,251,253,0.55);
+      margin-top: var(--space-1);
+    }
+
+    .route-line {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-1);
+      flex-shrink: 0;
+    }
+
+    .route-line-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      width: 140px;
+    }
+
+    .route-line-bar .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--brass);
+      flex-shrink: 0;
+    }
+
+    .route-line-bar .bar {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--brass), rgba(18,184,200,0.3));
+    }
+
+    .route-line-duration {
+      font-size: var(--text-xs);
+      color: var(--brass-dim);
+      letter-spacing: 0.04em;
+    }
+
+    /* flight meta row */
+    .flight-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2) var(--space-6);
+    }
+
+    .meta-chip {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .meta-chip .label {
+      font-size: var(--text-xs);
+      color: rgba(243,251,253,0.45);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .meta-chip .value {
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--paper);
+    }
+
+    /* ── Passenger list ───────────────────────────────────── */
+    .pax-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .pax-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding: var(--space-3) var(--space-4);
+      background: rgba(10,42,67,0.4);
+      border: 1px solid rgba(198,231,238,0.07);
+      border-radius: var(--radius-md);
+    }
+
+    .pax-row .pax-name {
+      font-weight: 500;
+      color: var(--paper);
+      font-size: var(--text-sm);
+    }
+
+    .pax-row .pax-seat {
+      font-size: var(--text-xs);
+      color: var(--brass-dim);
+      background: rgba(18,184,200,0.1);
+      border: 1px solid rgba(18,184,200,0.2);
+      padding: 2px var(--space-3);
+      border-radius: var(--radius-full);
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
+
+    /* ── Price summary ────────────────────────────────────── */
+    .price-rows {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: var(--text-sm);
+      color: rgba(243,251,253,0.65);
+    }
+
+    .price-row.total {
+      border-top: 1px solid rgba(198,231,238,0.12);
+      padding-top: var(--space-3);
+      margin-top: var(--space-2);
+      font-size: var(--text-base);
+      font-weight: 700;
+      color: var(--paper);
+    }
+
+    .price-row .amount { font-variant-numeric: tabular-nums; }
+    .price-row.total .amount { color: var(--brass); }
+
+    /* status badge */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+    }
+
+    .status-badge.paid {
+      background: rgba(34,197,94,0.1);
+      color: #6ee7a0;
+      border: 1px solid rgba(34,197,94,0.25);
+    }
+
+    .status-badge .dot-live {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #6ee7a0;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    /* ── Reminder banner ──────────────────────────────────── */
+    .reminder-banner {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-6);
+      background: rgba(18,184,200,0.06);
+      border: 1px solid rgba(18,184,200,0.18);
+      border-radius: var(--radius-lg);
+    }
+
+    .reminder-banner svg { color: var(--brass); flex-shrink: 0; }
+    .reminder-banner p { font-size: var(--text-sm); color: rgba(243,251,253,0.75); }
+    .reminder-banner strong { color: var(--paper); }
+
+    /* ── Actions ──────────────────────────────────────────── */
+    .actions {
+      display: flex;
+      gap: var(--space-4);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-8);
+      border-radius: var(--radius-full);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--brass);
+      color: var(--ink);
+    }
+
+    .btn-primary:hover {
+      background: var(--brass-dim);
+      box-shadow: 0 0 20px rgba(18,184,200,0.3);
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: rgba(243,251,253,0.7);
+      border: 1px solid rgba(198,231,238,0.2);
+    }
+
+    .btn-ghost:hover {
+      color: var(--paper);
+      border-color: rgba(198,231,238,0.45);
+      background: rgba(198,231,238,0.05);
+    }
+
+    /* ── Empty / error state ──────────────────────────────── */
+    .empty-state {
+      max-width: 480px;
+      margin: var(--space-16) auto;
+      text-align: center;
+      padding: var(--space-10) var(--space-8);
+      background: var(--ink-soft);
+      border: 1px solid rgba(198,231,238,0.1);
+      border-radius: var(--radius-xl);
+    }
+
+    .empty-state svg { color: var(--slate); margin: 0 auto var(--space-6); }
+    .empty-state h2 { font-family: var(--font-display); font-size: var(--text-xl); margin-bottom: var(--space-3); }
+    .empty-state p { color: rgba(243,251,253,0.6); font-size: var(--text-sm); margin-bottom: var(--space-8); }
+
+    /* ── Footer ───────────────────────────────────────────── */
+    .footer {
+      text-align: center;
+      padding: var(--space-8);
+      border-top: 1px solid rgba(198,231,238,0.08);
+      font-size: var(--text-xs);
+      color: rgba(243,251,253,0.3);
+    }
+
+    /* ── Responsive ───────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .nav { padding: var(--space-3) var(--space-4); }
+      .nav-links { display: none; }
+      .confirm-hero { padding: var(--space-12) var(--space-4) var(--space-8); }
+      .page-body { padding: var(--space-6) var(--space-4) var(--space-12); }
+      .card-body { padding: var(--space-4); }
+      .flight-route { gap: var(--space-2); }
+      .route-line-bar { width: 80px; }
+      .airport-code { font-size: var(--text-lg); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navigation ─────────────────────────────────────── -->
+  <nav class="nav" aria-label="Main navigation">
+    <a href="index.html" class="nav-logo" aria-label="Meridian Air home">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <circle cx="14" cy="14" r="13" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M5 18 L14 8 L23 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M9 18 L14 13 L19 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="rgba(18,184,200,0.3)"/>
+      </svg>
+      Meridian Air
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Book</a></li>
+      <li><a href="international.html">Destinations</a></li>
+      <li><a href="fleet.html">Fleet</a></li>
+    </ul>
+  </nav>
+
+  <!-- ── Confirmation hero ──────────────────────────────── -->
+  <div class="confirm-hero" id="confirmHero" style="display:none;">
+    <div class="check-ring" aria-hidden="true">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#12B8C8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <h1>Booking Confirmed</h1>
+    <p>Your Meridian Air journey is all set. Safe travels!</p>
+    <div class="booking-ref-pill">
+      <span>Booking Ref</span>
+      <strong id="heroRef">—</strong>
+    </div>
+  </div>
+
+  <!-- ── Main content ───────────────────────────────────── -->
+  <main>
+    <div class="page-body" id="pageBody" style="display:none;">
+
+      <!-- Flight card -->
+      <div class="card" id="flightCard">
+        <div class="card-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.42 12a19.79 19.79 0 0 1-3.07-8.67 2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <h2>Flight Details</h2>
+          <div style="margin-left:auto;" id="paymentBadge"></div>
+        </div>
+        <div class="card-body">
+          <div class="flight-route">
+            <div class="airport-col">
+              <div class="airport-code" id="fromCode">—</div>
+              <div class="airport-city" id="fromCity">—</div>
+              <div class="airport-city" id="depTime" style="margin-top:var(--space-2);color:var(--brass-dim);font-weight:500;"></div>
+            </div>
+            <div class="route-line">
+              <div class="route-line-bar">
+                <div class="dot"></div>
+                <div class="bar"></div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#12B8C8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </div>
+              <div class="route-line-duration" id="routeDuration">—</div>
+            </div>
+            <div class="airport-col right">
+              <div class="airport-code" id="toCode">—</div>
+              <div class="airport-city" id="toCity">—</div>
+              <div class="airport-city" id="arrTime" style="margin-top:var(--space-2);color:var(--brass-dim);font-weight:500;"></div>
+            </div>
+          </div>
+          <div class="flight-meta">
+            <div class="meta-chip"><span class="label">Date</span><span class="value" id="metaDate">—</span></div>
+            <div class="meta-chip"><span class="label">Flight</span><span class="value" id="metaFlight">—</span></div>
+            <div class="meta-chip"><span class="label">Aircraft</span><span class="value" id="metaAircraft">—</span></div>
+            <div class="meta-chip"><span class="label">Cabin</span><span class="value" id="metaCabin">—</span></div>
+            <div class="meta-chip"><span class="label">Passengers</span><span class="value" id="metaPax">—</span></div>
+            <div class="meta-chip"><span class="label">Distance</span><span class="value" id="metaDist">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Passengers card -->
+      <div class="card" id="passengerCard">
+        <div class="card-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <h2>Passengers &amp; Seats</h2>
+        </div>
+        <div class="card-body">
+          <div class="pax-list" id="paxList"></div>
+        </div>
+      </div>
+
+      <!-- Price card -->
+      <div class="card" id="priceCard">
+        <div class="card-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <h2>Price Summary</h2>
+        </div>
+        <div class="card-body">
+          <div class="price-rows" id="priceRows"></div>
+        </div>
+      </div>
+
+      <!-- Reminder banner (only if flight is within 5h) -->
+      <div class="reminder-banner" id="reminderBanner" style="display:none;" role="status">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <p id="reminderText"></p>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <a href="index.html" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+          Book Another Flight
+        </a>
+        <a href="international.html" class="btn btn-ghost">Explore Destinations</a>
+      </div>
+
+    </div>
+
+    <!-- Empty state (no booking found) -->
+    <div class="empty-state" id="emptyState" style="display:none;" role="alert">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <h2>No Booking Found</h2>
+      <p>We couldn't find a confirmed booking in this session. Please complete a booking from the search page first.</p>
+      <a href="index.html" class="btn btn-primary">Search Flights</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    &copy; 2026 Meridian Air. All rights reserved. This is a fictional airline for demonstration purposes only.
+  </footer>
+
+  <script src="booking.js"></script>
+  <script>
+    (function () {
+      /* ── helpers ──────────────────────────────────────── */
+      function fmt(n) {
+        return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      function capitalise(s) {
+        return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
+      }
+
+      /* ── load data ────────────────────────────────────── */
+      const sel  = typeof maLoadSelection  === 'function' ? maLoadSelection()  : null;
+      const seat = typeof maLoadSeat       === 'function' ? maLoadSeat()       : null;
+
+      if (!sel) {
+        document.getElementById('emptyState').style.display = '';
+        return;
+      }
+
+      /* ── generate booking reference ───────────────────── */
+      const ref = 'MA' + Math.floor(100000 + Math.random() * 900000);
+
+      /* ── show sections ────────────────────────────────── */
+      document.getElementById('confirmHero').style.display = '';
+      document.getElementById('heroRef').textContent = ref;
+      document.getElementById('pageBody').style.display = '';
+
+      /* ── flight details ───────────────────────────────── */
+      const fromA = (typeof maFindAirport === 'function') ? maFindAirport(sel.from) : null;
+      const toA   = (typeof maFindAirport === 'function') ? maFindAirport(sel.to)   : null;
+
+      document.getElementById('fromCode').textContent = fromA ? fromA.code : (sel.from || '—');
+      document.getElementById('fromCity').textContent = fromA ? fromA.city + ', ' + fromA.country : '';
+      document.getElementById('toCode').textContent   = toA   ? toA.code   : (sel.to   || '—');
+      document.getElementById('toCity').textContent   = toA   ? toA.city   + ', ' + toA.country   : '';
+
+      if (sel.depMinutes != null && typeof maFormatTime === 'function') {
+        document.getElementById('depTime').textContent = 'Dep ' + maFormatTime(sel.depMinutes);
+      }
+      if (sel.arrMinutes != null && typeof maFormatTime === 'function') {
+        const plusDay = (sel.arrDayOffset && sel.arrDayOffset > 0) ? ' +' + sel.arrDayOffset + 'd' : '';
+        document.getElementById('arrTime').textContent = 'Arr ' + maFormatTime(sel.arrMinutes) + plusDay;
+      }
+      if (sel.durMinutes != null && typeof maFormatDuration === 'function') {
+        document.getElementById('routeDuration').textContent = maFormatDuration(sel.durMinutes);
+      }
+
+      document.getElementById('metaDate').textContent     = (typeof maFormatDate === 'function') ? maFormatDate(sel.depart) : (sel.depart || '—');
+      document.getElementById('metaFlight').textContent   = sel.flightNumber || '—';
+      document.getElementById('metaAircraft').textContent = sel.aircraft     || '—';
+      document.getElementById('metaCabin').textContent    = capitalise(sel.cabin) || '—';
+      document.getElementById('metaPax').textContent      = (typeof maPassengerCount === 'function') ? maPassengerCount(sel.passengers) : (sel.passengers || 1);
+      document.getElementById('metaDist').textContent     = sel.distKm ? sel.distKm.toLocaleString() + ' km' : '—';
+
+      /* ── payment badge ────────────────────────────────── */
+      document.getElementById('paymentBadge').innerHTML =
+        '<div class="status-badge paid"><div class="dot-live" aria-hidden="true"></div>Payment Confirmed</div>';
+
+      /* ── passengers & seats ───────────────────────────── */
+      const paxCount = (typeof maPassengerCount === 'function') ? maPassengerCount(sel.passengers) : 1;
+      const paxList  = document.getElementById('paxList');
+
+      if (seat) {
+        /* single seat */
+        const row = document.createElement('div');
+        row.className = 'pax-row';
+        row.innerHTML =
+          '<span class="pax-name">Passenger 1</span>' +
+          '<span class="pax-seat">' + (seat.id || seat) + '</span>';
+        paxList.appendChild(row);
+      } else {
+        for (let i = 0; i < paxCount; i++) {
+          const row = document.createElement('div');
+          row.className = 'pax-row';
+          row.innerHTML =
+            '<span class="pax-name">Passenger ' + (i + 1) + '</span>' +
+            '<span class="pax-seat" style="color:rgba(243,251,253,0.4);border-color:rgba(198,231,238,0.12);">No seat selected</span>';
+          paxList.appendChild(row);
+        }
+      }
+
+      /* ── price summary ────────────────────────────────── */
+      const pricePerPax = sel.price || 0;
+      const total       = pricePerPax * paxCount;
+      const tax         = Math.round(total * 0.13 * 100) / 100;
+      const grandTotal  = total + tax;
+      const priceRows   = document.getElementById('priceRows');
+
+      priceRows.innerHTML =
+        '<div class="price-row"><span>' + capitalise(sel.cabin || 'Economy') + ' × ' + paxCount + ' passenger' + (paxCount !== 1 ? 's' : '') + '</span><span class="amount">' + fmt(total) + '</span></div>' +
+        '<div class="price-row"><span>Taxes &amp; fees (13%)</span><span class="amount">' + fmt(tax) + '</span></div>' +
+        '<div class="price-row total"><span>Total charged</span><span class="amount">' + fmt(grandTotal) + '</span></div>';
+
+      /* ── reminder banner ──────────────────────────────── */
+      if (sel.depart && sel.depMinutes != null) {
+        const now = new Date();
+        const flight = new Date(sel.depart + 'T00:00:00');
+        flight.setHours(Math.floor(sel.depMinutes / 60), sel.depMinutes % 60, 0, 0);
+        const mins = Math.round((flight.getTime() - now.getTime()) / 60000);
+        let msg = '';
+        if (mins > 0 && mins <= 300) {
+          const h = Math.floor(mins / 60), m = mins % 60;
+          msg = '<strong>Your flight departs in ' + (h > 0 ? h + 'h ' : '') + m + 'm.</strong> Please head to the airport now.';
+        } else if (mins <= 0 && mins > -120) {
+          msg = '<strong>Your Meridian Air flight is departing now.</strong> Please proceed to your gate immediately.';
+        }
+        if (msg) {
+          document.getElementById('reminderText').innerHTML = msg;
+          document.getElementById('reminderBanner').style.display = '';
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
