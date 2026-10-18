@@ -123,6 +123,7 @@
   .summary-card {
     position: sticky;
     top: 20px;
+    align-self: start;
   }
 
   .kicker {
@@ -150,6 +151,7 @@
 
   .summary-row strong {
     color: var(--ink);
+    text-align: right;
   }
 
   .price-total {
@@ -230,6 +232,17 @@
   .toggle-row small {
     color: var(--slate);
     font-size: 12px;
+  }
+
+  .seat-count {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--paper-dim);
+    border-radius: 999px;
+    display: inline-block;
+    padding: 5px 12px;
+    margin-bottom: 6px;
   }
 
   .seat-map {
@@ -383,6 +396,7 @@
   </a>
 
   <nav>
+    <a href="find.html">Find Your Flight</a>
     <a href="fleet.html">Our Fleet</a>
     <a href="international.html">International</a>
     <a href="ultra-long-range.html">Ultra-Long-Range</a>
@@ -407,7 +421,7 @@
         <div class="summary-row"><span>Aircraft</span><strong id="summary-aircraft">—</strong></div>
         <div class="summary-row"><span>Passengers</span><strong id="summary-passengers">—</strong></div>
         <div class="summary-row"><span>Cabin</span><strong id="summary-cabin">—</strong></div>
-        <div class="summary-row"><span>Seat</span><strong id="summary-seat">At check-in</strong></div>
+        <div class="summary-row"><span>Seats</span><strong id="summary-seat">At check-in</strong></div>
         <div class="summary-row"><span>Lounge</span><strong id="summary-lounge">No</strong></div>
       </div>
 
@@ -418,7 +432,7 @@
     <section class="panel">
       <div class="kicker">Optional upgrades</div>
       <h2 class="section-title">Upgrade Class?</h2>
-      <p class="section-copy">Choose a higher cabin or keep your selected fare.</p>
+      <p class="section-copy">Choose a higher cabin or keep your selected fare. Prices are per passenger.</p>
 
       <div class="upgrade-grid" id="upgrade-grid"></div>
 
@@ -434,7 +448,8 @@
 
       <div class="kicker">Choose your place onboard · optional</div>
       <h2 class="section-title">Seat Selection</h2>
-      <p class="section-copy">Pick a seat now, or skip this and choose one at check-in.</p>
+      <p class="section-copy" id="seat-copy">Pick a seat for each passenger (tap a seat again to deselect), or skip and choose at check-in.</p>
+      <div class="seat-count" id="seat-count"></div>
 
       <div id="seat-map" class="seat-map"></div>
 
@@ -469,15 +484,16 @@
     first: { label: 'First', extra: 1400 }
   };
 
+  const paxN = Math.max(1, Number(selection.passengers) || 1);
   let chosenCabin = selection.cabin;
-  let chosenSeat = null;
+  let chosenSeats = [];
   let lounge = false;
 
   document.getElementById('summary-route').textContent = selection.from + ' → ' + selection.to;
   document.getElementById('summary-date').textContent = maFormatDate(selection.depart);
   document.getElementById('summary-flight').textContent = selection.flight.flightNumber;
   document.getElementById('summary-aircraft').textContent = selection.flight.aircraft;
-  document.getElementById('summary-passengers').textContent = selection.passengers;
+  document.getElementById('summary-passengers').textContent = paxN;
   document.getElementById('hero-meta').textContent =
     maFormatDate(selection.depart) + ' · ' + selection.flight.flightNumber + ' · ' + selection.flight.aircraft;
 
@@ -489,20 +505,25 @@
     });
   }
 
+  function perPassenger() {
+    const base = selection.flight.prices[chosenCabin] || selection.price || 0;
+    return base + (lounge ? 45 : 0);
+  }
+
   function renderCabins() {
     const grid = document.getElementById('upgrade-grid');
     grid.innerHTML = cabinOptions().map(opt => `
       <div class="upgrade-card ${chosenCabin === opt.code ? 'active' : ''}" data-cabin="${opt.code}">
         <h3>${opt.label}</h3>
         <p>${opt.code === selection.cabin ? 'Currently selected fare.' : 'Upgrade to enjoy a more premium cabin experience.'}</p>
-        <div class="upgrade-price">$${opt.price.toLocaleString()}</div>
+        <div class="upgrade-price">$${opt.price.toLocaleString()} <small>per person</small></div>
       </div>
     `).join('');
 
     document.querySelectorAll('.upgrade-card').forEach(card => {
       card.addEventListener('click', () => {
         chosenCabin = card.dataset.cabin;
-        chosenSeat = null;
+        chosenSeats = [];
         renderCabins();
         renderSummary();
         renderSeats();
@@ -512,15 +533,19 @@
 
   function renderSummary() {
     const cabinLabel = classMeta[chosenCabin]?.label || chosenCabin;
-    const basePrice = selection.flight.prices[chosenCabin] || selection.price || 0;
-    const paxCount = Number(selection.passengers) || 1;
-    const loungeTotal = lounge ? 45 * paxCount : 0;
-    const total = basePrice + loungeTotal;
+    const perPax = perPassenger();
+    const total = perPax * paxN;
 
     document.getElementById('summary-cabin').textContent = cabinLabel;
-    document.getElementById('summary-seat').textContent = chosenSeat || 'At check-in';
+    document.getElementById('summary-seat').textContent = chosenSeats.length
+      ? chosenSeats.join(', ') + ' (' + chosenSeats.length + '/' + paxN + ')'
+      : 'At check-in';
     document.getElementById('summary-lounge').textContent = lounge ? 'Added' : 'No';
-    document.getElementById('total-price').textContent = '$' + total.toLocaleString();
+    document.getElementById('total-price').innerHTML =
+      '$' + total.toLocaleString() +
+      '<div class="mini-note">' + paxN + ' × $' + perPax.toLocaleString() + ' per passenger</div>';
+    document.getElementById('seat-count').textContent =
+      chosenSeats.length + ' of ' + paxN + ' seat' + (paxN === 1 ? '' : 's') + ' selected';
   }
 
   function renderSeats() {
@@ -536,7 +561,7 @@
           ${cols.map((col, idx) => {
             const seat = row.seatsByCol[col];
             const aisle = (idx === 1 || idx === cols.length - 2) ? '<div class="aisle"></div>' : '';
-            const cls = seat.occupied ? 'seat occupied' : ('seat' + (chosenSeat === seat.id ? ' selected' : ''));
+            const cls = seat.occupied ? 'seat occupied' : ('seat' + (chosenSeats.includes(seat.id) ? ' selected' : ''));
             return `
               <button class="${cls}" data-seat="${seat.id}" ${seat.occupied ? 'disabled' : ''}>${col}</button>
               ${aisle}
@@ -548,7 +573,13 @@
 
     map.querySelectorAll('.seat:not(.occupied)').forEach(btn => {
       btn.addEventListener('click', () => {
-        chosenSeat = (chosenSeat === btn.dataset.seat) ? null : btn.dataset.seat;
+        const id = btn.dataset.seat;
+        if (chosenSeats.includes(id)) {
+          chosenSeats = chosenSeats.filter(s => s !== id);
+        } else {
+          if (chosenSeats.length >= paxN) chosenSeats.shift();
+          chosenSeats.push(id);
+        }
         renderSummary();
         renderSeats();
       });
@@ -561,18 +592,17 @@
   });
 
   document.getElementById('continue-btn').addEventListener('click', () => {
-    const finalPrice = (selection.flight.prices[chosenCabin] || selection.price || 0) +
-      (lounge ? (45 * (Number(selection.passengers) || 1)) : 0);
-
+    /* price is stored PER PASSENGER (fare + lounge); later pages multiply by passengers */
     maSaveSelection({
       ...selection,
       cabin: chosenCabin,
-      price: finalPrice,
+      price: perPassenger(),
       lounge
     });
 
     maSaveSeat({
-      seat: chosenSeat,
+      seat: chosenSeats[0] || null,
+      seats: chosenSeats,
       cabin: chosenCabin,
       lounge
     });
