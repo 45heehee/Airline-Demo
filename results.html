@@ -157,6 +157,7 @@
         <div class="flight-meta">
           <div class="flight-number">${f.flightNumber}</div>
           <div class="flight-aircraft">${f.aircraft}</div>
+          <div class="flight-aircraft">${f.distNm ? f.distNm.toLocaleString() + ' NM' : ''}</div>
         </div>
       </div>
       <div class="fare-ladder">${pills}</div>
