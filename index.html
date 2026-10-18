@@ -462,7 +462,11 @@
           <option>2</option>
           <option>3</option>
           <option>4</option>
-          <option>5+</option>
+          <option>5</option>
+          <option>6</option>
+          <option>7</option>
+          <option>8</option>
+          <option>9</option>
         </select>
       </div>
       <button type="submit" class="search-btn">Search Flights</button>
@@ -522,8 +526,7 @@
     const from = document.getElementById('from').value.trim();
     const to = document.getElementById('to').value.trim();
     const depart = document.getElementById('depart').value;
-    let passengers = document.getElementById('passengers').value;
-    passengers = passengers === '5+' ? '5' : passengers;
+    const passengers = document.getElementById('passengers').value;
 
     /* New trip: start with a clean slate (no old names, seats or flight). */
     try {
