@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Passenger Information — Meridian Air</title>
+<style>
+  :root {
+    --ink: #0A2A43;
+    --ink-soft: #11486B;
+    --paper: #F3FBFD;
+    --paper-dim: #DDF4F7;
+    --brass: #12B8C8;
+    --slate: #4E7288;
+    --hairline: #C6E7EE;
+    --err: #B3261E;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); font-family: "Helvetica Neue", Arial, sans-serif; }
+  h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; }
+
+  header { display: flex; justify-content: space-between; align-items: center; padding: 20px 28px; border-bottom: 1px solid var(--hairline); background: var(--paper); }
+  .logo { text-decoration: none; color: var(--ink); display: flex; align-items: center; gap: 10px; }
+  .logo-text { display: flex; flex-direction: column; line-height: 1; }
+  .logo-text .name { font-family: Georgia, serif; font-size: 19px; }
+  .logo-text .tag { font-size: 9.5px; letter-spacing: 0.18em; color: var(--brass); text-transform: uppercase; margin-top: 2px; }
+  nav { display: flex; gap: 26px; font-size: 13px; }
+  nav a { color: var(--slate); text-decoration: none; }
+
+  .hero { background: var(--ink); color: var(--paper); padding: 34px 28px; }
+  .hero .eyebrow { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brass); margin-bottom: 10px; }
+  .hero h1 { font-size: clamp(28px, 4vw, 42px); margin-bottom: 10px; }
+  .hero p { color: var(--paper-dim); font-size: 14px; }
+
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 24px 70px; }
+  .layout { display: grid; grid-template-columns: 320px 1fr; gap: 22px; }
+  .panel { background: #fff; border: 1px solid var(--hairline); border-radius: 8px; padding: 20px; }
+  .summary-card { position: sticky; top: 20px; align-self: start; }
+  .kicker { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--slate); margin-bottom: 12px; }
+  .summary-grid { display: grid; gap: 12px; margin-top: 16px; }
+  .summary-row { display: flex; justify-content: space-between; gap: 14px; border-bottom: 1px solid var(--hairline); padding-bottom: 10px; font-size: 14px; }
+  .price-total { font-size: 24px; margin-top: 14px; }
+  .mini-note { font-size: 12px; color: var(--slate); margin-top: 8px; }
+
+  .section-title { font-size: 24px; margin-bottom: 8px; }
+  .section-copy { color: var(--slate); font-size: 14px; line-height: 1.6; margin-bottom: 18px; }
+
+  .pax-block { border: 1px solid var(--hairline); border-radius: 8px; background: var(--paper); padding: 18px; margin-bottom: 18px; }
+  .pax-block h3 { font-size: 20px; margin-bottom: 4px; }
+  .pax-seat { font-size: 12px; color: var(--slate); margin-bottom: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--slate); }
+  .field input, .field select { border: 1px solid var(--hairline); border-radius: 4px; padding: 11px 12px; font-size: 14px; background: #fff; color: var(--ink); font-family: inherit; }
+  .field input:focus, .field select:focus { outline: none; border-color: var(--brass); }
+  .field.invalid input, .field.invalid select { border-color: var(--err); }
+  .field .msg { display: none; font-size: 11.5px; color: var(--err); }
+  .field.invalid .msg { display: block; }
+  .full { grid-column: 1 / -1; }
+
+  .actions { margin-top: 24px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .btn { display: inline-block; border: 1px solid var(--hairline); border-radius: 4px; padding: 12px 18px; text-decoration: none; font-size: 13px; font-weight: 600; cursor: pointer; background: #fff; color: var(--ink); }
+  .btn-primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  footer { text-align: center; padding: 24px; border-top: 1px solid var(--hairline); font-size: 12px; color: var(--slate); }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .summary-card { position: static; }
+    .grid { grid-template-columns: 1fr; }
+    nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="index.html">
+    <div style="width:18px;height:18px;border:2px solid var(--brass);border-radius:50%; position:relative;">
+      <div style="position:absolute;left:7px;top:-5px;width:2px;height:26px;background:var(--brass);"></div>
+    </div>
+    <div class="logo-text">
+      <span class="name">Meridian Air</span>
+      <span class="tag">Every Longitude</span>
+    </div>
+  </a>
+  <nav>
+    <a href="fleet.html">Our Fleet</a>
+    <a href="international.html">International</a>
+    <a href="ultra-long-range.html">Ultra-Long-Range</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">Traveler Details</div>
+  <h1>Passenger Information</h1>
+  <p id="hero-meta">Loading your journey...</p>
+</section>
+
+<main class="wrap">
+  <div class="layout">
+    <aside class="panel summary-card">
+      <div class="kicker">Your itinerary</div>
+      <h2 id="summary-route">Route</h2>
+      <div class="summary-grid">
+        <div class="summary-row"><span>Date</span><strong id="summary-date">—</strong></div>
+        <div class="summary-row"><span>Flight</span><strong id="summary-flight">—</strong></div>
+        <div class="summary-row"><span>Passengers</span><strong id="summary-passengers">—</strong></div>
+        <div class="summary-row"><span>Cabin</span><strong id="summary-cabin">—</strong></div>
+        <div class="summary-row"><span>Seat</span><strong id="summary-seat">—</strong></div>
+      </div>
+      <div class="price-total" id="total-price">$0</div>
+      <div class="mini-note">Demo only. Details stay in this browser session and are never sent anywhere.</div>
+    </aside>
+
+    <section class="panel">
+      <div class="kicker">Step 3 of 4</div>
+      <h2 class="section-title">Who is travelling?</h2>
+      <p class="section-copy">Enter each passenger's name exactly as it appears on their passport.</p>
+
+      <form id="pax-form" novalidate>
+        <div id="pax-list"></div>
+
+        <div class="pax-block">
+          <h3>Contact details</h3>
+          <div class="pax-seat">We'll send the confirmation here.</div>
+          <div class="grid">
+            <div class="field">
+              <label for="contact-email">Email</label>
+              <input type="email" id="contact-email" autocomplete="email" />
+              <span class="msg">Enter a valid email address.</span>
+            </div>
+            <div class="field">
+              <label for="contact-phone">Phone</label>
+              <input type="tel" id="contact-phone" autocomplete="tel" />
+              <span class="msg">Enter a phone number (at least 7 digits).</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <a class="btn" href="seats.html">Back to seats</a>
+          <button type="submit" class="btn btn-primary">Continue to confirmation</button>
+        </div>
+      </form>
+    </section>
+  </div>
+</main>
+
+<footer>Meridian Air — demo site for illustration only · Not a real airline · Do not enter real passport details</footer>
+
+<script src="booking.js"></script>
+<script>
+  const selection = maLoadSelection();
+  const seat = maLoadSeat();
+
+  if (!selection || !selection.flight || !seat) {
+    location.href = 'index.html';
+  }
+
+  const paxCount = Math.max(1, maPassengerCount(selection.passengers));
+  const cabinLabels = { economy: 'Economy', premium: 'Premium Economy', business: 'Business', first: 'First' };
+
+  function loadSaved() {
+    try { return JSON.parse(sessionStorage.getItem('ma_passengers')) || {}; } catch (e) { return {}; }
+  }
+  const saved = loadSaved();
+  const savedPax = Array.isArray(saved.passengers) ? saved.passengers : [];
+  const countries = (window.MA_AIRPORTS ? [...new Set(window.MA_AIRPORTS.map(a => a.country))] : []).sort((a, b) => a.localeCompare(b));
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+
+  document.getElementById('summary-route').textContent = selection.from + ' → ' + selection.to;
+  document.getElementById('summary-date').textContent = maFormatDate(selection.depart);
+  document.getElementById('summary-flight').textContent = selection.flight.flightNumber;
+  document.getElementById('summary-passengers').textContent = paxCount;
+  document.getElementById('summary-cabin').textContent = cabinLabels[seat.cabin] || seat.cabin;
+  document.getElementById('summary-seat').textContent = seat.seat;
+  document.getElementById('total-price').textContent = '$' + (selection.price || 0).toLocaleString();
+  document.getElementById('hero-meta').textContent =
+    maFormatDate(selection.depart) + ' · ' + selection.flight.flightNumber + ' · ' + paxCount + (paxCount === 1 ? ' passenger' : ' passengers');
+
+  function paxBlock(i) {
+    const p = savedPax[i] || {};
+    const sel = (v, cur) => v === cur ? ' selected' : '';
+    const seatNote = i === 0 ? 'Seat ' + esc(seat.seat) : 'Seat assigned at check-in';
+    return `
+      <div class="pax-block" data-index="${i}">
+        <h3>Passenger ${i + 1}${i === 0 ? ' (lead)' : ''}</h3>
+        <div class="pax-seat">${seatNote}</div>
+        <div class="grid">
+          <div class="field">
+            <label>Title</label>
+            <select data-f="title">
+              <option value="">Select</option>
+              ${['Mr', 'Ms', 'Mrs', 'Mx', 'Dr'].map(t => `<option${sel(t, p.title)}>${t}</option>`).join('')}
+            </select>
+            <span class="msg">Choose a title.</span>
+          </div>
+          <div class="field">
+            <label>Date of birth</label>
+            <input type="date" data-f="dob" value="${esc(p.dob)}" />
+            <span class="msg">Enter a valid date of birth.</span>
+          </div>
+          <div class="field">
+            <label>First name</label>
+            <input type="text" data-f="first" value="${esc(p.first)}" autocomplete="off" />
+            <span class="msg">Enter a first name.</span>
+          </div>
+          <div class="field">
+            <label>Last name</label>
+            <input type="text" data-f="last" value="${esc(p.last)}" autocomplete="off" />
+            <span class="msg">Enter a last name.</span>
+          </div>
+          <div class="field">
+            <label>Nationality</label>
+            <select data-f="nationality">
+              <option value="">Select</option>
+              ${countries.map(c => `<option${sel(c, p.nationality)}>${esc(c)}</option>`).join('')}
+            </select>
+            <span class="msg">Choose a nationality.</span>
+          </div>
+          <div class="field">
+            <label>Passport number</label>
+            <input type="text" data-f="passport" value="${esc(p.passport)}" autocomplete="off" />
+            <span class="msg">Use 6–9 letters or numbers.</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  document.getElementById('pax-list').innerHTML = Array.from({ length: paxCount }, (_, i) => paxBlock(i)).join('');
+  if (saved.contact) {
+    document.getElementById('contact-email').value = saved.contact.email || '';
+    document.getElementById('contact-phone').value = saved.contact.phone || '';
+  }
+
+  function setInvalid(el, bad) {
+    el.closest('.field').classList.toggle('invalid', bad);
+    return !bad;
+  }
+
+  document.getElementById('pax-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    let ok = true;
+    const passengers = [];
+    const today = new Date().toISOString().slice(0, 10);
+
+    document.querySelectorAll('.pax-block[data-index]').forEach(block => {
+      const get = f => block.querySelector('[data-f="' + f + '"]');
+      const v = f => get(f).value.trim();
+      ok = setInvalid(get('title'), !v('title')) && ok;
+      ok = setInvalid(get('first'), v('first').length < 1) && ok;
+      ok = setInvalid(get('last'), v('last').length < 1) && ok;
+      ok = setInvalid(get('dob'), !v('dob') || v('dob') > today || v('dob') < '1900-01-01') && ok;
+      ok = setInvalid(get('nationality'), !v('nationality')) && ok;
+      ok = setInvalid(get('passport'), !/^[A-Za-z0-9]{6,9}$/.test(v('passport'))) && ok;
+      passengers.push({
+        title: v('title'), first: v('first'), last: v('last'), dob: v('dob'),
+        nationality: v('nationality'), passport: v('passport').toUpperCase()
+      });
+    });
+
+    const email = document.getElementById('contact-email');
+    const phone = document.getElementById('contact-phone');
+    ok = setInvalid(email, !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) && ok;
+    ok = setInvalid(phone, phone.value.replace(/\D/g, '').length < 7) && ok;
+
+    if (!ok) {
+      const first = document.querySelector('.field.invalid');
+      if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    try {
+      sessionStorage.setItem('ma_passengers', JSON.stringify({
+        passengers,
+        contact: { email: email.value.trim(), phone: phone.value.trim() }
+      }));
+    } catch (err) {}
+
+    location.href = 'confirmation.html';
+  });
+</script>
+
+</body>
+</html>
