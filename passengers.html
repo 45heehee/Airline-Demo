@@ -39,6 +39,7 @@
   .kicker { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--slate); margin-bottom: 12px; }
   .summary-grid { display: grid; gap: 12px; margin-top: 16px; }
   .summary-row { display: flex; justify-content: space-between; gap: 14px; border-bottom: 1px solid var(--hairline); padding-bottom: 10px; font-size: 14px; }
+  .summary-row strong { text-align: right; }
   .price-total { font-size: 24px; margin-top: 14px; }
   .mini-note { font-size: 12px; color: var(--slate); margin-top: 8px; }
 
@@ -116,7 +117,7 @@
         <div class="summary-row"><span>Flight</span><strong id="summary-flight">—</strong></div>
         <div class="summary-row"><span>Passengers</span><strong id="summary-passengers">—</strong></div>
         <div class="summary-row"><span>Cabin</span><strong id="summary-cabin">—</strong></div>
-        <div class="summary-row"><span>Seat</span><strong id="summary-seat">—</strong></div>
+        <div class="summary-row"><span>Seats</span><strong id="summary-seat">—</strong></div>
       </div>
       <div class="price-total" id="total-price">$0</div>
       <div class="mini-note" id="price-note">Fare before taxes.</div>
@@ -217,6 +218,7 @@
   const selection = maLoadSelection();
   const seat = maLoadSeat() || {};
   const seatId = seat.seat || null;
+  const seatList = Array.isArray(seat.seats) && seat.seats.length ? seat.seats.slice() : (seatId ? [seatId] : []);
 
   if (!selection || !selection.flight) {
     location.href = 'index.html';
@@ -246,9 +248,12 @@
   document.getElementById('summary-date').textContent = maFormatDate(selection.depart);
   document.getElementById('summary-flight').textContent = selection.flight.flightNumber;
   document.getElementById('summary-cabin').textContent = cabinLabels[cabinKey] || cabinKey;
-  document.getElementById('summary-seat').textContent = seatId || 'At check-in';
 
   function updateSummary() {
+    const shown = seatList.slice(0, paxCount);
+    document.getElementById('summary-seat').textContent = shown.length
+      ? shown.join(', ') + (shown.length < paxCount ? ' (' + shown.length + ' of ' + paxCount + ' chosen)' : '')
+      : 'At check-in';
     document.getElementById('summary-passengers').textContent = paxCount;
     document.getElementById('total-price').textContent = '$' + ((selection.price || 0) * paxCount).toLocaleString();
     document.getElementById('price-note').textContent = '$' + (selection.price || 0).toLocaleString() + ' × ' + paxCount + ', before taxes.';
@@ -259,7 +264,7 @@
   function paxBlock(i) {
     const p = paxValues[i] || {};
     const sel = (v, cur) => v === cur ? ' selected' : '';
-    const seatNote = (i === 0 && seatId) ? 'Seat ' + esc(seatId) : 'Seat: choose at check-in';
+    const seatNote = seatList[i] ? 'Seat ' + esc(seatList[i]) : 'Seat: choose at check-in';
     return `
       <div class="pax-block" data-index="${i}">
         <h3>Passenger ${i + 1}${i === 0 ? ' (lead)' : ''}</h3>
@@ -420,6 +425,12 @@
 
     selection.passengers = String(paxCount);
     maSaveSelection(selection);
+
+    /* keep only as many seats as there are passengers */
+    maSaveSeat(Object.assign({}, seat, {
+      seat: seatList[0] || null,
+      seats: seatList.slice(0, paxCount)
+    }));
 
     try {
       sessionStorage.setItem('ma_passengers', JSON.stringify({
