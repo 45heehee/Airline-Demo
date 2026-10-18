@@ -48,12 +48,6 @@
   .msg.show { display: block; }
   .note { margin-top: 12px; font-size: 12px; color: var(--slate); line-height: 1.5; }
 
-  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
-  .chip { display: inline-flex; align-items: center; border: 1px solid var(--hairline); background: var(--paper); border-radius: 999px; overflow: hidden; font-family: "Courier New", monospace; font-size: 13px; }
-  .chip button { background: none; border: none; cursor: pointer; font: inherit; color: var(--ink); padding: 8px 12px; }
-  .chip button.x { color: var(--slate); border-left: 1px solid var(--hairline); padding: 8px 10px; font-family: Arial, sans-serif; }
-  .chip button:hover { background: var(--paper-dim); }
-
   .route { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
   .code { font-family: Georgia, serif; font-size: 34px; }
   .city { font-size: 12px; color: var(--slate); }
@@ -95,7 +89,7 @@
 <section class="hero">
   <div class="eyebrow">Manage booking</div>
   <h1>Find Your Flight</h1>
-  <p>Enter your booking number to pull up your trip. We'll remember it on this device.</p>
+  <p>Enter your booking number to pull up your trip.</p>
 </section>
 
 <main class="wrap">
@@ -112,11 +106,6 @@
     <div class="note">Demo note: bookings are stored in this browser only, so a booking number works on the device and browser where it was made.</div>
   </section>
 
-  <section class="panel hidden" id="saved-panel">
-    <div class="kicker">Remembered bookings</div>
-    <div class="chips" id="chips"></div>
-  </section>
-
   <section class="panel hidden" id="result"></section>
 </main>
 
@@ -124,45 +113,20 @@
 
 <script src="booking.js"></script>
 <script>
-  const LS_REMEMBERED = 'ma_remembered';
-  const LS_LAST = 'ma_last_code';
   const cabinLabels = { economy: 'Economy', premium: 'Premium Economy', business: 'Business', first: 'First' };
 
-  function readList(key) {
-    try { const v = JSON.parse(localStorage.getItem(key) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; }
-  }
-  function remember(code) {
-    const list = readList(LS_REMEMBERED).filter(c => c !== code);
-    list.unshift(code);
-    try { localStorage.setItem(LS_REMEMBERED, JSON.stringify(list)); localStorage.setItem(LS_LAST, code); } catch (e) {}
-  }
-  function forget(code) {
-    const list = readList(LS_REMEMBERED).filter(c => c !== code);
-    try {
-      localStorage.setItem(LS_REMEMBERED, JSON.stringify(list));
-      if (localStorage.getItem(LS_LAST) === code) localStorage.removeItem(LS_LAST);
-    } catch (e) {}
-  }
-  function allCodes() {
-    const seen = new Set();
-    return readList(LS_REMEMBERED).concat(readList('ma_reservations').slice().reverse()).filter(c => !seen.has(c) && seen.add(c));
-  }
+  /* Clear anything an earlier version remembered so no booking number shows on its own. */
+  try {
+    localStorage.removeItem('ma_remembered');
+    localStorage.removeItem('ma_last_code');
+    sessionStorage.removeItem('ma_last_reservation');
+  } catch (e) {}
 
   const codeEl = document.getElementById('code');
   const errEl = document.getElementById('err');
   const resultEl = document.getElementById('result');
 
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
-
-  function renderChips() {
-    const codes = allCodes().filter(c => maLoadReservation(c));
-    document.getElementById('saved-panel').classList.toggle('hidden', codes.length === 0);
-    const remembered = new Set(readList(LS_REMEMBERED));
-    document.getElementById('chips').innerHTML = codes.map(c =>
-      '<span class="chip"><button type="button" data-open="' + esc(c) + '">' + esc(c) + '</button>' +
-      (remembered.has(c) ? '<button type="button" class="x" data-forget="' + esc(c) + '" title="Forget">✕</button>' : '') + '</span>'
-    ).join('');
-  }
 
   function render(res) {
     const f = maFindAirport(res.from), t = maFindAirport(res.to);
@@ -197,37 +161,27 @@
     resultEl.classList.remove('hidden');
   }
 
-  function lookup(raw, silent) {
+  function lookup(raw) {
     const code = String(raw || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
     const res = code ? maLoadReservation(code) : null;
     if (!res) {
       resultEl.classList.add('hidden');
-      if (!silent) errEl.classList.add('show');
+      errEl.classList.add('show');
       return;
     }
     errEl.classList.remove('show');
     codeEl.value = code;
-    remember(code);
     render(res);
-    renderChips();
   }
 
   document.getElementById('find-form').addEventListener('submit', (e) => {
     e.preventDefault();
-    lookup(codeEl.value, false);
+    lookup(codeEl.value);
   });
 
-  document.getElementById('chips').addEventListener('click', (e) => {
-    const o = e.target.getAttribute('data-open');
-    const x = e.target.getAttribute('data-forget');
-    if (o) lookup(o, false);
-    if (x) { forget(x); renderChips(); }
-  });
-
-  renderChips();
+  /* Only look up when a code is typed or passed in the link (find.html?code=XXXXXXXX). */
   const fromUrl = new URLSearchParams(location.search).get('code');
-  const start = fromUrl || localStorage.getItem(LS_LAST) || sessionStorage.getItem('ma_last_reservation');
-  if (start) lookup(start, !fromUrl);
+  if (fromUrl) lookup(fromUrl);
 </script>
 
 </body>
