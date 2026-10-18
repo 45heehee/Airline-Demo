@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet" />
   <style>
-    /* ── Design Tokens ─────────────────────────────────────────────────────────────── */
+    /* Design Tokens */
     :root {
       --ink:       #0A2A43;
       --ink-soft:  #11486B;
@@ -68,7 +68,7 @@
     button { cursor: pointer; background: none; border: none; font: inherit; color: inherit; }
     a { color: inherit; text-decoration: none; transition: color var(--transition); }
 
-    /* ── Nav ────────────────────────────────────────────────────────────── */
+    /* Nav */
     .nav {
       display: flex;
       align-items: center;
@@ -110,7 +110,7 @@
 
     .nav-links a:hover { color: var(--brass); }
 
-    /* ── Hero banner ────────────────────────────────────────────────────── */
+    /* Hero banner */
     .confirm-hero {
       background: linear-gradient(135deg, var(--ink-soft) 0%, var(--ink) 60%);
       padding: var(--space-16) var(--space-8) var(--space-10);
@@ -178,7 +178,7 @@
 
     .booking-ref-pill span { color: rgba(243,251,253,0.5); font-weight: 400; }
 
-    /* ── Main layout ─────────────────────────────────────────────────────── */
+    /* Main layout */
     .page-body {
       max-width: 820px;
       margin: 0 auto;
@@ -188,7 +188,7 @@
       gap: var(--space-6);
     }
 
-    /* ── Cards ─────────────────────────────────────────────────────────────── */
+    /* Cards */
     .card {
       background: var(--ink-soft);
       border: 1px solid rgba(198,231,238,0.1);
@@ -219,7 +219,7 @@
       padding: var(--space-6);
     }
 
-    /* ── Flight summary ───────────────────────────────────────────────────── */
+    /* Flight summary */
     .flight-route {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
@@ -280,7 +280,6 @@
       letter-spacing: 0.04em;
     }
 
-    /* flight meta row */
     .flight-meta {
       display: flex;
       flex-wrap: wrap;
@@ -306,7 +305,7 @@
       color: var(--paper);
     }
 
-    /* ── Passenger list ─────────────────────────────────────────────────── */
+    /* Passenger list */
     .pax-list {
       display: flex;
       flex-direction: column;
@@ -356,7 +355,7 @@
 
     .pax-contact strong { color: var(--paper); font-weight: 500; }
 
-    /* ── Price summary ─────────────────────────────────────────────────── */
+    /* Price summary */
     .price-rows {
       display: flex;
       flex-direction: column;
@@ -383,7 +382,13 @@
     .price-row .amount { font-variant-numeric: tabular-nums; }
     .price-row.total .amount { color: var(--brass); }
 
-    /* status badge */
+    .price-row.payment {
+      font-size: var(--text-xs);
+      color: rgba(243,251,253,0.55);
+    }
+
+    .price-row.payment strong { color: var(--paper); font-weight: 500; }
+
     .status-badge {
       display: inline-flex;
       align-items: center;
@@ -415,7 +420,7 @@
       50% { opacity: 0.35; }
     }
 
-    /* ── Reminder banner ───────────────────────────────────────────────── */
+    /* Reminder banner */
     .reminder-banner {
       display: flex;
       align-items: center;
@@ -430,7 +435,7 @@
     .reminder-banner p { font-size: var(--text-sm); color: rgba(243,251,253,0.75); }
     .reminder-banner strong { color: var(--paper); }
 
-    /* ── Actions ──────────────────────────────────────────────────────────── */
+    /* Actions */
     .actions {
       display: flex;
       gap: var(--space-4);
@@ -474,7 +479,7 @@
       background: rgba(198,231,238,0.05);
     }
 
-    /* ── Empty / error state ────────────────────────────────────────── */
+    /* Empty / error state */
     .empty-state {
       max-width: 480px;
       margin: var(--space-16) auto;
@@ -489,7 +494,7 @@
     .empty-state h2 { font-family: var(--font-display); font-size: var(--text-xl); margin-bottom: var(--space-3); }
     .empty-state p { color: rgba(243,251,253,0.6); font-size: var(--text-sm); margin-bottom: var(--space-8); }
 
-    /* ── Footer ────────────────────────────────────────────────────────────── */
+    /* Footer */
     .footer {
       text-align: center;
       padding: var(--space-8);
@@ -498,7 +503,7 @@
       color: rgba(243,251,253,0.3);
     }
 
-    /* ── Responsive ─────────────────────────────────────────────────────── */
+    /* Responsive */
     @media (max-width: 600px) {
       .nav { padding: var(--space-3) var(--space-4); }
       .nav-links { display: none; }
@@ -513,7 +518,6 @@
 </head>
 <body>
 
-  <!-- ── Navigation ───────────────────────────────────────────────────────────────────── -->
   <nav class="nav" aria-label="Main navigation">
     <a href="index.html" class="nav-logo" aria-label="Meridian Air home">
       <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
@@ -530,7 +534,6 @@
     </ul>
   </nav>
 
-  <!-- ── Confirmation hero ─────────────────────────────────────────────────────── -->
   <div class="confirm-hero" id="confirmHero" style="display:none;">
     <div class="check-ring" aria-hidden="true">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#12B8C8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -545,11 +548,9 @@
     </div>
   </div>
 
-  <!-- ── Main content ───────────────────────────────────────────────────────────── -->
   <main>
     <div class="page-body" id="pageBody" style="display:none;">
 
-      <!-- Flight card -->
       <div class="card" id="flightCard">
         <div class="card-header">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.42 12a19.79 19.79 0 0 1-3.07-8.67 2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
@@ -588,7 +589,6 @@
         </div>
       </div>
 
-      <!-- Passengers card -->
       <div class="card" id="passengerCard">
         <div class="card-header">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -600,7 +600,6 @@
         </div>
       </div>
 
-      <!-- Price card -->
       <div class="card" id="priceCard">
         <div class="card-header">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -611,13 +610,11 @@
         </div>
       </div>
 
-      <!-- Reminder banner (only if flight is within 5h) -->
       <div class="reminder-banner" id="reminderBanner" style="display:none;" role="status">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         <p id="reminderText"></p>
       </div>
 
-      <!-- Actions -->
       <div class="actions">
         <a href="index.html" class="btn btn-primary">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
@@ -628,7 +625,6 @@
 
     </div>
 
-    <!-- Empty state (no booking found) -->
     <div class="empty-state" id="emptyState" style="display:none;" role="alert">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <h2>No Booking Found</h2>
@@ -644,7 +640,6 @@
   <script src="booking.js"></script>
   <script>
     (function () {
-      /* ── helpers ─────────────────────────────────────────────────────────────── */
       function fmt(n) {
         return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       }
@@ -653,7 +648,6 @@
         return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
       }
 
-      /* ── load data ──────────────────────────────────────────────────────────────── */
       const sel  = typeof maLoadSelection  === 'function' ? maLoadSelection()  : null;
       const seat = typeof maLoadSeat       === 'function' ? maLoadSeat()       : null;
       const seatId = seat && (seat.seat || seat.id) ? (seat.seat || seat.id) : null;
@@ -662,16 +656,15 @@
       try { paxData = JSON.parse(sessionStorage.getItem('ma_passengers')); } catch (e) { paxData = null; }
       const people  = paxData && Array.isArray(paxData.passengers) ? paxData.passengers : [];
       const contact = paxData && paxData.contact ? paxData.contact : null;
+      const payment = paxData && paxData.payment ? paxData.payment : null;
 
       if (!sel) {
         document.getElementById('emptyState').style.display = '';
         return;
       }
 
-      /* flight details are nested under sel.flight (set by results.html) */
       const f = sel.flight || sel;
 
-      /* ── reservation code: created once per booking, stable on refresh ── */
       let reservation = null;
       if (sel.reservationCode && typeof maLoadReservation === 'function') {
         reservation = maLoadReservation(sel.reservationCode);
@@ -688,19 +681,18 @@
           distNm: f.distNm,
           seat: seatId,
           passengerDetails: people,
-          contact: contact
+          contact: contact,
+          payment: payment
         });
         sel.reservationCode = reservation.code;
         if (typeof maSaveSelection === 'function') maSaveSelection(sel);
       }
       const ref = reservation ? reservation.code : '—';
 
-      /* ── show sections ──────────────────────────────────────────────────────────── */
       document.getElementById('confirmHero').style.display = '';
       document.getElementById('heroRef').textContent = ref;
       document.getElementById('pageBody').style.display = '';
 
-      /* ── flight details ───────────────────────────────────────────────────────────── */
       const fromA = (typeof maFindAirport === 'function') ? maFindAirport(sel.from) : null;
       const toA   = (typeof maFindAirport === 'function') ? maFindAirport(sel.to)   : null;
 
@@ -727,11 +719,9 @@
       document.getElementById('metaPax').textContent      = (typeof maPassengerCount === 'function') ? maPassengerCount(sel.passengers) : (sel.passengers || 1);
       document.getElementById('metaDist').textContent     = f.distNm ? f.distNm.toLocaleString() + ' NM' : '—';
 
-      /* ── payment badge ──────────────────────────────────────────────────────────── */
       document.getElementById('paymentBadge').innerHTML =
         '<div class="status-badge paid"><div class="dot-live" aria-hidden="true"></div>Payment Confirmed</div>';
 
-      /* ── passengers & seats ─────────────────────────────────────────────────── */
       const paxCount = (typeof maPassengerCount === 'function') ? maPassengerCount(sel.passengers) : 1;
       const paxList  = document.getElementById('paxList');
 
@@ -770,7 +760,6 @@
         c.style.display = '';
       }
 
-      /* ── price summary ──────────────────────────────────────────────────────────── */
       const pricePerPax = sel.price || 0;
       const total       = pricePerPax * paxCount;
       const tax         = Math.round(total * 0.13 * 100) / 100;
@@ -782,7 +771,18 @@
         '<div class="price-row"><span>Taxes &amp; fees (13%)</span><span class="amount">' + fmt(tax) + '</span></div>' +
         '<div class="price-row total"><span>Total charged</span><span class="amount">' + fmt(grandTotal) + '</span></div>';
 
-      /* ── reminder banner ────────────────────────────────────────────────────────── */
+      if (payment && payment.last4) {
+        const payRow = document.createElement('div');
+        payRow.className = 'price-row payment';
+        const label = document.createElement('span');
+        label.appendChild(document.createTextNode('Paid with '));
+        const b = document.createElement('strong');
+        b.textContent = (payment.brand || 'Card') + ' ending ' + payment.last4;
+        label.appendChild(b);
+        payRow.appendChild(label);
+        priceRows.appendChild(payRow);
+      }
+
       if (sel.depart && f.depMinutes != null) {
         const now = new Date();
         const flight = new Date(sel.depart + 'T00:00:00');
