@@ -376,6 +376,17 @@
         return;
       }
 
+      /* If this trip's booking number was cancelled, never rebuild it under a new number. */
+      let cancelledList = [];
+      try { cancelledList = JSON.parse(localStorage.getItem('ma_cancelled') || '[]'); } catch (e) { cancelledList = []; }
+      if (sel.reservationCode && cancelledList.indexOf(sel.reservationCode) >= 0) {
+        const es = document.getElementById('emptyState');
+        es.querySelector('h2').textContent = 'Booking Cancelled';
+        es.querySelector('p').textContent = 'Booking ' + sel.reservationCode + ' has been cancelled. No new booking was created.';
+        es.style.display = '';
+        return;
+      }
+
       const f = sel.flight || sel;
 
       let reservation = null;
