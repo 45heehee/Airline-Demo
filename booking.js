@@ -281,10 +281,16 @@ function maGenerateFlights(from, to, depart, passengers) {
   }
 
   /* Derive realistic distance */
-  let distKm = null;
+  let distKm;
   if (info) {
     distKm = Math.round(info.pair.minKm + rand() * (info.pair.maxKm - info.pair.minKm));
+  } else {
+    distKm = tier === 1 ? Math.round(500 + rand() * 1500)
+           : tier === 2 ? Math.round(2500 + rand() * 4000)
+           : Math.round(6500 + rand() * 7000);
   }
+  const distNm = Math.round(distKm / 1.852);
+  const usedNumbers = new Set();
 
   const flightCount = 3 + Math.floor(rand() * 2);
   const flights = [];
@@ -300,13 +306,16 @@ function maGenerateFlights(from, to, depart, passengers) {
       (tier === 1 ? 90 : tier === 2 ? 480 : 780) +
       rand() * (tier === 1 ? 160 : tier === 2 ? 420 : 900)
     );
-    const flightNumber = 'MA ' + (100 + Math.floor(rand() * 800));
+    let num;
+    do { num = 1 + Math.floor(rand() * 999); } while (usedNumbers.has(num));
+    usedNumbers.add(num);
+    const flightNumber = 'MA ' + num;
     const prices = {};
     classes.forEach(c => { prices[c] = Math.round(basePriceEconomy * MA_CLASS_META[c].mult / 5) * 5; });
 
     flights.push({
       id: 'f' + i + '-' + seed,
-      flightNumber, aircraft, tier, stops, durMinutes, distKm,
+      flightNumber, aircraft, tier, stops, durMinutes, distKm, distNm,
       depMinutes, arrMinutes, arrDayOffset, classes, prices
     });
   }
@@ -395,3 +404,34 @@ function maLoadSelection()     { try { return JSON.parse(sessionStorage.getItem(
 function maSaveSeat(seat)      { try { sessionStorage.setItem('ma_seat', JSON.stringify(seat)); } catch(e){} }
 function maLoadSeat()          { try { return JSON.parse(sessionStorage.getItem('ma_seat')); } catch(e){ return null; } }
 function maClearBooking()      { try { sessionStorage.removeItem('ma_selection'); sessionStorage.removeItem('ma_seat'); } catch(e){} }
+
+
+/* RESERVATION NUMBERS: "MA" + 6 random letters/digits (A-Z, 0-9 only), unique per booking */
+function maGenerateReservationCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
+  let used = [];
+  try { used = JSON.parse(localStorage.getItem('ma_reservations') || '[]'); } catch (e) {}
+  let code;
+  do {
+    code = 'MA';
+    const buf = new Uint32Array(6);
+    (window.crypto || window.msCrypto).getRandomValues(buf);
+    for (let i = 0; i < 6; i++) code += chars[buf[i] % chars.length];
+  } while (used.indexOf(code) !== -1);
+  return code;
+}
+
+function maSaveReservation(details) {
+  const reservation = Object.assign({ code: maGenerateReservationCode(), createdAt: new Date().toISOString() }, details || {});
+  try {
+    const list = JSON.parse(localStorage.getItem('ma_reservations') || '[]');
+    list.push(reservation.code);
+    localStorage.setItem('ma_reservations', JSON.stringify(list));
+    localStorage.setItem('ma_res_' + reservation.code, JSON.stringify(reservation));
+    sessionStorage.setItem('ma_last_reservation', reservation.code);
+  } catch (e) {}
+  return reservation;
+}
+function maLoadReservation(code) {
+  try { return JSON.parse(localStorage.getItem('ma_res_' + code)); } catch (e) { return null; }
+}
