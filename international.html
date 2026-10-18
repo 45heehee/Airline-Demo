@@ -587,8 +587,9 @@
 </footer>
 
 <script src="booking.js"></script>
+<script src="distances.js"></script>
 <script>
-  /* ── colour themes for featured cards ─────────────────────────────── */
+  /* ── colour themes for featured cards ─────────────────────────────────────── */
   const featureThemes = {
     JFK: 'linear-gradient(135deg, #5ea1df 0%, #283b65 52%, #0c1425 100%)',
     LAX: 'linear-gradient(135deg, #f4c67a 0%, #a06240 48%, #2a1a10 100%)',
@@ -617,7 +618,7 @@
     AKL: 'linear-gradient(135deg, #a8e4d8 0%, #3880a0 50%, #0a2030 100%)'
   };
 
-  /* ── map dot positions for selected hubs ───────────────────────────── */
+  /* ── map dot positions for selected hubs ─────────────────────────────── */
   const mapPositions = {
     JFK: { x: 146, y: 145, label: 'New York' },
     LHR: { x: 350, y: 128, label: 'London' },
@@ -631,7 +632,7 @@
     GRU: { x: 210, y: 278, label: 'São Paulo' }
   };
 
-  /* ── load airports from booking.js ─────────────────────────────────── */
+  /* ── load airports from booking.js ───────────────────────────────── */
   const airports = Array.isArray(window.MA_AIRPORTS) ? window.MA_AIRPORTS : [];
   const regions  = [...new Set(airports.map(a => a.region))].sort((a, b) => a.localeCompare(b));
 
@@ -641,6 +642,19 @@
       .sort((a, b) => a.city.localeCompare(b.city));
     return acc;
   }, {});
+
+  /* ── longest route in the network (real great-circle distance, NM) ── */
+  function maxNetworkSpanNm() {
+    if (typeof window.maDistanceNm !== 'function') return 0;
+    let max = 0;
+    for (let i = 0; i < airports.length; i++) {
+      for (let j = i + 1; j < airports.length; j++) {
+        const d = window.maDistanceNm(airports[i].code, airports[j].code);
+        if (d && d > max) max = d;
+      }
+    }
+    return max;
+  }
 
   /* ── balanced featured selection from all 101 airports ─────────────── */
   function buildFeaturedAirports(allAirports) {
@@ -719,16 +733,17 @@
 
   const featured = buildFeaturedAirports(airports);
 
-  /* ── render functions ───────────────────────────────────────────────── */
+  /* ── render functions ─────────────────────────────────────────────────────── */
 
   function renderHeroStats() {
     const el = document.getElementById('hero-stats');
     if (!el) return;
+    const spanNm = maxNetworkSpanNm();
     const stats = [
       { value: airports.length,                              label: 'destinations in network' },
       { value: regions.length,                               label: 'world regions served' },
       { value: new Set(airports.map(a => a.country)).size,   label: 'countries represented' },
-      { value: '3,090 NM',                                   label: 'max network span' }
+      { value: spanNm ? spanNm.toLocaleString() + ' NM' : '—', label: 'max network span' }
     ];
     el.innerHTML = stats.map(s => `
       <div class="hero-stat">
@@ -816,7 +831,7 @@
     }).join('');
   }
 
-  /* ── init ───────────────────────────────────────────────────────────── */
+  /* ── init ───────────────────────────────────────────────────────────────────── */
   renderHeroStats();
   renderMapDots();
   renderNetworkStrip();
