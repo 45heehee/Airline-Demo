@@ -107,7 +107,7 @@
       </div>
       <button type="submit" class="btn">Find flight</button>
     </form>
-    <div class="msg" id="err">We couldn't find that booking number on this device. It may have been cancelled. Check it and try again.</div>
+    <div class="msg" id="err">We couldn't find that booking number on this device. Check it and try again.</div>
     <div class="note">Demo note: bookings are stored in this browser only, so a booking number works on the device and browser where it was made.</div>
   </section>
 
@@ -133,12 +133,21 @@
 
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
 
-  /* Cancel a booking: remove it from this browser's saved reservations. */
+  function maCancelledList() {
+    try { return JSON.parse(localStorage.getItem('ma_cancelled') || '[]'); } catch (e) { return []; }
+  }
+
+  /* Cancel a booking: delete it, record the number as cancelled, and clear this session's trip
+     so the confirmation page can never re-create it under a new number. */
   function maCancelReservation(code) {
     try {
       localStorage.removeItem('ma_res_' + code);
       const list = JSON.parse(localStorage.getItem('ma_reservations') || '[]').filter(c => c !== code);
       localStorage.setItem('ma_reservations', JSON.stringify(list));
+      const gone = maCancelledList();
+      if (gone.indexOf(code) < 0) gone.push(code);
+      localStorage.setItem('ma_cancelled', JSON.stringify(gone));
+      try { sessionStorage.clear(); } catch (e) {}
       return true;
     } catch (e) { return false; }
   }
@@ -180,10 +189,7 @@
       const ok = window.confirm('Cancel booking ' + res.code + ' for ' + n + ' passenger' + (n === 1 ? '' : 's') + '? This cannot be undone.');
       if (!ok) return;
       if (maCancelReservation(res.code)) {
-        resultEl.innerHTML =
-          '<div class="cancelled-banner">Booking <strong>' + esc(res.code) + '</strong> has been cancelled. ' +
-          'A refund of $' + Math.round(total * 1.13).toLocaleString() + ' (fare plus taxes) would be returned to ' + pay + ' within 5–7 business days. This is a demo, so no real payment was made.</div>' +
-          '<div style="margin-top:18px;"><a class="btn" href="index.html">Book another flight</a></div>';
+        showCancelled(res.code, total, pay);
         codeEl.value = '';
       } else {
         window.alert('Sorry, we could not cancel this booking. Please try again.');
@@ -191,10 +197,23 @@
     });
   }
 
+  function showCancelled(code, total, pay) {
+    const refund = total ? ' A refund of $' + Math.round(total * 1.13).toLocaleString() + ' (fare plus taxes) would be returned to ' + pay + ' within 5–7 business days. This is a demo, so no real payment was made.' : '';
+    resultEl.innerHTML =
+      '<div class="cancelled-banner">Booking <strong>' + esc(code) + '</strong> has been cancelled.' + refund + '</div>' +
+      '<div style="margin-top:18px;"><a class="btn" href="index.html">Book another flight</a></div>';
+    resultEl.classList.remove('hidden');
+  }
+
   function lookup(raw) {
     const code = String(raw || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
     const res = code ? maLoadReservation(code) : null;
     if (!res) {
+      if (code && maCancelledList().indexOf(code) >= 0) {
+        errEl.classList.remove('show');
+        showCancelled(code, 0, '');
+        return;
+      }
       resultEl.classList.add('hidden');
       errEl.classList.add('show');
       return;
