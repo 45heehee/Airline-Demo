@@ -58,6 +58,11 @@
   .field.invalid .msg { display: block; }
   .full { grid-column: 1 / -1; }
 
+  .card-wrap { position: relative; }
+  .card-wrap input { width: 100%; padding-right: 110px; font-family: "Courier New", monospace; letter-spacing: 0.06em; }
+  .brand-tag { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); background: var(--paper-dim); border-radius: 4px; padding: 3px 8px; display: none; }
+  .brand-tag.show { display: block; }
+
   .actions { margin-top: 24px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
   .btn { display: inline-block; border: 1px solid var(--hairline); border-radius: 4px; padding: 12px 18px; text-decoration: none; font-size: 13px; font-weight: 600; cursor: pointer; background: #fff; color: var(--ink); }
   .btn-primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
@@ -92,7 +97,7 @@
 </header>
 
 <section class="hero">
-  <div class="eyebrow">Traveler Details</div>
+  <div class="eyebrow">Traveler Details & Payment</div>
   <h1>Passenger Information</h1>
   <p id="hero-meta">Loading your journey...</p>
 </section>
@@ -110,7 +115,7 @@
         <div class="summary-row"><span>Seat</span><strong id="summary-seat">—</strong></div>
       </div>
       <div class="price-total" id="total-price">$0</div>
-      <div class="mini-note">Demo only. Details stay in this browser session and are never sent anywhere.</div>
+      <div class="mini-note">Demo only. Nothing is charged and card details are never sent anywhere.</div>
     </aside>
 
     <section class="panel">
@@ -138,16 +143,46 @@
           </div>
         </div>
 
+        <div class="pax-block">
+          <h3>Payment</h3>
+          <div class="pax-seat">Visa, Mastercard or Amex. Demo only — use a test number such as 2499 9903 3012 3456.</div>
+          <div class="grid">
+            <div class="field full">
+              <label for="card-name">Name on card</label>
+              <input type="text" id="card-name" autocomplete="cc-name" />
+              <span class="msg">Enter the name on the card.</span>
+            </div>
+            <div class="field full">
+              <label for="card-number">Card number</label>
+              <div class="card-wrap">
+                <input type="text" id="card-number" inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000" maxlength="19" />
+                <span class="brand-tag" id="brand-tag"></span>
+              </div>
+              <span class="msg">Enter a valid card number (16 digits, or 15 for Amex).</span>
+            </div>
+            <div class="field">
+              <label for="card-exp">Expiry (MM/YY)</label>
+              <input type="text" id="card-exp" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY" maxlength="5" />
+              <span class="msg">Enter a valid future expiry date.</span>
+            </div>
+            <div class="field">
+              <label for="card-cvc">Security code (CVC)</label>
+              <input type="password" id="card-cvc" inputmode="numeric" autocomplete="cc-csc" placeholder="123" maxlength="4" />
+              <span class="msg">Enter the 3-digit code (4 for Amex).</span>
+            </div>
+          </div>
+        </div>
+
         <div class="actions">
           <a class="btn" href="seats.html">Back to seats</a>
-          <button type="submit" class="btn btn-primary">Continue to confirmation</button>
+          <button type="submit" class="btn btn-primary">Pay &amp; confirm</button>
         </div>
       </form>
     </section>
   </div>
 </main>
 
-<footer>Meridian Air — demo site for illustration only · Not a real airline · Do not enter real passport details</footer>
+<footer>Meridian Air — demo site for illustration only · Not a real airline · Do not enter real passport or card details</footer>
 
 <script src="booking.js"></script>
 <script>
@@ -240,6 +275,50 @@
     document.getElementById('contact-phone').value = saved.contact.phone || '';
   }
 
+  /* ---- card helpers ---- */
+  const cardNum = document.getElementById('card-number');
+  const cardExp = document.getElementById('card-exp');
+  const cardCvc = document.getElementById('card-cvc');
+  const brandTag = document.getElementById('brand-tag');
+
+  function cardBrand(d) {
+    if (/^4/.test(d)) return 'Visa';
+    if (/^(5[1-5]|2(2[2-9][1-9]|2[3-9]\d|[3-6]\d\d|7[01]\d|720))/.test(d)) return 'Mastercard';
+    if (/^3[47]/.test(d)) return 'Amex';
+    return '';
+  }
+
+  cardNum.addEventListener('input', () => {
+    const brand = cardBrand(cardNum.value.replace(/\D/g, ''));
+    const isAmex = brand === 'Amex';
+    const d = cardNum.value.replace(/\D/g, '').slice(0, isAmex ? 15 : 16);
+    cardNum.value = isAmex
+      ? [d.slice(0, 4), d.slice(4, 10), d.slice(10)].filter(Boolean).join(' ')
+      : (d.match(/.{1,4}/g) || []).join(' ');
+    brandTag.textContent = brand;
+    brandTag.classList.toggle('show', !!brand);
+    cardCvc.maxLength = isAmex ? 4 : 3;
+  });
+
+  cardExp.addEventListener('input', () => {
+    let d = cardExp.value.replace(/\D/g, '').slice(0, 4);
+    if (d.length >= 3) d = d.slice(0, 2) + '/' + d.slice(2);
+    cardExp.value = d;
+  });
+
+  cardCvc.addEventListener('input', () => {
+    cardCvc.value = cardCvc.value.replace(/\D/g, '');
+  });
+
+  function validExpiry(v) {
+    const m = /^(\d{2})\/(\d{2})$/.exec(v);
+    if (!m) return false;
+    const mm = Number(m[1]), yy = 2000 + Number(m[2]);
+    if (mm < 1 || mm > 12) return false;
+    const now = new Date();
+    return yy > now.getFullYear() || (yy === now.getFullYear() && mm >= now.getMonth() + 1);
+  }
+
   function setInvalid(el, bad) {
     el.closest('.field').classList.toggle('invalid', bad);
     return !bad;
@@ -271,6 +350,14 @@
     ok = setInvalid(email, !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) && ok;
     ok = setInvalid(phone, phone.value.replace(/\D/g, '').length < 7) && ok;
 
+    const digits = cardNum.value.replace(/\D/g, '');
+    const brand = cardBrand(digits);
+    const isAmex = brand === 'Amex';
+    ok = setInvalid(document.getElementById('card-name'), document.getElementById('card-name').value.trim().length < 2) && ok;
+    ok = setInvalid(cardNum, !brand || digits.length !== (isAmex ? 15 : 16)) && ok;
+    ok = setInvalid(cardExp, !validExpiry(cardExp.value)) && ok;
+    ok = setInvalid(cardCvc, cardCvc.value.length !== (isAmex ? 4 : 3)) && ok;
+
     if (!ok) {
       const first = document.querySelector('.field.invalid');
       if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -280,7 +367,8 @@
     try {
       sessionStorage.setItem('ma_passengers', JSON.stringify({
         passengers,
-        contact: { email: email.value.trim(), phone: phone.value.trim() }
+        contact: { email: email.value.trim(), phone: phone.value.trim() },
+        payment: { brand, last4: digits.slice(-4) }
       }));
     } catch (err) {}
 
