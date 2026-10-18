@@ -44,6 +44,8 @@
   .field input:focus { outline: none; border-color: var(--brass); }
   .btn { border: 1px solid var(--ink); background: var(--ink); color: var(--paper); border-radius: 4px; padding: 13px 20px; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
   .btn-ghost { background: #fff; color: var(--ink); border-color: var(--hairline); }
+  .btn-danger { background: #fff; color: var(--err); border-color: var(--err); }
+  .btn-danger:hover { background: var(--err); color: #fff; }
   .msg { margin-top: 12px; font-size: 13px; color: var(--err); display: none; }
   .msg.show { display: block; }
   .note { margin-top: 12px; font-size: 12px; color: var(--slate); line-height: 1.5; }
@@ -61,6 +63,9 @@
   .pax-item { display: flex; justify-content: space-between; gap: 10px; background: var(--paper); border: 1px solid var(--hairline); border-radius: 6px; padding: 9px 12px; margin-bottom: 8px; font-size: 14px; }
   .pax-item .s { color: var(--slate); font-size: 12px; }
   .hidden { display: none; }
+
+  .cancelled-banner { background: #FDECEA; border: 1px solid var(--err); color: var(--err); border-radius: 6px; padding: 14px 16px; font-size: 14px; line-height: 1.5; }
+  .cancelled-banner strong { font-family: "Courier New", monospace; letter-spacing: 0.08em; }
 
   footer { text-align: center; padding: 24px; border-top: 1px solid var(--hairline); font-size: 12px; color: var(--slate); }
   @media (max-width: 760px) { nav { display: none; } }
@@ -89,7 +94,7 @@
 <section class="hero">
   <div class="eyebrow">Manage booking</div>
   <h1>Find Your Flight</h1>
-  <p>Enter your booking number to pull up your trip.</p>
+  <p>Enter your booking number to view or cancel your trip.</p>
 </section>
 
 <main class="wrap">
@@ -102,7 +107,7 @@
       </div>
       <button type="submit" class="btn">Find flight</button>
     </form>
-    <div class="msg" id="err">We couldn't find that booking number on this device. Check it and try again.</div>
+    <div class="msg" id="err">We couldn't find that booking number on this device. It may have been cancelled. Check it and try again.</div>
     <div class="note">Demo note: bookings are stored in this browser only, so a booking number works on the device and browser where it was made.</div>
   </section>
 
@@ -127,6 +132,16 @@
   const resultEl = document.getElementById('result');
 
   function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+
+  /* Cancel a booking: remove it from this browser's saved reservations. */
+  function maCancelReservation(code) {
+    try {
+      localStorage.removeItem('ma_res_' + code);
+      const list = JSON.parse(localStorage.getItem('ma_reservations') || '[]').filter(c => c !== code);
+      localStorage.setItem('ma_reservations', JSON.stringify(list));
+      return true;
+    } catch (e) { return false; }
+  }
 
   function render(res) {
     const f = maFindAirport(res.from), t = maFindAirport(res.to);
@@ -157,8 +172,23 @@
       (res.contact && res.contact.email ? '<div class="row"><span>Confirmation sent to</span><strong>' + esc(res.contact.email) + '</strong></div>' : '') +
       '</div>' +
       '<div class="pax"><h3>Passengers</h3>' + paxHtml + '</div>' +
-      '<div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;"><a class="btn" href="index.html">Book another flight</a></div>';
+      '<div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;"><a class="btn" href="index.html">Book another flight</a>' +
+      '<button type="button" class="btn btn-danger" id="cancel-btn">Cancel booking</button></div>';
     resultEl.classList.remove('hidden');
+
+    document.getElementById('cancel-btn').addEventListener('click', function () {
+      const ok = window.confirm('Cancel booking ' + res.code + ' for ' + n + ' passenger' + (n === 1 ? '' : 's') + '? This cannot be undone.');
+      if (!ok) return;
+      if (maCancelReservation(res.code)) {
+        resultEl.innerHTML =
+          '<div class="cancelled-banner">Booking <strong>' + esc(res.code) + '</strong> has been cancelled. ' +
+          'A refund of $' + Math.round(total * 1.13).toLocaleString() + ' (fare plus taxes) would be returned to ' + pay + ' within 5–7 business days. This is a demo, so no real payment was made.</div>' +
+          '<div style="margin-top:18px;"><a class="btn" href="index.html">Book another flight</a></div>';
+        codeEl.value = '';
+      } else {
+        window.alert('Sorry, we could not cancel this booking. Please try again.');
+      }
+    });
   }
 
   function lookup(raw) {
