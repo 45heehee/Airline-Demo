@@ -407,7 +407,7 @@
         <div class="summary-row"><span>Aircraft</span><strong id="summary-aircraft">—</strong></div>
         <div class="summary-row"><span>Passengers</span><strong id="summary-passengers">—</strong></div>
         <div class="summary-row"><span>Cabin</span><strong id="summary-cabin">—</strong></div>
-        <div class="summary-row"><span>Seat</span><strong id="summary-seat">Not selected</strong></div>
+        <div class="summary-row"><span>Seat</span><strong id="summary-seat">At check-in</strong></div>
         <div class="summary-row"><span>Lounge</span><strong id="summary-lounge">No</strong></div>
       </div>
 
@@ -432,9 +432,9 @@
         <input type="checkbox" id="lounge-toggle" />
       </div>
 
-      <div class="kicker">Choose your place onboard</div>
+      <div class="kicker">Choose your place onboard · optional</div>
       <h2 class="section-title">Seat Selection</h2>
-      <p class="section-copy">Pick one available seat before continuing.</p>
+      <p class="section-copy">Pick a seat now, or skip this and choose one at check-in.</p>
 
       <div id="seat-map" class="seat-map"></div>
 
@@ -502,6 +502,7 @@
     document.querySelectorAll('.upgrade-card').forEach(card => {
       card.addEventListener('click', () => {
         chosenCabin = card.dataset.cabin;
+        chosenSeat = null;
         renderCabins();
         renderSummary();
         renderSeats();
@@ -517,7 +518,7 @@
     const total = basePrice + loungeTotal;
 
     document.getElementById('summary-cabin').textContent = cabinLabel;
-    document.getElementById('summary-seat').textContent = chosenSeat || 'Not selected';
+    document.getElementById('summary-seat').textContent = chosenSeat || 'At check-in';
     document.getElementById('summary-lounge').textContent = lounge ? 'Added' : 'No';
     document.getElementById('total-price').textContent = '$' + total.toLocaleString();
   }
@@ -547,7 +548,7 @@
 
     map.querySelectorAll('.seat:not(.occupied)').forEach(btn => {
       btn.addEventListener('click', () => {
-        chosenSeat = btn.dataset.seat;
+        chosenSeat = (chosenSeat === btn.dataset.seat) ? null : btn.dataset.seat;
         renderSummary();
         renderSeats();
       });
@@ -560,11 +561,6 @@
   });
 
   document.getElementById('continue-btn').addEventListener('click', () => {
-    if (!chosenSeat) {
-      alert('Please select a seat first.');
-      return;
-    }
-
     const finalPrice = (selection.flight.prices[chosenCabin] || selection.price || 0) +
       (lounge ? (45 * (Number(selection.passengers) || 1)) : 0);
 

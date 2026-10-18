@@ -152,14 +152,16 @@
 <script src="booking.js"></script>
 <script>
   const selection = maLoadSelection();
-  const seat = maLoadSeat();
+  const seat = maLoadSeat() || {};
+  const seatId = seat.seat || null;
 
-  if (!selection || !selection.flight || !seat) {
+  if (!selection || !selection.flight) {
     location.href = 'index.html';
   }
 
   const paxCount = Math.max(1, maPassengerCount(selection.passengers));
   const cabinLabels = { economy: 'Economy', premium: 'Premium Economy', business: 'Business', first: 'First' };
+  const cabinKey = seat.cabin || selection.cabin;
 
   function loadSaved() {
     try { return JSON.parse(sessionStorage.getItem('ma_passengers')) || {}; } catch (e) { return {}; }
@@ -176,8 +178,8 @@
   document.getElementById('summary-date').textContent = maFormatDate(selection.depart);
   document.getElementById('summary-flight').textContent = selection.flight.flightNumber;
   document.getElementById('summary-passengers').textContent = paxCount;
-  document.getElementById('summary-cabin').textContent = cabinLabels[seat.cabin] || seat.cabin;
-  document.getElementById('summary-seat').textContent = seat.seat;
+  document.getElementById('summary-cabin').textContent = cabinLabels[cabinKey] || cabinKey;
+  document.getElementById('summary-seat').textContent = seatId || 'At check-in';
   document.getElementById('total-price').textContent = '$' + (selection.price || 0).toLocaleString();
   document.getElementById('hero-meta').textContent =
     maFormatDate(selection.depart) + ' · ' + selection.flight.flightNumber + ' · ' + paxCount + (paxCount === 1 ? ' passenger' : ' passengers');
@@ -185,7 +187,7 @@
   function paxBlock(i) {
     const p = savedPax[i] || {};
     const sel = (v, cur) => v === cur ? ' selected' : '';
-    const seatNote = i === 0 ? 'Seat ' + esc(seat.seat) : 'Seat assigned at check-in';
+    const seatNote = (i === 0 && seatId) ? 'Seat ' + esc(seatId) : 'Seat: choose at check-in';
     return `
       <div class="pax-block" data-index="${i}">
         <h3>Passenger ${i + 1}${i === 0 ? ' (lead)' : ''}</h3>
