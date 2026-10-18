@@ -58,10 +58,13 @@
   .field.invalid .msg { display: block; }
   .full { grid-column: 1 / -1; }
 
-  .card-wrap { position: relative; }
-  .card-wrap input { width: 100%; padding-right: 110px; font-family: "Courier New", monospace; letter-spacing: 0.06em; }
-  .brand-tag { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); background: var(--paper-dim); border-radius: 4px; padding: 3px 8px; display: none; }
-  .brand-tag.show { display: block; }
+  .count-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+  .count-row .field { min-width: 170px; }
+
+  .card-row { display: flex; gap: 10px; }
+  .card-row input { flex: 1; font-family: "Courier New", monospace; letter-spacing: 0.06em; }
+  .btn-small { border: 1px solid var(--hairline); background: #fff; color: var(--ink); border-radius: 4px; padding: 0 14px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .btn-small:hover { border-color: var(--brass); }
 
   .actions { margin-top: 24px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
   .btn { display: inline-block; border: 1px solid var(--hairline); border-radius: 4px; padding: 12px 18px; text-decoration: none; font-size: 13px; font-weight: 600; cursor: pointer; background: #fff; color: var(--ink); }
@@ -90,6 +93,7 @@
     </div>
   </a>
   <nav>
+    <a href="find.html">Find Your Flight</a>
     <a href="fleet.html">Our Fleet</a>
     <a href="international.html">International</a>
     <a href="ultra-long-range.html">Ultra-Long-Range</a>
@@ -115,15 +119,29 @@
         <div class="summary-row"><span>Seat</span><strong id="summary-seat">—</strong></div>
       </div>
       <div class="price-total" id="total-price">$0</div>
+      <div class="mini-note" id="price-note">Fare before taxes.</div>
       <div class="mini-note">Demo only. Nothing is charged and card details are never sent anywhere.</div>
     </aside>
 
     <section class="panel">
       <div class="kicker">Step 3 of 4</div>
       <h2 class="section-title">Who is travelling?</h2>
-      <p class="section-copy">Enter each passenger's name exactly as it appears on their passport.</p>
+      <p class="section-copy">Enter each passenger's name exactly as it appears on their passport. Clicked the wrong number of passengers? Change it here.</p>
 
       <form id="pax-form" novalidate>
+        <div class="pax-block">
+          <div class="count-row">
+            <div>
+              <h3>Edit passengers</h3>
+              <div class="pax-seat" style="margin-bottom:0">What you've typed stays put when you change this.</div>
+            </div>
+            <div class="field">
+              <label for="pax-count">Number of passengers</label>
+              <select id="pax-count"></select>
+            </div>
+          </div>
+        </div>
+
         <div id="pax-list"></div>
 
         <div class="pax-block">
@@ -145,7 +163,7 @@
 
         <div class="pax-block">
           <h3>Payment</h3>
-          <div class="pax-seat">Visa, Mastercard or Amex. Demo only — use a test number such as 2499 9903 3012 3456.</div>
+          <div class="pax-seat">Pick Mastercard, RBC or Rogers. Demo only — type any 16 digits or tap Random number.</div>
           <div class="grid">
             <div class="field full">
               <label for="card-name">Name on card</label>
@@ -153,12 +171,22 @@
               <span class="msg">Enter the name on the card.</span>
             </div>
             <div class="field full">
+              <label for="card-issuer">Card</label>
+              <select id="card-issuer">
+                <option value="">Select</option>
+                <option>Mastercard</option>
+                <option>RBC</option>
+                <option>Rogers</option>
+              </select>
+              <span class="msg">Choose Mastercard, RBC or Rogers.</span>
+            </div>
+            <div class="field full">
               <label for="card-number">Card number</label>
-              <div class="card-wrap">
+              <div class="card-row">
                 <input type="text" id="card-number" inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000" maxlength="19" />
-                <span class="brand-tag" id="brand-tag"></span>
+                <button type="button" class="btn-small" id="card-random">Random number</button>
               </div>
-              <span class="msg">Enter a valid card number (16 digits, or 15 for Amex).</span>
+              <span class="msg">Enter 16 digits (0–9).</span>
             </div>
             <div class="field">
               <label for="card-exp">Expiry (MM/YY)</label>
@@ -167,8 +195,8 @@
             </div>
             <div class="field">
               <label for="card-cvc">Security code (CVC)</label>
-              <input type="password" id="card-cvc" inputmode="numeric" autocomplete="cc-csc" placeholder="123" maxlength="4" />
-              <span class="msg">Enter the 3-digit code (4 for Amex).</span>
+              <input type="password" id="card-cvc" inputmode="numeric" autocomplete="cc-csc" placeholder="123" maxlength="3" />
+              <span class="msg">Enter the 3-digit code.</span>
             </div>
           </div>
         </div>
@@ -194,15 +222,20 @@
     location.href = 'index.html';
   }
 
-  const paxCount = Math.max(1, maPassengerCount(selection.passengers));
+  let paxCount = Math.min(9, Math.max(1, maPassengerCount(selection.passengers)));
   const cabinLabels = { economy: 'Economy', premium: 'Premium Economy', business: 'Business', first: 'First' };
   const cabinKey = seat.cabin || selection.cabin;
 
+  /* Only reuse typed info if it is for this same flight and date (e.g. coming back from seats). */
+  const flightKey = selection.flight.flightNumber + '|' + selection.depart;
   function loadSaved() {
-    try { return JSON.parse(sessionStorage.getItem('ma_passengers')) || {}; } catch (e) { return {}; }
+    try {
+      const s = JSON.parse(sessionStorage.getItem('ma_passengers'));
+      return s && s.key === flightKey ? s : {};
+    } catch (e) { return {}; }
   }
   const saved = loadSaved();
-  const savedPax = Array.isArray(saved.passengers) ? saved.passengers : [];
+  let paxValues = Array.isArray(saved.passengers) ? saved.passengers.slice() : [];
   const countries = (window.MA_AIRPORTS ? [...new Set(window.MA_AIRPORTS.map(a => a.country))] : []).sort((a, b) => a.localeCompare(b));
 
   function esc(s) {
@@ -212,15 +245,19 @@
   document.getElementById('summary-route').textContent = selection.from + ' → ' + selection.to;
   document.getElementById('summary-date').textContent = maFormatDate(selection.depart);
   document.getElementById('summary-flight').textContent = selection.flight.flightNumber;
-  document.getElementById('summary-passengers').textContent = paxCount;
   document.getElementById('summary-cabin').textContent = cabinLabels[cabinKey] || cabinKey;
   document.getElementById('summary-seat').textContent = seatId || 'At check-in';
-  document.getElementById('total-price').textContent = '$' + (selection.price || 0).toLocaleString();
-  document.getElementById('hero-meta').textContent =
-    maFormatDate(selection.depart) + ' · ' + selection.flight.flightNumber + ' · ' + paxCount + (paxCount === 1 ? ' passenger' : ' passengers');
+
+  function updateSummary() {
+    document.getElementById('summary-passengers').textContent = paxCount;
+    document.getElementById('total-price').textContent = '$' + ((selection.price || 0) * paxCount).toLocaleString();
+    document.getElementById('price-note').textContent = '$' + (selection.price || 0).toLocaleString() + ' × ' + paxCount + ', before taxes.';
+    document.getElementById('hero-meta').textContent =
+      maFormatDate(selection.depart) + ' · ' + selection.flight.flightNumber + ' · ' + paxCount + (paxCount === 1 ? ' passenger' : ' passengers');
+  }
 
   function paxBlock(i) {
-    const p = savedPax[i] || {};
+    const p = paxValues[i] || {};
     const sel = (v, cur) => v === cur ? ' selected' : '';
     const seatNote = (i === 0 && seatId) ? 'Seat ' + esc(seatId) : 'Seat: choose at check-in';
     return `
@@ -269,7 +306,31 @@
     `;
   }
 
-  document.getElementById('pax-list').innerHTML = Array.from({ length: paxCount }, (_, i) => paxBlock(i)).join('');
+  function readPaxFromDom() {
+    document.querySelectorAll('.pax-block[data-index]').forEach(block => {
+      const i = Number(block.dataset.index);
+      const o = {};
+      block.querySelectorAll('[data-f]').forEach(el => { o[el.dataset.f] = el.value; });
+      paxValues[i] = o;
+    });
+  }
+
+  function renderPax() {
+    document.getElementById('pax-list').innerHTML = Array.from({ length: paxCount }, (_, i) => paxBlock(i)).join('');
+    updateSummary();
+  }
+
+  const countSel = document.getElementById('pax-count');
+  countSel.innerHTML = Array.from({ length: 9 }, (_, i) => `<option value="${i + 1}"${i + 1 === paxCount ? ' selected' : ''}>${i + 1}</option>`).join('');
+  countSel.addEventListener('change', () => {
+    readPaxFromDom();
+    paxCount = Number(countSel.value);
+    selection.passengers = String(paxCount);
+    maSaveSelection(selection);
+    renderPax();
+  });
+
+  renderPax();
   if (saved.contact) {
     document.getElementById('contact-email').value = saved.contact.email || '';
     document.getElementById('contact-phone').value = saved.contact.phone || '';
@@ -279,25 +340,18 @@
   const cardNum = document.getElementById('card-number');
   const cardExp = document.getElementById('card-exp');
   const cardCvc = document.getElementById('card-cvc');
-  const brandTag = document.getElementById('brand-tag');
 
-  function cardBrand(d) {
-    if (/^4/.test(d)) return 'Visa';
-    if (/^(5[1-5]|2(2[2-9][1-9]|2[3-9]\d|[3-6]\d\d|7[01]\d|720))/.test(d)) return 'Mastercard';
-    if (/^3[47]/.test(d)) return 'Amex';
-    return '';
-  }
+  function fmtCard(d) { return (d.match(/.{1,4}/g) || []).join(' '); }
 
   cardNum.addEventListener('input', () => {
-    const brand = cardBrand(cardNum.value.replace(/\D/g, ''));
-    const isAmex = brand === 'Amex';
-    const d = cardNum.value.replace(/\D/g, '').slice(0, isAmex ? 15 : 16);
-    cardNum.value = isAmex
-      ? [d.slice(0, 4), d.slice(4, 10), d.slice(10)].filter(Boolean).join(' ')
-      : (d.match(/.{1,4}/g) || []).join(' ');
-    brandTag.textContent = brand;
-    brandTag.classList.toggle('show', !!brand);
-    cardCvc.maxLength = isAmex ? 4 : 3;
+    cardNum.value = fmtCard(cardNum.value.replace(/\D/g, '').slice(0, 16));
+  });
+
+  document.getElementById('card-random').addEventListener('click', () => {
+    const buf = new Uint32Array(16);
+    crypto.getRandomValues(buf);
+    cardNum.value = fmtCard(Array.from(buf, n => n % 10).join(''));
+    cardNum.closest('.field').classList.remove('invalid');
   });
 
   cardExp.addEventListener('input', () => {
@@ -350,13 +404,13 @@
     ok = setInvalid(email, !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) && ok;
     ok = setInvalid(phone, phone.value.replace(/\D/g, '').length < 7) && ok;
 
+    const issuer = document.getElementById('card-issuer');
     const digits = cardNum.value.replace(/\D/g, '');
-    const brand = cardBrand(digits);
-    const isAmex = brand === 'Amex';
     ok = setInvalid(document.getElementById('card-name'), document.getElementById('card-name').value.trim().length < 2) && ok;
-    ok = setInvalid(cardNum, !brand || digits.length !== (isAmex ? 15 : 16)) && ok;
+    ok = setInvalid(issuer, ['Mastercard', 'RBC', 'Rogers'].indexOf(issuer.value) === -1) && ok;
+    ok = setInvalid(cardNum, digits.length !== 16) && ok;
     ok = setInvalid(cardExp, !validExpiry(cardExp.value)) && ok;
-    ok = setInvalid(cardCvc, cardCvc.value.length !== (isAmex ? 4 : 3)) && ok;
+    ok = setInvalid(cardCvc, cardCvc.value.length !== 3) && ok;
 
     if (!ok) {
       const first = document.querySelector('.field.invalid');
@@ -364,11 +418,15 @@
       return;
     }
 
+    selection.passengers = String(paxCount);
+    maSaveSelection(selection);
+
     try {
       sessionStorage.setItem('ma_passengers', JSON.stringify({
+        key: flightKey,
         passengers,
         contact: { email: email.value.trim(), phone: phone.value.trim() },
-        payment: { brand, last4: digits.slice(-4) }
+        payment: { brand: issuer.value, last4: digits.slice(-4) }
       }));
     } catch (err) {}
 

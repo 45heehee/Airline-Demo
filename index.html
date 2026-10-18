@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -193,6 +192,8 @@
     padding: 28px 28px 24px;
   }
 
+  .ticket + .ticket { margin-top: 20px; }
+
   .ticket-label {
     font-size: 10.5px;
     letter-spacing: 0.18em;
@@ -214,6 +215,13 @@
   form.search-form {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr auto;
+    gap: 16px;
+    align-items: end;
+  }
+
+  form.find-form {
+    display: grid;
+    grid-template-columns: 1fr auto;
     gap: 16px;
     align-items: end;
   }
@@ -241,6 +249,8 @@
     background: transparent;
     padding: 6px 2px;
   }
+
+  .field input.code-input { text-transform: uppercase; letter-spacing: 0.1em; }
 
   .field select:focus,
   .field input:focus {
@@ -276,6 +286,7 @@
 
   @media (max-width: 860px) {
     form.search-form { grid-template-columns: 1fr 1fr; }
+    form.find-form { grid-template-columns: 1fr; }
     .search-btn { grid-column: 1 / -1; }
   }
 
@@ -372,6 +383,7 @@
     </span>
   </a>
     <nav>
+  <a href="find.html">Find Your Flight</a>
   <a href="fleet.html">Our Fleet</a>
   <a href="international.html">International</a>
   <a href="destinations.html">Destinations</a>
@@ -456,6 +468,17 @@
       <button type="submit" class="search-btn">Search Flights</button>
     </form>
   </div>
+
+  <div class="ticket">
+    <div class="ticket-label">Find your flight</div>
+    <form class="find-form" id="find-form">
+      <div class="field">
+        <label for="booking-code">Booking number</label>
+        <input type="text" id="booking-code" class="code-input" placeholder="e.g. MA7K3Q9X" maxlength="8" autocomplete="off" spellcheck="false" required />
+      </div>
+      <button type="submit" class="search-btn">Find Flight</button>
+    </form>
+  </div>
 </div>
 
 <section class="routes">
@@ -488,6 +511,12 @@
 </footer>
 
 <script>
+  /* Remember the last booking number so it's ready to go. */
+  try {
+    const last = localStorage.getItem('ma_last_code');
+    if (last) document.getElementById('booking-code').value = last;
+  } catch (e) {}
+
   document.getElementById('search-form').addEventListener('submit', function (e) {
     e.preventDefault();
     const from = document.getElementById('from').value.trim();
@@ -496,8 +525,19 @@
     let passengers = document.getElementById('passengers').value;
     passengers = passengers === '5+' ? '5' : passengers;
 
+    /* New trip: start with a clean slate (no old names, seats or flight). */
+    try {
+      ['ma_passengers', 'ma_seat', 'ma_selection'].forEach(k => sessionStorage.removeItem(k));
+    } catch (err) {}
+
     const params = new URLSearchParams({ from, to, depart, passengers });
     window.location.href = 'results.html?' + params.toString();
+  });
+
+  document.getElementById('find-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const code = document.getElementById('booking-code').value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+    window.location.href = 'find.html?code=' + encodeURIComponent(code);
   });
 </script>
 

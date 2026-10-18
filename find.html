@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Find Your Flight — Meridian Air</title>
+<style>
+  :root {
+    --ink: #0A2A43;
+    --ink-soft: #11486B;
+    --paper: #F3FBFD;
+    --paper-dim: #DDF4F7;
+    --brass: #12B8C8;
+    --slate: #4E7288;
+    --hairline: #C6E7EE;
+    --err: #B3261E;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--paper); color: var(--ink); font-family: "Helvetica Neue", Arial, sans-serif; }
+  h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; }
+
+  header { display: flex; justify-content: space-between; align-items: center; padding: 20px 28px; border-bottom: 1px solid var(--hairline); background: var(--paper); }
+  .logo { text-decoration: none; color: var(--ink); display: flex; align-items: center; gap: 10px; }
+  .logo-text { display: flex; flex-direction: column; line-height: 1; }
+  .logo-text .name { font-family: Georgia, serif; font-size: 19px; }
+  .logo-text .tag { font-size: 9.5px; letter-spacing: 0.18em; color: var(--brass); text-transform: uppercase; margin-top: 2px; }
+  nav { display: flex; gap: 26px; font-size: 13px; }
+  nav a { color: var(--slate); text-decoration: none; }
+  nav a.active { color: var(--ink); font-weight: 600; }
+
+  .hero { background: var(--ink); color: var(--paper); padding: 34px 28px; }
+  .hero .eyebrow { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--brass); margin-bottom: 10px; }
+  .hero h1 { font-size: clamp(28px, 4vw, 42px); margin-bottom: 10px; }
+  .hero p { color: var(--paper-dim); font-size: 14px; }
+
+  .wrap { max-width: 820px; margin: 0 auto; padding: 28px 24px 70px; display: grid; gap: 20px; }
+  .panel { background: #fff; border: 1px solid var(--hairline); border-radius: 8px; padding: 22px; }
+  .kicker { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--slate); margin-bottom: 12px; }
+
+  .find-form { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+  .field { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 220px; }
+  .field label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--slate); }
+  .field input { border: 1px solid var(--hairline); border-radius: 4px; padding: 12px; font-size: 15px; font-family: "Courier New", monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); }
+  .field input:focus { outline: none; border-color: var(--brass); }
+  .btn { border: 1px solid var(--ink); background: var(--ink); color: var(--paper); border-radius: 4px; padding: 13px 20px; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
+  .btn-ghost { background: #fff; color: var(--ink); border-color: var(--hairline); }
+  .msg { margin-top: 12px; font-size: 13px; color: var(--err); display: none; }
+  .msg.show { display: block; }
+  .note { margin-top: 12px; font-size: 12px; color: var(--slate); line-height: 1.5; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip { display: inline-flex; align-items: center; border: 1px solid var(--hairline); background: var(--paper); border-radius: 999px; overflow: hidden; font-family: "Courier New", monospace; font-size: 13px; }
+  .chip button { background: none; border: none; cursor: pointer; font: inherit; color: var(--ink); padding: 8px 12px; }
+  .chip button.x { color: var(--slate); border-left: 1px solid var(--hairline); padding: 8px 10px; font-family: Arial, sans-serif; }
+  .chip button:hover { background: var(--paper-dim); }
+
+  .route { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
+  .code { font-family: Georgia, serif; font-size: 34px; }
+  .city { font-size: 12px; color: var(--slate); }
+  .arrow { color: var(--brass); font-size: 22px; }
+  .ref { display: inline-block; font-family: "Courier New", monospace; letter-spacing: 0.12em; background: var(--paper-dim); border-radius: 4px; padding: 4px 10px; font-size: 13px; margin-bottom: 14px; }
+  .rows { display: grid; gap: 10px; margin-top: 14px; }
+  .row { display: flex; justify-content: space-between; gap: 14px; border-bottom: 1px solid var(--hairline); padding-bottom: 9px; font-size: 14px; }
+  .row span:first-child { color: var(--slate); }
+  .pax { margin-top: 16px; }
+  .pax h3 { font-size: 17px; margin-bottom: 8px; }
+  .pax-item { display: flex; justify-content: space-between; gap: 10px; background: var(--paper); border: 1px solid var(--hairline); border-radius: 6px; padding: 9px 12px; margin-bottom: 8px; font-size: 14px; }
+  .pax-item .s { color: var(--slate); font-size: 12px; }
+  .hidden { display: none; }
+
+  footer { text-align: center; padding: 24px; border-top: 1px solid var(--hairline); font-size: 12px; color: var(--slate); }
+  @media (max-width: 760px) { nav { display: none; } }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="index.html">
+    <div style="width:18px;height:18px;border:2px solid var(--brass);border-radius:50%; position:relative;">
+      <div style="position:absolute;left:7px;top:-5px;width:2px;height:26px;background:var(--brass);"></div>
+    </div>
+    <div class="logo-text">
+      <span class="name">Meridian Air</span>
+      <span class="tag">Every Longitude</span>
+    </div>
+  </a>
+  <nav>
+    <a class="active" href="find.html">Find Your Flight</a>
+    <a href="fleet.html">Our Fleet</a>
+    <a href="international.html">International</a>
+    <a href="ultra-long-range.html">Ultra-Long-Range</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">Manage booking</div>
+  <h1>Find Your Flight</h1>
+  <p>Enter your booking number to pull up your trip. We'll remember it on this device.</p>
+</section>
+
+<main class="wrap">
+  <section class="panel">
+    <div class="kicker">Booking number</div>
+    <form class="find-form" id="find-form" novalidate>
+      <div class="field">
+        <label for="code">e.g. MA7K3Q9X</label>
+        <input type="text" id="code" maxlength="8" autocomplete="off" spellcheck="false" />
+      </div>
+      <button type="submit" class="btn">Find flight</button>
+    </form>
+    <div class="msg" id="err">We couldn't find that booking number on this device. Check it and try again.</div>
+    <div class="note">Demo note: bookings are stored in this browser only, so a booking number works on the device and browser where it was made.</div>
+  </section>
+
+  <section class="panel hidden" id="saved-panel">
+    <div class="kicker">Remembered bookings</div>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <section class="panel hidden" id="result"></section>
+</main>
+
+<footer>Meridian Air — demo site for illustration only · Not a real airline</footer>
+
+<script src="booking.js"></script>
+<script>
+  const LS_REMEMBERED = 'ma_remembered';
+  const LS_LAST = 'ma_last_code';
+  const cabinLabels = { economy: 'Economy', premium: 'Premium Economy', business: 'Business', first: 'First' };
+
+  function readList(key) {
+    try { const v = JSON.parse(localStorage.getItem(key) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; }
+  }
+  function remember(code) {
+    const list = readList(LS_REMEMBERED).filter(c => c !== code);
+    list.unshift(code);
+    try { localStorage.setItem(LS_REMEMBERED, JSON.stringify(list)); localStorage.setItem(LS_LAST, code); } catch (e) {}
+  }
+  function forget(code) {
+    const list = readList(LS_REMEMBERED).filter(c => c !== code);
+    try {
+      localStorage.setItem(LS_REMEMBERED, JSON.stringify(list));
+      if (localStorage.getItem(LS_LAST) === code) localStorage.removeItem(LS_LAST);
+    } catch (e) {}
+  }
+  function allCodes() {
+    const seen = new Set();
+    return readList(LS_REMEMBERED).concat(readList('ma_reservations').slice().reverse()).filter(c => !seen.has(c) && seen.add(c));
+  }
+
+  const codeEl = document.getElementById('code');
+  const errEl = document.getElementById('err');
+  const resultEl = document.getElementById('result');
+
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+
+  function renderChips() {
+    const codes = allCodes().filter(c => maLoadReservation(c));
+    document.getElementById('saved-panel').classList.toggle('hidden', codes.length === 0);
+    const remembered = new Set(readList(LS_REMEMBERED));
+    document.getElementById('chips').innerHTML = codes.map(c =>
+      '<span class="chip"><button type="button" data-open="' + esc(c) + '">' + esc(c) + '</button>' +
+      (remembered.has(c) ? '<button type="button" class="x" data-forget="' + esc(c) + '" title="Forget">✕</button>' : '') + '</span>'
+    ).join('');
+  }
+
+  function render(res) {
+    const f = maFindAirport(res.from), t = maFindAirport(res.to);
+    const n = (res.passengerDetails || []).length || maPassengerCount(res.passengers);
+    const people = res.passengerDetails || [];
+    let paxHtml = '';
+    for (let i = 0; i < n; i++) {
+      const p = people[i];
+      const name = p ? [p.title, p.first, p.last].filter(Boolean).join(' ') : 'Passenger ' + (i + 1);
+      paxHtml += '<div class="pax-item"><span>' + esc(name) + '</span><span class="s">' + (i === 0 && res.seat ? 'Seat ' + esc(res.seat) : 'Seat at check-in') + '</span></div>';
+    }
+    const total = (res.price || 0) * n;
+    const pay = res.payment && res.payment.last4 ? esc(res.payment.brand || 'Card') + ' ending ' + esc(res.payment.last4) : '—';
+    resultEl.innerHTML =
+      '<div class="kicker">Your booking</div>' +
+      '<div class="ref">' + esc(res.code) + '</div>' +
+      '<div class="route"><div><div class="code">' + esc(f ? f.code : res.from) + '</div><div class="city">' + esc(f ? f.city : '') + '</div></div>' +
+      '<div class="arrow">→</div>' +
+      '<div style="text-align:right"><div class="code">' + esc(t ? t.code : res.to) + '</div><div class="city">' + esc(t ? t.city : '') + '</div></div></div>' +
+      '<div class="rows">' +
+      '<div class="row"><span>Date</span><strong>' + esc(maFormatDate(res.depart)) + '</strong></div>' +
+      '<div class="row"><span>Flight</span><strong>' + esc(res.flightNumber || '—') + '</strong></div>' +
+      '<div class="row"><span>Cabin</span><strong>' + esc(cabinLabels[res.cabin] || res.cabin || '—') + '</strong></div>' +
+      '<div class="row"><span>Fare (before taxes)</span><strong>$' + total.toLocaleString() + '</strong></div>' +
+      '<div class="row"><span>Paid with</span><strong>' + pay + '</strong></div>' +
+      (res.contact && res.contact.email ? '<div class="row"><span>Confirmation sent to</span><strong>' + esc(res.contact.email) + '</strong></div>' : '') +
+      '</div>' +
+      '<div class="pax"><h3>Passengers</h3>' + paxHtml + '</div>' +
+      '<div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;"><a class="btn" href="index.html">Book another flight</a></div>';
+    resultEl.classList.remove('hidden');
+  }
+
+  function lookup(raw, silent) {
+    const code = String(raw || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const res = code ? maLoadReservation(code) : null;
+    if (!res) {
+      resultEl.classList.add('hidden');
+      if (!silent) errEl.classList.add('show');
+      return;
+    }
+    errEl.classList.remove('show');
+    codeEl.value = code;
+    remember(code);
+    render(res);
+    renderChips();
+  }
+
+  document.getElementById('find-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    lookup(codeEl.value, false);
+  });
+
+  document.getElementById('chips').addEventListener('click', (e) => {
+    const o = e.target.getAttribute('data-open');
+    const x = e.target.getAttribute('data-forget');
+    if (o) lookup(o, false);
+    if (x) { forget(x); renderChips(); }
+  });
+
+  renderChips();
+  const fromUrl = new URLSearchParams(location.search).get('code');
+  const start = fromUrl || localStorage.getItem(LS_LAST) || sessionStorage.getItem('ma_last_reservation');
+  if (start) lookup(start, !fromUrl);
+</script>
+
+</body>
+</html>
