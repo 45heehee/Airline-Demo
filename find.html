@@ -168,11 +168,12 @@
     const f = maFindAirport(res.from), t = maFindAirport(res.to);
     const n = (res.passengerDetails || []).length || maPassengerCount(res.passengers);
     const people = res.passengerDetails || [];
+    const seats = Array.isArray(res.seats) && res.seats.length ? res.seats : (res.seat ? [res.seat] : []);
     let paxHtml = '';
     for (let i = 0; i < n; i++) {
       const p = people[i];
       const name = p ? [p.title, p.first, p.last].filter(Boolean).join(' ') : 'Passenger ' + (i + 1);
-      paxHtml += '<div class="pax-item"><span>' + esc(name) + '</span><span class="s">' + (i === 0 && res.seat ? 'Seat ' + esc(res.seat) : 'Seat at check-in') + '</span></div>';
+      paxHtml += '<div class="pax-item"><span>' + esc(name) + '</span><span class="s">' + (seats[i] ? 'Seat ' + esc(seats[i]) : 'Seat at check-in') + '</span></div>';
     }
     const total = (res.price || 0) * n;
     const pay = res.payment && res.payment.last4 ? esc(res.payment.brand || 'Card') + ' ending ' + esc(res.payment.last4) : '—';
@@ -186,6 +187,7 @@
       '<div class="row"><span>Date</span><strong>' + esc(maFormatDate(res.depart)) + '</strong></div>' +
       '<div class="row"><span>Flight</span><strong>' + esc(res.flightNumber || '—') + '</strong></div>' +
       '<div class="row"><span>Cabin</span><strong>' + esc(cabinLabels[res.cabin] || res.cabin || '—') + '</strong></div>' +
+      '<div class="row"><span>Passengers</span><strong>' + n + '</strong></div>' +
       '<div class="row"><span>Fare (before taxes)</span><strong>$' + total.toLocaleString() + '</strong></div>' +
       '<div class="row"><span>Paid with</span><strong>' + pay + '</strong></div>' +
       (res.contact && res.contact.email ? '<div class="row"><span>Confirmation sent to</span><strong>' + esc(res.contact.email) + '</strong></div>' : '') +
