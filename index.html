@@ -515,12 +515,6 @@
 </footer>
 
 <script>
-  /* Remember the last booking number so it's ready to go. */
-  try {
-    const last = localStorage.getItem('ma_last_code');
-    if (last) document.getElementById('booking-code').value = last;
-  } catch (e) {}
-
   document.getElementById('search-form').addEventListener('submit', function (e) {
     e.preventDefault();
     const from = document.getElementById('from').value.trim();
