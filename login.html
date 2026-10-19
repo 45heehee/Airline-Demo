@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Meridian Air | Log in</title>
 <style>
-:root{--navy:#071a33;--blue:#0b5cad;--ink:#15243a;--muted:#66758a;--line:#d9e3ef}
+:root{--navy:#071a33;--blue:#0b5cad;--ink:#15243a;--muted:#66758a;--line:#d9e3ef;--gold:#c99a32}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:linear-gradient(135deg,#f7fbff,#eaf4ff 55%,#dcecff)}
 .shell{width:min(100%,960px);display:grid;grid-template-columns:.9fr 1.1fr;border-radius:26px;overflow:hidden;background:#fff;box-shadow:0 24px 70px rgba(7,26,51,.16)}
@@ -31,6 +31,16 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,92,173,.12);ba
 .msg.ok{color:#067647}
 .note{margin-top:20px;padding-top:16px;border-top:1px solid #edf1f5;color:var(--muted);font-size:.76rem;line-height:1.5}
 [hidden]{display:none!important}
+.vip{position:fixed;inset:0;display:grid;place-items:center;padding:20px;background:rgba(7,26,51,.6);backdrop-filter:blur(6px);z-index:10}
+.vip-card{width:min(100%,460px);padding:38px 34px;text-align:center;border-radius:22px;color:#fff;background:linear-gradient(160deg,#061a35,#0a4380);border:1px solid rgba(201,154,50,.7);box-shadow:0 30px 80px rgba(0,0,0,.4)}
+.vip-card .star{font-size:2rem;color:var(--gold)}
+.vip-card small{display:block;margin:10px 0 6px;color:var(--gold);letter-spacing:.2em;font-weight:800}
+.vip-card h3{margin:0 0 12px;font-size:1.7rem;letter-spacing:-.03em}
+.vip-card p{margin:0 0 20px;color:#d5e8fb;line-height:1.55;font-size:.95rem}
+.vip-card ul{list-style:none;margin:0 0 24px;padding:0;text-align:left;color:#e8f3ff;font-size:.9rem;line-height:1.9}
+.vip-card li::before{content:"\2726  ";color:var(--gold)}
+.vip-card button{width:100%;border:0;border-radius:10px;padding:14px;font:inherit;font-weight:800;cursor:pointer;color:#071a33;background:linear-gradient(135deg,#e6c46a,#c99a32)}
+.vip-card a{display:block;margin-top:12px;color:#b9d4ef;font-size:.82rem;cursor:pointer}
 @media(max-width:760px){.shell{grid-template-columns:1fr}.brand{min-height:260px}}
 </style>
 </head>
@@ -58,22 +68,51 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,92,173,.12);ba
 <p class="note">Demo only: accounts are stored in this browser, not on a server. Use a real authentication service before accepting real users.</p>
 </section>
 </main>
+
+<div class="vip" id="vip" hidden>
+<div class="vip-card" role="dialog" aria-modal="true" aria-labelledby="vip-title">
+<div class="star">&#10022;</div>
+<small>VIP INVITATION</small>
+<h3 id="vip-title">You're invited, <span id="vip-name"></span></h3>
+<p>Welcome to Meridian Air. As a new member, you've been invited to join our VIP circle.</p>
+<ul><li>Priority access to new routes</li><li>Member-only offers</li><li>A VIP badge on your account</li></ul>
+<button id="vip-accept" type="button">Accept VIP invitation</button>
+<a id="vip-skip">Maybe later</a>
+</div>
+</div>
+
 <script>
 (function(){
  var USERS='ma_users',SESSION='ma_user',mode='login';
  var $=function(i){return document.getElementById(i)};
  function users(){try{return JSON.parse(localStorage.getItem(USERS))||{}}catch(e){return {}}}
+ function session(){try{return JSON.parse(localStorage.getItem(SESSION))}catch(e){return null}}
  async function hash(s){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('')}
  function say(t,ok){$('msg').textContent=t;$('msg').className='msg'+(ok?' ok':'')}
  function setMode(m){mode=m;var s=m==='signup';
   $('tl').classList.toggle('on',!s);$('ts').classList.toggle('on',s);
   $('nf').hidden=$('cf').hidden=$('tf').hidden=!s;
+  $('pw').autocomplete=s?'new-password':'current-password';
   $('title').textContent=s?'Create your account':'Welcome back';
   $('sub').textContent=s?'Join Meridian Air in a minute.':'Log in to manage your Meridian Air journeys.';
   $('go').textContent=s?'Create account':'Log in';say('')}
  $('tl').onclick=function(){setMode('login')};
  $('ts').onclick=function(){setMode('signup')};
- if(localStorage.getItem(SESSION)){location.replace('index.html');return}
+ if(new URLSearchParams(location.search).get('mode')==='signup'){setMode('signup')}
+ else if(session()){location.replace('index.html');return}
+
+ function goHome(){location.href='index.html'}
+ function showVip(name,email){
+  $('vip-name').textContent=name;
+  $('vip').hidden=false;
+  $('vip-accept').onclick=function(){
+   var db=users();if(db[email]){db[email].vip=true;localStorage.setItem(USERS,JSON.stringify(db))}
+   var s=session()||{};s.vip=true;localStorage.setItem(SESSION,JSON.stringify(s));
+   goHome();
+  };
+  $('vip-skip').onclick=goHome;
+ }
+
  $('form').addEventListener('submit',async function(e){
   e.preventDefault();
   var email=$('email').value.trim().toLowerCase(),pw=$('pw').value;
@@ -86,17 +125,17 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,92,173,.12);ba
    if(pw!==$('pw2').value){return say('Passwords do not match.')}
    if(!$('terms').checked){return say('Please accept the terms.')}
    if(db[email]){return say('An account with this email already exists.')}
-   db[email]={name:name,hash:await hash(pw),created:Date.now()};
+   db[email]={name:name,hash:await hash(pw),created:Date.now(),vip:false};
    localStorage.setItem(USERS,JSON.stringify(db));
-   localStorage.setItem(SESSION,JSON.stringify({email:email,name:name}));
-   say('Account created. Redirecting...',true);
+   localStorage.setItem(SESSION,JSON.stringify({email:email,name:name,vip:false}));
+   showVip(name,email);
   }else{
    var u=db[email];
    if(!u||u.hash!==await hash(pw)){return say('Incorrect email or password.')}
-   localStorage.setItem(SESSION,JSON.stringify({email:email,name:u.name}));
+   localStorage.setItem(SESSION,JSON.stringify({email:email,name:u.name,vip:!!u.vip}));
    say('Welcome back, '+u.name+'. Redirecting...',true);
+   setTimeout(goHome,700);
   }
-  setTimeout(function(){location.href='index.html'},700);
  });
 })();
 </script>
