@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meridian Air | Log in</title>
+<style>
+:root{--navy:#071a33;--blue:#0b5cad;--ink:#15243a;--muted:#66758a;--line:#d9e3ef}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:linear-gradient(135deg,#f7fbff,#eaf4ff 55%,#dcecff)}
+.shell{width:min(100%,960px);display:grid;grid-template-columns:.9fr 1.1fr;border-radius:26px;overflow:hidden;background:#fff;box-shadow:0 24px 70px rgba(7,26,51,.16)}
+.brand{display:flex;flex-direction:column;justify-content:space-between;min-height:600px;padding:40px;color:#fff;background:linear-gradient(150deg,#061a35,#0a4380 65%,#1681c4)}
+.logo{font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:#fff;text-decoration:none}
+.brand h1{margin:0 0 16px;font-size:clamp(2.2rem,5vw,3.6rem);line-height:1;letter-spacing:-.05em}
+.brand p{margin:0;color:#d5e8fb;line-height:1.6}
+.panel{padding:46px clamp(26px,6vw,70px)}
+.eyebrow{margin:0 0 8px;color:var(--blue);font-size:.76rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase}
+h2{margin:0 0 8px;color:var(--navy);font-size:2rem;letter-spacing:-.04em}
+.sub{margin:0 0 24px;color:var(--muted)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:5px;margin-bottom:22px;border-radius:13px;background:#f1f5f9}
+.tabs button{border:0;border-radius:9px;padding:11px;color:var(--muted);background:transparent;cursor:pointer;font:inherit;font-weight:700}
+.tabs button.on{color:var(--navy);background:#fff;box-shadow:0 3px 12px rgba(7,26,51,.1)}
+form{display:grid;gap:16px}
+.f{display:grid;gap:6px}
+label{font-size:.87rem;font-weight:700}
+input[type=text],input[type=email],input[type=password]{width:100%;border:1px solid var(--line);border-radius:10px;padding:13px 14px;font:inherit;background:#fbfdff;outline:none}
+input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,92,173,.12);background:#fff}
+.terms{display:flex;gap:9px;align-items:flex-start;font-size:.8rem;color:var(--muted);font-weight:400}
+.go{border:0;border-radius:10px;padding:14px;color:#fff;background:linear-gradient(135deg,var(--blue),#0a78c2);font:inherit;font-weight:800;cursor:pointer;box-shadow:0 10px 20px rgba(11,92,173,.2)}
+.msg{min-height:20px;margin:0;font-size:.86rem;font-weight:700;color:#b42318}
+.msg.ok{color:#067647}
+.note{margin-top:20px;padding-top:16px;border-top:1px solid #edf1f5;color:var(--muted);font-size:.76rem;line-height:1.5}
+[hidden]{display:none!important}
+@media(max-width:760px){.shell{grid-template-columns:1fr}.brand{min-height:260px}}
+</style>
+</head>
+<body>
+<main class="shell">
+<aside class="brand">
+<a class="logo" href="index.html">&#10022; Meridian Air</a>
+<div><h1>Your journey starts here.</h1><p>Manage your trips and unlock member benefits with one Meridian Air account.</p></div>
+<small>Secure member access</small>
+</aside>
+<section class="panel">
+<p class="eyebrow">Member access</p>
+<h2 id="title">Welcome back</h2>
+<p class="sub" id="sub">Log in to manage your Meridian Air journeys.</p>
+<div class="tabs"><button class="on" id="tl" type="button">Log in</button><button id="ts" type="button">Create account</button></div>
+<form id="form" novalidate>
+<div class="f" id="nf" hidden><label for="name">Full name</label><input id="name" type="text" autocomplete="name"></div>
+<div class="f"><label for="email">Email address</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com"></div>
+<div class="f"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" placeholder="At least 8 characters"></div>
+<div class="f" id="cf" hidden><label for="pw2">Confirm password</label><input id="pw2" type="password" autocomplete="new-password"></div>
+<label class="terms" id="tf" hidden><input id="terms" type="checkbox"><span>I agree to the Meridian Air membership terms.</span></label>
+<button class="go" id="go" type="submit">Log in</button>
+<p class="msg" id="msg" role="status" aria-live="polite"></p>
+</form>
+<p class="note">Demo only: accounts are stored in this browser, not on a server. Use a real authentication service before accepting real users.</p>
+</section>
+</main>
+<script>
+(function(){
+ var USERS='ma_users',SESSION='ma_user',mode='login';
+ var $=function(i){return document.getElementById(i)};
+ function users(){try{return JSON.parse(localStorage.getItem(USERS))||{}}catch(e){return {}}}
+ async function hash(s){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('')}
+ function say(t,ok){$('msg').textContent=t;$('msg').className='msg'+(ok?' ok':'')}
+ function setMode(m){mode=m;var s=m==='signup';
+  $('tl').classList.toggle('on',!s);$('ts').classList.toggle('on',s);
+  $('nf').hidden=$('cf').hidden=$('tf').hidden=!s;
+  $('title').textContent=s?'Create your account':'Welcome back';
+  $('sub').textContent=s?'Join Meridian Air in a minute.':'Log in to manage your Meridian Air journeys.';
+  $('go').textContent=s?'Create account':'Log in';say('')}
+ $('tl').onclick=function(){setMode('login')};
+ $('ts').onclick=function(){setMode('signup')};
+ if(localStorage.getItem(SESSION)){location.replace('index.html');return}
+ $('form').addEventListener('submit',async function(e){
+  e.preventDefault();
+  var email=$('email').value.trim().toLowerCase(),pw=$('pw').value;
+  if(!/^\S+@\S+\.\S+$/.test(email)){return say('Enter a valid email address.')}
+  if(pw.length<8){return say('Password must be at least 8 characters.')}
+  var db=users();
+  if(mode==='signup'){
+   var name=$('name').value.trim();
+   if(!name){return say('Enter your full name.')}
+   if(pw!==$('pw2').value){return say('Passwords do not match.')}
+   if(!$('terms').checked){return say('Please accept the terms.')}
+   if(db[email]){return say('An account with this email already exists.')}
+   db[email]={name:name,hash:await hash(pw),created:Date.now()};
+   localStorage.setItem(USERS,JSON.stringify(db));
+   localStorage.setItem(SESSION,JSON.stringify({email:email,name:name}));
+   say('Account created. Redirecting...',true);
+  }else{
+   var u=db[email];
+   if(!u||u.hash!==await hash(pw)){return say('Incorrect email or password.')}
+   localStorage.setItem(SESSION,JSON.stringify({email:email,name:u.name}));
+   say('Welcome back, '+u.name+'. Redirecting...',true);
+  }
+  setTimeout(function(){location.href='index.html'},700);
+ });
+})();
+</script>
+</body>
+</html>
