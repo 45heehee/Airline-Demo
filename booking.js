@@ -1,6 +1,6 @@
 /* Meridian Air — shared booking logic */
 
-/* ── 1. AIRPORTS ─────────────────────────────────────────────────────── */
+/* ── 1. AIRPORTS ─────────────────────────────────────────────────────────────────────────── */
  window.MA_AIRPORTS = [
   { city: "Atlanta", code: "ATL", country: "United States", region: "North America", airport: "Hartsfield-Jackson Atlanta International Airport" },
   { city: "Beijing", code: "PEK", country: "China", region: "East Asia", airport: "Beijing Capital International Airport" },
@@ -120,7 +120,7 @@ window.MA_AIRPORTS.forEach(a => {
   if (a.city === "Ho Chi Minh City") MA_BY_NAME["ho chi minh"] = a;
 });
 
-/* ── 2. REGION-PAIR TABLE ────────────────────────────────────────────── */
+/* ── 2. REGION-PAIR TABLE ────────────────────────────────────────────────────────────── */
 /*  Keys are sorted alphabetically so lookup is order-independent.
     tier: 1 = narrow/short-haul (<3.5h), 2 = wide/medium (3.5–8h), 3 = flagship (>8h) */
 const MA_REGION_PAIRS = {
@@ -179,7 +179,7 @@ function maLookupRegionPair(r1, r2) {
   return MA_REGION_PAIRS[maRegionPairKey(r1, r2)] || null;
 }
 
-/* ── 3. AIRCRAFT BY TIER ─────────────────────────────────────────────── */
+/* ── 3. AIRCRAFT BY TIER ─────────────────────────────────────────────────────────────── */
 const MA_AIRCRAFT = {
   1: ['Airbus A320', 'Boeing 737-800', 'Boeing 737-900ER', 'Boeing 737 MAX 8', 'Boeing 737 MAX 9'],
   2: ['Airbus A330-900neo', 'Boeing 787-8', 'Boeing 787-9', 'Airbus A321neo'],
@@ -206,7 +206,7 @@ const MA_TIER_LABEL = {
   3: 'Long-haul'
 };
 
-/* ── 4. LOOKUP HELPERS ───────────────────────────────────────────────── */
+/* ── 4. LOOKUP HELPERS ───────────────────────────────────────────────────────────────── */
 function maNormalize(str) { return (str || '').trim().toLowerCase(); }
 
 function maFindAirport(input) {
@@ -242,7 +242,7 @@ function maRouteInfo(from, to) {
   return { fromAirport: f, toAirport: t, pair };
 }
 
-/* ── 5. HASH / RNG ───────────────────────────────────────────────────── */
+/* ── 5. HASH / RNG ───────────────────────────────────────────────────────────────────── */
 function maHash(str) {
   let h = 0;
   for (let i = 0; i < str.length; i++) { h = (h << 5) - h + str.charCodeAt(i); h |= 0; }
@@ -259,7 +259,7 @@ function maSeededRandom(seed) {
   };
 }
 
-/* ── 6. FLIGHT GENERATION ───────────────────────────────────────────── */
+/* ── 6. FLIGHT GENERATION ─────────────────────────────────────────────────────────────── */
 function maGenerateFlights(from, to, depart, passengers) {
   const tier = maResolveTier(from, to);
   const aircraftList = MA_AIRCRAFT[tier];
@@ -324,7 +324,7 @@ function maGenerateFlights(from, to, depart, passengers) {
   return { tier, from, to, depart, passengers, flights };
 }
 
-/* ── 7. FORMATTING ───────────────────────────────────────────────────── */
+/* ── 7. FORMATTING ──────────────────────────────────────────────────────────────────── */
 function maFormatTime(mins) {
   mins = ((mins % (24 * 60)) + 24 * 60) % (24 * 60);
   let h = Math.floor(mins / 60); const m = mins % 60;
@@ -352,7 +352,7 @@ function maPassengerCount(p) {
   return isNaN(n) ? 1 : n;
 }
 
-/* ── 8. SEAT MAPS ────────────────────────────────────────────────────── */
+/* ── 8. SEAT MAPS ────────────────────────────────────────────────────────────────────── */
 function maSeatConfig(tier, cabin) {
   const layouts = {
     economy:  { cols: ['A','B','C','D','E','F','G','H'], aisleAfter: 2, aisleAfter2: 6 },
@@ -398,13 +398,58 @@ function maGenerateSeats(seed, config) {
   return rows;
 }
 
-/* ── 9. SESSION STORAGE ──────────────────────────────────────────────── */
+/* ── 9. SESSION STORAGE ───────────────────────────────────────────────────────────────── */
 function maSaveSelection(obj)  { try { sessionStorage.setItem('ma_selection', JSON.stringify(obj)); } catch(e){} }
 function maLoadSelection()     { try { return JSON.parse(sessionStorage.getItem('ma_selection')); } catch(e){ return null; } }
 function maSaveSeat(seat)      { try { sessionStorage.setItem('ma_seat', JSON.stringify(seat)); } catch(e){} }
 function maLoadSeat()          { try { return JSON.parse(sessionStorage.getItem('ma_seat')); } catch(e){ return null; } }
 function maClearBooking()      { try { sessionStorage.removeItem('ma_selection'); sessionStorage.removeItem('ma_seat'); } catch(e){} }
 
+
+/* ── 10. LOYALTY POINTS ──────────────────────────────────────────────────────────────── */
+const MA_POINTS_PER_DOLLAR = 1;
+const MA_VIP_POINTS = 3000;
+
+function maToNumber(v) {
+  if (v === null || v === undefined) return 0;
+  const n = Number(String(v).replace(/[^0-9.]/g, ''));
+  return isNaN(n) ? 0 : n;
+}
+
+/* Work out how much was spent: prefer the booking details, fall back to the saved selection */
+function maReservationAmount(details) {
+  const d = details || {};
+  const keys = ['total', 'totalPrice', 'totalAmount', 'grandTotal', 'amount', 'price'];
+  for (let i = 0; i < keys.length; i++) {
+    const n = maToNumber(d[keys[i]]);
+    if (n > 0) return n;
+  }
+  const sel = maLoadSelection();
+  if (sel) {
+    const base = maToNumber(sel.total || sel.totalPrice || sel.price);
+    if (base > 0) return sel.total || sel.totalPrice ? base : base * maPassengerCount(sel.passengers);
+  }
+  return 0;
+}
+
+/* Add points to the signed-in member; returns the points earned */
+function maAwardPoints(amount) {
+  const earned = Math.floor(maToNumber(amount) * MA_POINTS_PER_DOLLAR);
+  if (earned <= 0) return 0;
+  try {
+    const session = JSON.parse(localStorage.getItem('ma_user'));
+    if (!session || !session.email) return 0;
+    const db = JSON.parse(localStorage.getItem('ma_users')) || {};
+    const user = db[session.email];
+    const total = Math.max(0, Number((user && user.points) || session.points || 0)) + earned;
+    const vip = !!(user && user.vip) || !!session.vip || total >= MA_VIP_POINTS;
+    if (user) { user.points = total; user.vip = vip; localStorage.setItem('ma_users', JSON.stringify(db)); }
+    session.points = total;
+    session.vip = vip;
+    localStorage.setItem('ma_user', JSON.stringify(session));
+  } catch (e) { return 0; }
+  return earned;
+}
 
 /* RESERVATION NUMBERS: "MA" + 6 random letters/digits (A-Z, 0-9 only), unique per booking */
 function maGenerateReservationCode() {
@@ -423,6 +468,7 @@ function maGenerateReservationCode() {
 
 function maSaveReservation(details) {
   const reservation = Object.assign({ code: maGenerateReservationCode(), createdAt: new Date().toISOString() }, details || {});
+  reservation.pointsEarned = maAwardPoints(maReservationAmount(details));
   try {
     const list = JSON.parse(localStorage.getItem('ma_reservations') || '[]');
     list.push(reservation.code);
