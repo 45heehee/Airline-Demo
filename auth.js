@@ -25,6 +25,19 @@
     var pts = Math.max(0, Number(s.points || 0));
     var isVip = !!s.vip || pts >= VIP_POINTS;
 
+    if (isVip) {
+      var g = document.createElement('style');
+      g.textContent =
+        ':root{--ink:#5A4410;--ink-soft:#B88624;--paper:#FFF9E8;--navy:#3D2D08;--blue:#C99A32}' +
+        '.ma-auth a,.ma-auth button{color:#8A6516}' +
+        '.ma-auth a:hover,.ma-auth button:hover{color:#5A4410}' +
+        '.ma-auth .ma-hi{color:#5A4410}' +
+        '.ma-auth .ma-points{color:#b88624}' +
+        '.ma-auth .ma-cta{background:#B88624;color:#fff}' +
+        '.ma-auth .ma-cta:hover{background:#8A6516;color:#fff}';
+      document.head.appendChild(g);
+    }
+
     var hi = document.createElement('span');
     hi.className = 'ma-hi';
     hi.textContent = 'Hi, ' + (s.name || 'member');
