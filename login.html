@@ -63,6 +63,7 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,92,173,.12);ba
 (function(){
  var USERS='ma_users',SESSION='ma_user',mode='login';
  var LOWEST_TIER='Member',VIP_POINTS=3000;
+ var VIP_EMAILS=['namanthakur@gmail.com','divyab68@gmail.com'];
  var $=function(i){return document.getElementById(i)};
  function users(){try{return JSON.parse(localStorage.getItem(USERS))||{}}catch(e){return {}}}
  function session(){try{return JSON.parse(localStorage.getItem(SESSION))}catch(e){return null}}
@@ -88,22 +89,24 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,92,173,.12);ba
   if(!/^\S+@\S+\.\S+$/.test(email)){return say('Enter a valid email address.')}
   if(pw.length<8){return say('Password must be at least 8 characters.')}
   var db=users();
+  var vipEmail=VIP_EMAILS.indexOf(email)>-1;
   if(mode==='signup'){
    var name=$('name').value.trim();
    if(!name){return say('Enter your full name.')}
    if(pw!==$('pw2').value){return say('Passwords do not match.')}
    if(!$('terms').checked){return say('Please accept the terms.')}
    if(db[email]){return say('An account with this email already exists.')}
-   db[email]={name:name,hash:await hash(pw),created:Date.now(),vip:false,points:0,tier:LOWEST_TIER};
+   db[email]={name:name,hash:await hash(pw),created:Date.now(),vip:vipEmail,points:0,tier:vipEmail?'VIP':LOWEST_TIER};
    localStorage.setItem(USERS,JSON.stringify(db));
-   localStorage.setItem(SESSION,JSON.stringify({email:email,name:name,vip:false,points:0,tier:LOWEST_TIER}));
+   localStorage.setItem(SESSION,JSON.stringify({email:email,name:name,vip:vipEmail,points:0,tier:vipEmail?'VIP':LOWEST_TIER}));
    say('Account created. Welcome, '+name+'. Redirecting...',true);
    setTimeout(goHome,700);
   }else{
    var u=db[email];
    if(!u||u.hash!==await hash(pw)){return say('Incorrect email or password.')}
    var pts=Math.max(0,Number(u.points||0));
-   localStorage.setItem(SESSION,JSON.stringify({email:email,name:u.name,vip:!!u.vip||pts>=VIP_POINTS,points:pts,tier:u.tier||LOWEST_TIER}));
+   var isV=!!u.vip||pts>=VIP_POINTS||vipEmail;
+   localStorage.setItem(SESSION,JSON.stringify({email:email,name:u.name,vip:isV,points:pts,tier:vipEmail?'VIP':(u.tier||LOWEST_TIER)}));
    say('Welcome back, '+u.name+'. Redirecting...',true);
    setTimeout(goHome,700);
   }
