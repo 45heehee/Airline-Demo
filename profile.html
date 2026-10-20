@@ -12,7 +12,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:18p
 .logo{display:flex;align-items:center;gap:14px;text-decoration:none}
 .logo-name{font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:28px;color:#fff;letter-spacing:.01em;line-height:1}
 header a.back{font-size:13px;color:var(--brass-dim);text-decoration:none}header a.back:hover{color:#fff}
-.wrap{max-width:760px;margin:0 auto;padding:34px 24px 70px}.top{display:flex;align-items:center;gap:18px;margin-bottom:26px}
+.wrap{max-width:900px;margin:0 auto;padding:34px 24px 70px}.top{display:flex;align-items:center;gap:18px;margin-bottom:26px}
 .avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--brass),var(--ink-soft));color:#fff;display:grid;place-items:center;font-family:Georgia,serif;font-size:28px}
 h1{font-family:Georgia,serif;font-weight:400;font-size:30px}.badge{display:inline-block;margin-top:6px;font-size:10px;letter-spacing:.12em;font-weight:700;border-radius:999px;padding:4px 10px;color:#fff;background:linear-gradient(135deg,#12B8C8,#11486B)}
 .card{background:#fff;border:1px solid var(--hairline);border-radius:6px;padding:22px 24px;margin-bottom:18px}.card h2{font-family:Georgia,serif;font-weight:400;font-size:19px;margin-bottom:14px}
@@ -37,6 +37,8 @@ h1{font-family:Georgia,serif;font-weight:400;font-size:30px}.badge{display:inlin
   <a class="back" href="index.html">← Back to home</a>
 </header>
 <div class="wrap" id="app"></div>
+<script src="booking.js"></script>
+<script src="dashboard.js"></script>
 <script>
 (function () {
   var VIP_DISCOUNT = 10, MIN_AGE = 18, GRACE_DAYS = 7, DAY = 86400000;
@@ -70,7 +72,8 @@ h1{font-family:Georgia,serif;font-weight:400;font-size:30px}.badge{display:inlin
   }
   var progressHtml;if(isVip){progressHtml='<div class="small">You hold the top rank, VIP. Enjoy your '+VIP_DISCOUNT+'% booking discount.</div>'}else if(idx<4){var nxt=TIERS[idx+1],base=TIERS[idx].pts,pct=Math.min(100,Math.round((pts-base)/(nxt.pts-base)*100));progressHtml='<div class="bar"><div style="width:'+pct+'%"></div></div><div class="small">'+pts.toLocaleString()+' points · '+(nxt.pts-pts).toLocaleString()+' more to reach '+nxt.name+'. VIP is not earned with points.</div>'}else{progressHtml='<div class="bar"><div style="width:100%"></div></div><div class="small">You have reached Northstar, the highest points-based rank. VIP requires an invitation after meeting the travel requirements below.</div>'}
   var ladder=TIERS.map(function(t,i){var cls=i===idx?'cur':(i<idx?'done':'');return '<div class="tier '+cls+'"><div class="n">'+(i+1)+'</div><div><div class="t">'+t.name+(i===idx?'<span class="here">YOU ARE HERE</span>':'')+'</div><div class="req">'+t.req+'</div><div class="ben">'+t.benefit+'</div></div></div>'}).join('');
-  document.getElementById('app').innerHTML=dobCard+'<div class="top"><div class="avatar">'+esc(name.charAt(0).toUpperCase())+'</div><div><h1>'+esc(name)+'</h1><span class="badge">'+esc(cur.name.toUpperCase())+'</span></div></div>'+
+  var dash='';try{dash=maBuildDashboard({name:name,email:s.email,pts:pts,isVip:isVip,tiers:TIERS,idx:idx})}catch(e){dash=''}
+  document.getElementById('app').innerHTML=dobCard+dash+'<div class="top"><div class="avatar">'+esc(name.charAt(0).toUpperCase())+'</div><div><h1>'+esc(name)+'</h1><span class="badge">'+esc(cur.name.toUpperCase())+'</span></div></div>'+
     '<div class="card"><h2>Account information</h2><div class="row"><span class="k">Full name</span><span class="v">'+esc(name)+'</span></div><div class="row"><span class="k">Email</span><span class="v">'+esc(s.email)+'</span></div><div class="row"><span class="k">Date of birth</span><span class="v">'+esc(dobText)+'</span></div><div class="row"><span class="k">Age</span><span class="v">'+esc(ageText)+'</span></div><div class="row"><span class="k">Member since</span><span class="v">'+fmtDate(u.created)+'</span></div></div>'+
     '<div class="card"><h2>Your rank</h2><div class="row"><span class="k">Current rank</span><span class="v">'+esc(cur.name)+'</span></div><div class="row"><span class="k">Points</span><span class="v">'+pts.toLocaleString()+'</span></div><div class="row"><span class="k">VIP discount</span><span class="v">'+(isVip?VIP_DISCOUNT+'% active':'Not active')+'</span></div><div style="margin-top:14px">'+progressHtml+'</div></div>'+
     '<div class="card"><h2>VIP invitation requirements</h2><p class="small" style="margin-bottom:10px">VIP is invitation-only and is never unlocked by earning points.</p><ul class="vip-list"><li><strong>150 completed flights</strong> with Meridian Air</li><li><strong>More than 1,000 flying hours</strong> with Meridian Air</li><li><strong>5 completed First Class bookings</strong></li></ul></div>'+
