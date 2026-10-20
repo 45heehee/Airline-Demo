@@ -442,7 +442,7 @@ function maAwardPoints(amount) {
     const db = JSON.parse(localStorage.getItem('ma_users')) || {};
     const user = db[session.email];
     const total = Math.max(0, Number((user && user.points) || session.points || 0)) + earned;
-    const vip = !!(user && user.vip) || !!session.vip || total >= MA_VIP_POINTS;
+    const vip = !!(user && user.vip) || !!session.vip;
     if (user) { user.points = total; user.vip = vip; localStorage.setItem('ma_users', JSON.stringify(db)); }
     session.points = total;
     session.vip = vip;
@@ -468,6 +468,20 @@ function maGenerateReservationCode() {
 
 function maSaveReservation(details) {
   const reservation = Object.assign({ code: maGenerateReservationCode(), createdAt: new Date().toISOString() }, details || {});
+  try {
+    const u = JSON.parse(localStorage.getItem('ma_user') || 'null');
+    reservation.owner = (u && u.email) ? u.email : '';
+  } catch (e) { reservation.owner = ''; }
+  try {
+    const g = maGenerateFlights(reservation.from, reservation.to, reservation.depart, reservation.passengers);
+    const f = g.flights.find(x => x.flightNumber === reservation.flightNumber);
+    if (f) {
+      reservation.depMinutes = f.depMinutes;
+      reservation.arrMinutes = f.arrMinutes;
+      reservation.arrDayOffset = f.arrDayOffset;
+      reservation.durMinutes = f.durMinutes;
+    }
+  } catch (e) {}
   reservation.pointsEarned = maAwardPoints(maReservationAmount(details));
   try {
     const list = JSON.parse(localStorage.getItem('ma_reservations') || '[]');
