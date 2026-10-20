@@ -15,7 +15,7 @@
   .md-tier{right:30px;bottom:82px;text-align:right;font-size:16px;line-height:1.25;font-weight:300}
   .md-name{left:30px;bottom:26px;font-size:15px;font-weight:400;letter-spacing:.1em;text-transform:uppercase}
   .md-orbs{right:28px;bottom:22px;width:78px;height:50px}
-  .md-sky{background:url('wing-points.jpg') center/cover no-repeat,linear-gradient(115deg,#6f8fb8 0%,#a996b8 45%,#c99bb6 70%,#7d6aa8 100%);min-height:200px}
+  .md-sky{background:url('wing.png') center/cover no-repeat,linear-gradient(115deg,#6f8fb8 0%,#a996b8 45%,#c99bb6 70%,#7d6aa8 100%);min-height:200px}
   .md-sunset{background:linear-gradient(180deg,rgba(0,0,0,.05) 0%,rgba(0,0,0,.28) 100%),url('wing-ticket.jpg') center/cover no-repeat,linear-gradient(180deg,#6f93bd 0%,#a6a2b0 35%,#d7a07a 68%,#4a352c 100%);min-height:260px;flex:1}
   .md-label{font-size:25px;font-weight:300;opacity:.95;text-shadow:0 1px 8px rgba(0,0,0,.25)}
   .md-big{font-size:46px;font-weight:400;margin:8px 0 6px;letter-spacing:.01em;text-shadow:0 1px 8px rgba(0,0,0,.25)}
