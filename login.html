@@ -50,14 +50,14 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,92,173,.12);ba
 <form id="form" novalidate>
 <div class="f" id="nf" hidden><label for="name">Full name</label><input id="name" type="text" autocomplete="name"></div>
 <div class="f"><label for="email">Email address</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com"></div>
-<div class="f" id="df" hidden><label for="dob">Date of birth</label><input id="dob" type="date" autocomplete="bday"><span class="hint">You must be 18 or older to create a membership.</span></div>
+<div class="f" id="df" hidden><label for="dob">Date of birth</label><input id="dob" type="date" autocomplete="bday"><span class="hint">You must be 18 or older to hold a membership.</span></div>
 <div class="f"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" placeholder="At least 8 characters"></div>
 <div class="f" id="cf" hidden><label for="pw2">Confirm password</label><input id="pw2" type="password" autocomplete="new-password"></div>
 <label class="terms" id="tf" hidden><input id="terms" type="checkbox"><span>I agree to the Meridian Air membership terms and confirm I am 18 or older.</span></label>
 <button class="go" id="go" type="submit">Log in</button>
 <p class="msg" id="msg" role="status" aria-live="polite"></p>
 </form>
-<p class="note">Demo only: accounts are stored in this browser, not on a server. Use a real authentication service before accepting real users.</p>
+<p class="note">Demo only: accounts and age checks are stored in this browser, not on a server. Use a real authentication service before accepting real users.</p>
 </section>
 </main>
 
@@ -72,19 +72,23 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,92,173,.12);ba
  async function hash(s){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('')}
  function say(t,ok){$('msg').textContent=t;$('msg').className='msg'+(ok?' ok':'')}
  function ageOf(v){var b=new Date(v+'T00:00:00'),t=new Date();var a=t.getFullYear()-b.getFullYear();var m=t.getMonth()-b.getMonth();if(m<0||(m===0&&t.getDate()<b.getDate()))a--;return a}
+ function turns18(v){var b=new Date(v+'T00:00:00');b.setFullYear(b.getFullYear()+MIN_AGE);return b.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'})}
  function tierFor(p){var T=[['Waypoint',0],['Horizon',5000],['Summit',15000],['Apex',35000],['Northstar',75000]],r='Waypoint';for(var i=0;i<T.length;i++){if(p>=T[i][1])r=T[i][0]}return r}
  (function(){var t=new Date();t.setFullYear(t.getFullYear()-MIN_AGE);$('dob').max=t.toISOString().slice(0,10)})();
  function setMode(m){mode=m;var s=m==='signup';
   $('tl').classList.toggle('on',!s);$('ts').classList.toggle('on',s);
-  $('nf').hidden=$('df').hidden=$('cf').hidden=$('tf').hidden=!s;
+  $('nf').hidden=$('cf').hidden=$('tf').hidden=!s;$('df').hidden=!s;
   $('pw').autocomplete=s?'new-password':'current-password';
   $('title').textContent=s?'Create your account':'Welcome back';
   $('sub').textContent=s?'Join Meridian Air in a minute. Members must be 18+.':'Log in to manage your Meridian Air journeys.';
   $('go').textContent=s?'Create account':'Log in';say('')}
  $('tl').onclick=function(){setMode('login')};
  $('ts').onclick=function(){setMode('signup')};
- if(new URLSearchParams(location.search).get('mode')==='signup'){setMode('signup')}
+ var qs=new URLSearchParams(location.search);
+ if(qs.get('mode')==='signup'){setMode('signup')}
  else if(session()){location.replace('index.html');return}
+ if(qs.get('banned')){say('This account is on hold because the holder is under 18. Log in again once you turn 18.')}
+ if(qs.get('verify')){$('df').hidden=false;say('Your account is on hold. Log in and enter your date of birth to restore it.')}
 
  function goHome(){location.href='index.html'}
 
@@ -114,6 +118,14 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,92,173,.12);ba
   }else{
    var u=db[email];
    if(!u||u.hash!==await hash(pw)){return say('Incorrect email or password.')}
+   if(u.dob&&ageOf(u.dob)<MIN_AGE){return say('This account is on hold until you turn '+MIN_AGE+' on '+turns18(u.dob)+'.')}
+   if(!u.dob&&u.dobDeadline&&Date.now()>u.dobDeadline){
+    var d2=$('dob').value;
+    if(!d2){$('df').hidden=false;return say('Your account is on hold. Enter your date of birth to restore it.')}
+    if(isNaN(new Date(d2+'T00:00:00'))||ageOf(d2)<0){return say('Enter a valid date of birth.')}
+    u.dob=d2;delete u.dobDeadline;db[email]=u;localStorage.setItem(USERS,JSON.stringify(db));
+    if(ageOf(d2)<MIN_AGE){return say('Thanks. You are under '+MIN_AGE+', so this account stays on hold until you turn '+MIN_AGE+' on '+turns18(d2)+'.')}
+   }
    var pts=Math.max(0,Number(u.points||0));
    var isV=!!u.vip||vipEmail;
    localStorage.setItem(SESSION,JSON.stringify({email:email,name:u.name,vip:isV,points:pts,tier:isV?'VIP':tierFor(pts)}));
