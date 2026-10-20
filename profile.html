@@ -8,11 +8,10 @@
 :root{--ink:#0A2A43;--ink-soft:#11486B;--paper:#F3FBFD;--paper-dim:#DDF4F7;--brass:#12B8C8;--brass-dim:#74D9E3;--slate:#4E7288;--hairline:#C6E7EE}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--paper);font-family:'Helvetica Neue',Arial,sans-serif;color:var(--ink)}
-header{display:flex;align-items:center;justify-content:space-between;padding:20px 28px;border-bottom:1px solid var(--hairline);background:var(--paper)}
-.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
-.logo-text{display:flex;flex-direction:column;line-height:1}
-.logo-text .name{font-family:Georgia,serif;font-size:19px}.logo-text .tag{font-size:9.5px;letter-spacing:.18em;color:var(--brass);text-transform:uppercase;margin-top:2px}
-header a.back{font-size:13px;color:var(--slate);text-decoration:none}header a.back:hover{color:var(--ink)}
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;background:#0A2A43}
+.logo{display:flex;align-items:center;gap:14px;text-decoration:none}
+.logo-name{font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:28px;color:#fff;letter-spacing:.01em;line-height:1}
+header a.back{font-size:13px;color:var(--brass-dim);text-decoration:none}header a.back:hover{color:#fff}
 .wrap{max-width:760px;margin:0 auto;padding:34px 24px 70px}.top{display:flex;align-items:center;gap:18px;margin-bottom:26px}
 .avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--brass),var(--ink-soft));color:#fff;display:grid;place-items:center;font-family:Georgia,serif;font-size:28px}
 h1{font-family:Georgia,serif;font-weight:400;font-size:30px}.badge{display:inline-block;margin-top:6px;font-size:10px;letter-spacing:.12em;font-weight:700;border-radius:999px;padding:4px 10px;color:#fff;background:linear-gradient(135deg,#12B8C8,#11486B)}
@@ -25,7 +24,14 @@ h1{font-family:Georgia,serif;font-weight:400;font-size:30px}.badge{display:inlin
 </head>
 <body>
 <header>
-  <a class="logo" href="index.html"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="12" stroke="#0E2238" stroke-width="1"/><path d="M13 1 V25 M1 13 H25" stroke="#0E2238" stroke-width="0.6" opacity="0.4"/><path d="M13 4 C 18 8, 18 18, 13 22 C 8 18, 8 8, 13 4 Z" stroke="#12B8C8" stroke-width="1.1" fill="none"/></svg><span class="logo-text"><span class="name">Meridian Air</span><span class="tag">Est. 1962 · Every Longitude</span></span></a>
+  <a class="logo" href="index.html" aria-label="Meridian Air home">
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+      <circle cx="22" cy="22" r="20" stroke="#1FB5C6" stroke-width="2.5"/>
+      <path d="M11 26 L22 14 L33 26" stroke="#1FB5C6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M15.5 29.5 L22 22.5 L28.5 29.5" stroke="#1FB5C6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="logo-name">Meridian Air</span>
+  </a>
   <a class="back" href="index.html">← Back to home</a>
 </header>
 <div class="wrap" id="app"></div>
