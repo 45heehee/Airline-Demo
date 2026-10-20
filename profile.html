@@ -20,7 +20,6 @@ header a.back:hover{color:var(--ink)}
 .avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--brass),var(--ink-soft));color:#fff;display:grid;place-items:center;font-family:Georgia,serif;font-size:28px}
 h1{font-family:Georgia,serif;font-weight:400;font-size:30px}
 .badge{display:inline-block;margin-top:6px;font-size:10px;letter-spacing:.12em;font-weight:700;border-radius:999px;padding:4px 10px;color:#fff;background:linear-gradient(135deg,#12B8C8,#11486B)}
-.badge.member{background:var(--slate)}
 .card{background:#fff;border:1px solid var(--hairline);border-radius:6px;padding:22px 24px;margin-bottom:18px}
 .card h2{font-family:Georgia,serif;font-weight:400;font-size:19px;margin-bottom:14px}
 .row{display:flex;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--hairline);font-size:14px}
@@ -30,6 +29,16 @@ h1{font-family:Georgia,serif;font-weight:400;font-size:30px}
 .bar{height:10px;background:var(--paper-dim);border-radius:999px;overflow:hidden;margin:6px 0 8px}
 .bar>div{height:100%;background:linear-gradient(90deg,var(--brass),var(--ink-soft))}
 .small{font-size:12.5px;color:var(--slate)}
+.tier{display:flex;gap:14px;align-items:flex-start;padding:14px 14px;border:1px solid var(--hairline);border-radius:6px;margin-bottom:10px;background:#fff}
+.tier .n{width:30px;height:30px;border-radius:50%;background:var(--paper-dim);color:var(--ink-soft);display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.tier .t{font-family:Georgia,serif;font-size:17px}
+.tier .req{font-size:12px;color:var(--slate);margin:2px 0 4px}
+.tier .ben{font-size:13px;color:var(--ink)}
+.tier.done{opacity:.75}
+.tier.done .n{background:var(--brass);color:#fff}
+.tier.cur{border:2px solid var(--brass);background:var(--paper)}
+.tier.cur .n{background:var(--ink-soft);color:#fff}
+.here{display:inline-block;margin-left:8px;font-family:'Helvetica Neue',Arial,sans-serif;font-size:10px;letter-spacing:.1em;font-weight:700;color:#fff;background:var(--ink-soft);border-radius:999px;padding:3px 8px;vertical-align:middle}
 .actions{display:flex;gap:12px;flex-wrap:wrap}
 .btn{font:inherit;font-size:13px;font-weight:600;border-radius:4px;padding:10px 18px;cursor:pointer;text-decoration:none;border:1px solid var(--ink)}
 .btn.primary{background:var(--ink);color:#fff}
@@ -56,7 +65,16 @@ h1{font-family:Georgia,serif;font-weight:400;font-size:30px}
 
 <script>
 (function () {
-  var VIP_POINTS = 3000, VIP_DISCOUNT = 10;
+  var VIP_DISCOUNT = 10;
+  var TIERS = [
+    { name: 'Waypoint',  pts: 0,     req: 'Free signup',                benefit: 'Member pricing, booking history, earn Meridian Points' },
+    { name: 'Horizon',   pts: 5000,  req: '5,000 annual points',        benefit: 'Priority seat selection, 10% points bonus' },
+    { name: 'Summit',    pts: 15000, req: '15,000 annual points',       benefit: 'Priority boarding, one free checked bag' },
+    { name: 'Apex',      pts: 35000, req: '35,000 annual points',       benefit: 'Lounge passes, 25% points bonus, priority rebooking' },
+    { name: 'Northstar', pts: 75000, req: '75,000 annual points',       benefit: 'Upgrade priority, lounge access, 50% points bonus' },
+    { name: 'VIP',       pts: null,  req: 'By invitation only',         benefit: 'Top upgrade priority, complimentary changes, private check-in, lounge access with one guest, ' + VIP_DISCOUNT + '% booking discount' }
+  ];
+
   var s = null, db = {};
   try { s = JSON.parse(localStorage.getItem('ma_user')); } catch (e) {}
   try { db = JSON.parse(localStorage.getItem('ma_users')) || {}; } catch (e) {}
@@ -64,54 +82,73 @@ h1{font-family:Georgia,serif;font-weight:400;font-size:30px}
 
   var u = db[s.email] || {};
   var pts = Math.max(0, Number(s.points || u.points || 0));
-  var isVip = !!s.vip || !!u.vip || pts >= VIP_POINTS;
-  var tier = isVip ? 'VIP' : (s.tier || u.tier || 'Member');
+  var isVip = !!s.vip || !!u.vip;
   var name = s.name || u.name || 'Member';
 
+  var idx = 0;
+  for (var i = 0; i < 5; i++) { if (pts >= TIERS[i].pts) idx = i; }
+  if (isVip) idx = 5;
+  var cur = TIERS[idx];
+
+  function esc(x) { return String(x).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function fmtDate(t) {
     if (!t) return 'Not available';
     var d = new Date(t);
     return isNaN(d) ? 'Not available' : d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
   }
   function ageOf(dob) {
-    var b = new Date(dob), t = new Date();
+    var b = new Date(dob + 'T00:00:00'), t = new Date();
     var a = t.getFullYear() - b.getFullYear();
     var m = t.getMonth() - b.getMonth();
     if (m < 0 || (m === 0 && t.getDate() < b.getDate())) a--;
     return a;
   }
-  function esc(x) { return String(x).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
-  var dobText = 'Not provided';
-  var ageText = 'Not provided';
+  var dobText = 'Not provided', ageText = 'Not provided';
   if (u.dob) {
     var dd = new Date(u.dob + 'T00:00:00');
     dobText = isNaN(dd) ? u.dob : dd.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
     ageText = ageOf(u.dob) + ' years old';
   }
 
-  var pct = isVip ? 100 : Math.min(100, Math.round(pts / VIP_POINTS * 100));
-  var progress = isVip
-    ? 'VIP unlocked — ' + VIP_DISCOUNT + '% discount on bookings.'
-    : (VIP_POINTS - pts).toLocaleString() + ' more points to unlock VIP and ' + VIP_DISCOUNT + '% off.';
+  var progressHtml;
+  if (isVip) {
+    progressHtml = '<div class="small">You hold the top rank, VIP. Enjoy your ' + VIP_DISCOUNT + '% booking discount.</div>';
+  } else if (idx < 4) {
+    var nxt = TIERS[idx + 1];
+    var base = TIERS[idx].pts;
+    var pct = Math.min(100, Math.round((pts - base) / (nxt.pts - base) * 100));
+    progressHtml = '<div class="bar"><div style="width:' + pct + '%"></div></div>' +
+      '<div class="small">' + pts.toLocaleString() + ' points · ' + (nxt.pts - pts).toLocaleString() + ' more to reach ' + nxt.name + '.</div>';
+  } else {
+    progressHtml = '<div class="bar"><div style="width:100%"></div></div><div class="small">You have reached Northstar, the highest points-based rank. VIP is by invitation only.</div>';
+  }
+
+  var ladder = TIERS.map(function (t, i) {
+    var cls = i === idx ? 'cur' : (i < idx ? 'done' : '');
+    return '<div class="tier ' + cls + '"><div class="n">' + (i + 1) + '</div><div>' +
+      '<div class="t">' + t.name + (i === idx ? '<span class="here">YOU ARE HERE</span>' : '') + '</div>' +
+      '<div class="req">' + t.req + '</div><div class="ben">' + t.benefit + '</div></div></div>';
+  }).join('');
 
   document.getElementById('app').innerHTML =
     '<div class="top"><div class="avatar">' + esc(name.charAt(0).toUpperCase()) + '</div>' +
-    '<div><h1>' + esc(name) + '</h1><span class="badge ' + (isVip ? '' : 'member') + '">' + esc(tier.toUpperCase()) + '</span></div></div>' +
+    '<div><h1>' + esc(name) + '</h1><span class="badge">' + esc(cur.name.toUpperCase()) + '</span></div></div>' +
 
-    '<div class="card"><h2>Personal information</h2>' +
+    '<div class="card"><h2>Account information</h2>' +
     '<div class="row"><span class="k">Full name</span><span class="v">' + esc(name) + '</span></div>' +
     '<div class="row"><span class="k">Email</span><span class="v">' + esc(s.email) + '</span></div>' +
     '<div class="row"><span class="k">Date of birth</span><span class="v">' + esc(dobText) + '</span></div>' +
     '<div class="row"><span class="k">Age</span><span class="v">' + esc(ageText) + '</span></div>' +
     '<div class="row"><span class="k">Member since</span><span class="v">' + fmtDate(u.created) + '</span></div></div>' +
 
-    '<div class="card"><h2>Membership</h2>' +
-    '<div class="row"><span class="k">Rank</span><span class="v">' + esc(tier) + '</span></div>' +
+    '<div class="card"><h2>Your rank</h2>' +
+    '<div class="row"><span class="k">Current rank</span><span class="v">' + esc(cur.name) + '</span></div>' +
     '<div class="row"><span class="k">Points</span><span class="v">' + pts.toLocaleString() + '</span></div>' +
     '<div class="row"><span class="k">VIP discount</span><span class="v">' + (isVip ? VIP_DISCOUNT + '% active' : 'Not active') + '</span></div>' +
-    '<div style="margin-top:14px"><div class="bar"><div style="width:' + pct + '%"></div></div>' +
-    '<div class="small">' + pts.toLocaleString() + ' / ' + VIP_POINTS.toLocaleString() + ' points · ' + progress + '</div></div></div>' +
+    '<div style="margin-top:14px">' + progressHtml + '</div></div>' +
+
+    '<div class="card"><h2>All ranks</h2>' + ladder + '</div>' +
 
     '<div class="actions"><a class="btn primary" href="index.html">Book a flight</a>' +
     '<button class="btn ghost" id="out" type="button">Log out</button></div>';

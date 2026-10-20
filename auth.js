@@ -3,8 +3,8 @@
   var s = null;
   try { s = JSON.parse(localStorage.getItem('ma_user')); } catch (e) {}
 
-  var VIP_POINTS = 3000;
   var VIP_DISCOUNT = 10;
+  var TIERS = [['Waypoint', 0], ['Horizon', 5000], ['Summit', 15000], ['Apex', 35000], ['Northstar', 75000]];
 
   var css = document.createElement('style');
   css.textContent =
@@ -23,7 +23,10 @@
 
   if (s && s.email) {
     var pts = Math.max(0, Number(s.points || 0));
-    var isVip = !!s.vip || pts >= VIP_POINTS;
+    var isVip = !!s.vip;
+    var rank = 'Waypoint';
+    for (var i = 0; i < TIERS.length; i++) { if (pts >= TIERS[i][1]) rank = TIERS[i][0]; }
+    if (isVip) rank = 'VIP';
 
     var hi = document.createElement('span');
     hi.className = 'ma-hi';
@@ -40,7 +43,7 @@
     pb.type = 'button';
     pb.className = 'ma-points';
     pb.title = 'View your profile';
-    pb.textContent = 'Points: ' + pts.toLocaleString() + (isVip ? ' \u00b7 ' + VIP_DISCOUNT + '% VIP discount' : ' \u00b7 ' + (VIP_POINTS - pts).toLocaleString() + ' to VIP');
+    pb.textContent = 'Points: ' + pts.toLocaleString() + ' \u00b7 ' + rank + (isVip ? ' \u00b7 ' + VIP_DISCOUNT + '% discount' : '');
     pb.onclick = function () { location.href = 'profile.html'; };
     box.appendChild(pb);
 

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Meridian Air | Log in</title>
 <style>
-:root{--navy:#071a33;--blue:#0b5cad;--ink:#15243a;--muted:#66758a;--line:#d9e3ef;--gold:#c99a32}
+:root{--navy:#071a33;--blue:#0b5cad;--ink:#15243a;--muted:#66758a;--line:#d9e3ef}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:linear-gradient(135deg,#f7fbff,#eaf4ff 55%,#dcecff)}
 .shell{width:min(100%,960px);display:grid;grid-template-columns:.9fr 1.1fr;border-radius:26px;overflow:hidden;background:#fff;box-shadow:0 24px 70px rgba(7,26,51,.16)}
@@ -39,7 +39,7 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,92,173,.12);ba
 <main class="shell">
 <aside class="brand">
 <a class="logo" href="index.html">&#10022; Meridian Air</a>
-<div><h1>Your journey starts here.</h1><p>Manage your trips and earn points toward VIP with one Meridian Air account.</p></div>
+<div><h1>Your journey starts here.</h1><p>Manage your trips and earn points to rise through the Meridian Air ranks with one account.</p></div>
 <small>Secure member access</small>
 </aside>
 <section class="panel">
@@ -64,7 +64,7 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,92,173,.12);ba
 <script>
 (function(){
  var USERS='ma_users',SESSION='ma_user',mode='login';
- var LOWEST_TIER='Member',VIP_POINTS=3000,MIN_AGE=18;
+ var LOWEST_TIER='Waypoint',MIN_AGE=18;
  var VIP_EMAILS=['namanthakur@gmail.com','divyab68@gmail.com'];
  var $=function(i){return document.getElementById(i)};
  function users(){try{return JSON.parse(localStorage.getItem(USERS))||{}}catch(e){return {}}}
@@ -72,6 +72,7 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,92,173,.12);ba
  async function hash(s){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('')}
  function say(t,ok){$('msg').textContent=t;$('msg').className='msg'+(ok?' ok':'')}
  function ageOf(v){var b=new Date(v+'T00:00:00'),t=new Date();var a=t.getFullYear()-b.getFullYear();var m=t.getMonth()-b.getMonth();if(m<0||(m===0&&t.getDate()<b.getDate()))a--;return a}
+ function tierFor(p){var T=[['Waypoint',0],['Horizon',5000],['Summit',15000],['Apex',35000],['Northstar',75000]],r='Waypoint';for(var i=0;i<T.length;i++){if(p>=T[i][1])r=T[i][0]}return r}
  (function(){var t=new Date();t.setFullYear(t.getFullYear()-MIN_AGE);$('dob').max=t.toISOString().slice(0,10)})();
  function setMode(m){mode=m;var s=m==='signup';
   $('tl').classList.toggle('on',!s);$('ts').classList.toggle('on',s);
@@ -114,8 +115,8 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,92,173,.12);ba
    var u=db[email];
    if(!u||u.hash!==await hash(pw)){return say('Incorrect email or password.')}
    var pts=Math.max(0,Number(u.points||0));
-   var isV=!!u.vip||pts>=VIP_POINTS||vipEmail;
-   localStorage.setItem(SESSION,JSON.stringify({email:email,name:u.name,vip:isV,points:pts,tier:vipEmail?'VIP':(u.tier||LOWEST_TIER)}));
+   var isV=!!u.vip||vipEmail;
+   localStorage.setItem(SESSION,JSON.stringify({email:email,name:u.name,vip:isV,points:pts,tier:isV?'VIP':tierFor(pts)}));
    say('Welcome back, '+u.name+'. Redirecting...',true);
    setTimeout(goHome,700);
   }
