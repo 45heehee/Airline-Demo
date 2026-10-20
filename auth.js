@@ -39,10 +39,9 @@
     var pb = document.createElement('button');
     pb.type = 'button';
     pb.className = 'ma-points';
+    pb.title = 'View your profile';
     pb.textContent = 'Points: ' + pts.toLocaleString() + (isVip ? ' \u00b7 ' + VIP_DISCOUNT + '% VIP discount' : ' \u00b7 ' + (VIP_POINTS - pts).toLocaleString() + ' to VIP');
-    pb.onclick = function () {
-      alert('Points: ' + pts.toLocaleString() + '\n' + (isVip ? 'VIP active: ' + VIP_DISCOUNT + '% discount on bookings.' : (VIP_POINTS - pts).toLocaleString() + ' more points to unlock VIP and ' + VIP_DISCOUNT + '% off.'));
-    };
+    pb.onclick = function () { location.href = 'profile.html'; };
     box.appendChild(pb);
 
     var out = document.createElement('button');

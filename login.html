@@ -23,8 +23,9 @@ h2{margin:0 0 8px;color:var(--navy);font-size:2rem;letter-spacing:-.04em}
 form{display:grid;gap:16px}
 .f{display:grid;gap:6px}
 label{font-size:.87rem;font-weight:700}
-input[type=text],input[type=email],input[type=password]{width:100%;border:1px solid var(--line);border-radius:10px;padding:13px 14px;font:inherit;background:#fbfdff;outline:none}
+input[type=text],input[type=email],input[type=password],input[type=date]{width:100%;border:1px solid var(--line);border-radius:10px;padding:13px 14px;font:inherit;background:#fbfdff;outline:none}
 input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,92,173,.12);background:#fff}
+.hint{font-size:.76rem;color:var(--muted);font-weight:400}
 .terms{display:flex;gap:9px;align-items:flex-start;font-size:.8rem;color:var(--muted);font-weight:400}
 .go{border:0;border-radius:10px;padding:14px;color:#fff;background:linear-gradient(135deg,var(--blue),#0a78c2);font:inherit;font-weight:800;cursor:pointer;box-shadow:0 10px 20px rgba(11,92,173,.2)}
 .msg{min-height:20px;margin:0;font-size:.86rem;font-weight:700;color:#b42318}
@@ -49,9 +50,10 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,92,173,.12);ba
 <form id="form" novalidate>
 <div class="f" id="nf" hidden><label for="name">Full name</label><input id="name" type="text" autocomplete="name"></div>
 <div class="f"><label for="email">Email address</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com"></div>
+<div class="f" id="df" hidden><label for="dob">Date of birth</label><input id="dob" type="date" autocomplete="bday"><span class="hint">You must be 18 or older to create a membership.</span></div>
 <div class="f"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" placeholder="At least 8 characters"></div>
 <div class="f" id="cf" hidden><label for="pw2">Confirm password</label><input id="pw2" type="password" autocomplete="new-password"></div>
-<label class="terms" id="tf" hidden><input id="terms" type="checkbox"><span>I agree to the Meridian Air membership terms.</span></label>
+<label class="terms" id="tf" hidden><input id="terms" type="checkbox"><span>I agree to the Meridian Air membership terms and confirm I am 18 or older.</span></label>
 <button class="go" id="go" type="submit">Log in</button>
 <p class="msg" id="msg" role="status" aria-live="polite"></p>
 </form>
@@ -62,19 +64,21 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,92,173,.12);ba
 <script>
 (function(){
  var USERS='ma_users',SESSION='ma_user',mode='login';
- var LOWEST_TIER='Member',VIP_POINTS=3000;
+ var LOWEST_TIER='Member',VIP_POINTS=3000,MIN_AGE=18;
  var VIP_EMAILS=['namanthakur@gmail.com','divyab68@gmail.com'];
  var $=function(i){return document.getElementById(i)};
  function users(){try{return JSON.parse(localStorage.getItem(USERS))||{}}catch(e){return {}}}
  function session(){try{return JSON.parse(localStorage.getItem(SESSION))}catch(e){return null}}
  async function hash(s){var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0')}).join('')}
  function say(t,ok){$('msg').textContent=t;$('msg').className='msg'+(ok?' ok':'')}
+ function ageOf(v){var b=new Date(v+'T00:00:00'),t=new Date();var a=t.getFullYear()-b.getFullYear();var m=t.getMonth()-b.getMonth();if(m<0||(m===0&&t.getDate()<b.getDate()))a--;return a}
+ (function(){var t=new Date();t.setFullYear(t.getFullYear()-MIN_AGE);$('dob').max=t.toISOString().slice(0,10)})();
  function setMode(m){mode=m;var s=m==='signup';
   $('tl').classList.toggle('on',!s);$('ts').classList.toggle('on',s);
-  $('nf').hidden=$('cf').hidden=$('tf').hidden=!s;
+  $('nf').hidden=$('df').hidden=$('cf').hidden=$('tf').hidden=!s;
   $('pw').autocomplete=s?'new-password':'current-password';
   $('title').textContent=s?'Create your account':'Welcome back';
-  $('sub').textContent=s?'Join Meridian Air in a minute.':'Log in to manage your Meridian Air journeys.';
+  $('sub').textContent=s?'Join Meridian Air in a minute. Members must be 18+.':'Log in to manage your Meridian Air journeys.';
   $('go').textContent=s?'Create account':'Log in';say('')}
  $('tl').onclick=function(){setMode('login')};
  $('ts').onclick=function(){setMode('signup')};
@@ -93,13 +97,17 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,92,173,.12);ba
   if(mode==='signup'){
    var name=$('name').value.trim();
    if(!name){return say('Enter your full name.')}
+   var dob=$('dob').value;
+   if(!dob||isNaN(new Date(dob+'T00:00:00'))){return say('Enter your date of birth.')}
+   if(ageOf(dob)<0){return say('Enter a valid date of birth.')}
+   if(ageOf(dob)<MIN_AGE){return say('You must be '+MIN_AGE+' or older to create a membership.')}
    if(pw!==$('pw2').value){return say('Passwords do not match.')}
    if(!$('terms').checked){return say('Please accept the terms.')}
    if(db[email]){return say('An account with this email already exists.')}
-   db[email]={name:name,hash:await hash(pw),created:Date.now(),vip:vipEmail,points:0,tier:vipEmail?'VIP':LOWEST_TIER};
+   db[email]={name:name,hash:await hash(pw),created:Date.now(),dob:dob,vip:vipEmail,points:0,tier:vipEmail?'VIP':LOWEST_TIER};
    localStorage.setItem(USERS,JSON.stringify(db));
    localStorage.setItem(SESSION,JSON.stringify({email:email,name:name,vip:vipEmail,points:0,tier:vipEmail?'VIP':LOWEST_TIER}));
-   if(vipEmail){alert('You\u2019re invited, '+name+'!\n\nWelcome to Meridian Air VIP. Your VIP membership is active, including a '+10+'% discount on bookings.')}
+   if(vipEmail){alert('You\u2019re invited, '+name+'!\n\nWelcome to Meridian Air VIP. Your VIP membership is active, including a 10% discount on bookings.')}
    say(vipEmail?'Account created. You are invited to VIP, '+name+'! Redirecting...':'Account created. Welcome, '+name+'. Redirecting...',true);
    setTimeout(goHome,vipEmail?900:700);
   }else{
