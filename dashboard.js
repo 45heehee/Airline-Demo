@@ -2,34 +2,53 @@
 (function () {
   var CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;500&family=Libre+Baskerville&display=swap');
-  .md{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px;font-family:'Lato','Helvetica Neue',Arial,sans-serif;font-weight:300;color:#fff}
-  .md-col{display:flex;flex-direction:column;gap:16px}
-  .md-card{position:relative;border-radius:22px;padding:24px 26px;overflow:hidden;min-height:150px}
-  .md-member{background:linear-gradient(145deg,#5a5b60,#46474c);min-height:230px;flex:1}
-  .md-logo{font-family:'Libre Baskerville',Georgia,serif;font-size:24px;font-weight:400}
-  .md-tag{position:absolute;right:26px;top:30px;font-size:12px;font-weight:400;letter-spacing:.2em}
-  .md-chip{position:absolute;left:26px;top:86px;width:52px;height:40px;border:1px solid rgba(255,255,255,.55);border-radius:8px}
-  .md-tier{position:absolute;right:26px;bottom:22px;text-align:right;font-size:15px;line-height:1.25}
-  .md-name{position:absolute;left:26px;bottom:22px;font-size:15px;font-weight:400;letter-spacing:.06em;text-transform:uppercase}
-  .md-sky{background:linear-gradient(120deg,#6f8fb8 0%,#c79bb8 58%,#7a6aa5 100%)}
-  .md-sunset{background:linear-gradient(180deg,#7ea0c4 0%,#d7a07a 68%,#4a352c 100%);min-height:230px;flex:1}
-  .md-wing{position:absolute;right:0;bottom:0;width:70%;height:60%;opacity:.55;pointer-events:none}
-  .md-card>*{position:relative}
-  .md-card>.md-wing{position:absolute}
-  .md-label{font-size:21px}
-  .md-big{font-size:38px;font-weight:500;margin:6px 0 10px}
-  .md-bar{height:7px;border-radius:99px;background:rgba(255,255,255,.3);overflow:hidden;max-width:260px}
+  .md{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:26px;font-family:'Lato','Helvetica Neue',Arial,sans-serif;font-weight:300;color:#fff}
+  .md *{box-sizing:border-box}
+  .md-col{display:flex;flex-direction:column;gap:16px;min-width:0}
+  .md-card{position:relative;border-radius:24px;overflow:hidden;padding:26px 30px}
+  .md-in{position:relative;z-index:2}
+  .md-abs{position:absolute;z-index:2}
+  .md-member{background:linear-gradient(145deg,#5a5b60,#4b4c51);min-height:300px;flex:1}
+  .md-logo{font-family:'Libre Baskerville',Georgia,serif;font-size:26px;font-weight:400;letter-spacing:.01em}
+  .md-tag{right:30px;top:32px;font-size:13px;font-weight:400;letter-spacing:.24em}
+  .md-chip{left:30px;top:92px;width:56px;height:44px}
+  .md-tier{right:30px;bottom:82px;text-align:right;font-size:16px;line-height:1.25;font-weight:300}
+  .md-name{left:30px;bottom:26px;font-size:15px;font-weight:400;letter-spacing:.1em;text-transform:uppercase}
+  .md-orbs{right:28px;bottom:22px;width:78px;height:50px}
+  .md-sky{background:linear-gradient(115deg,#6f8fb8 0%,#a996b8 45%,#c99bb6 70%,#7d6aa8 100%);min-height:200px}
+  .md-sunset{background:linear-gradient(180deg,#6f93bd 0%,#a6a2b0 35%,#d7a07a 68%,#4a352c 100%);min-height:260px;flex:1}
+  .md-wing{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+  .md-label{font-size:25px;font-weight:300;opacity:.95}
+  .md-big{font-size:46px;font-weight:400;margin:8px 0 6px;letter-spacing:.01em}
+  .md-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.3);overflow:hidden;max-width:280px;margin-top:6px}
   .md-bar>div{height:100%;background:#fff;border-radius:99px}
-  .md-sm{font-size:13px;margin-top:8px;font-weight:400}
-  .md-dep{background:#1c1c1e;min-height:120px}.md-arr{background:#0000c8;min-height:120px}
-  .md-code{font-size:42px;font-weight:500;letter-spacing:.02em;line-height:1}
-  .md-city{font-size:22px;margin-top:14px;display:flex;justify-content:space-between;gap:10px}
-  .md-time{font-weight:500}
-  .md-t1{font-size:22px}.md-t2{font-size:15px;margin-top:10px;font-weight:400;line-height:1.6}
-  .md-btn{display:inline-block;margin-top:14px;color:#fff;border:1px solid rgba(255,255,255,.8);border-radius:99px;padding:8px 18px;text-decoration:none;font-size:13px;font-weight:400}
-  @media(max-width:700px){.md{grid-template-columns:1fr}}`;
+  .md-sm{font-size:13px;margin-top:6px;font-weight:400;opacity:.95}
+  .md-route{position:relative;display:flex;flex-direction:column;gap:16px}
+  .md-dep{background:#1d1d1f;min-height:200px}.md-arr{background:#0000c8;min-height:200px}
+  .md-code{font-size:58px;font-weight:400;letter-spacing:.02em;line-height:1;margin-top:6px}
+  .md-city{position:absolute;left:30px;right:30px;bottom:26px;font-size:27px;display:flex;justify-content:space-between;gap:10px;align-items:baseline;z-index:2}
+  .md-time{font-weight:400;font-size:25px;white-space:nowrap}
+  .md-path{position:absolute;left:57%;top:100px;bottom:70px;border-left:2px dashed #fff;z-index:5;pointer-events:none}
+  .md-path:before{content:'';position:absolute;left:-10px;top:-14px;width:18px;height:18px;border:2px solid #fff;border-radius:50%;background:#1d1d1f}
+  .md-plane{position:absolute;left:calc(57% - 27px);top:calc(50% + 4px);width:54px;height:54px;z-index:6;pointer-events:none}
+  .md-t1{font-size:25px;font-weight:300}
+  .md-dots{right:30px;top:30px;font-size:26px;letter-spacing:2px;line-height:1}
+  .md-t2{font-size:13.5px;margin-top:10px;font-weight:400;line-height:1.7;max-width:60%}
+  .md-title{position:absolute;left:30px;bottom:22px;font-size:54px;font-weight:400;line-height:1.05;z-index:2}
+  .md-go{position:absolute;right:30px;bottom:30px;width:96px;height:96px;border:2px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;z-index:3;background:rgba(0,0,0,.08)}
+  .md-go:hover{background:rgba(255,255,255,.18)}
+  @media(max-width:760px){.md{grid-template-columns:1fr}.md-title{font-size:42px}.md-code{font-size:48px}}`;
 
-  var WING = '<svg class="md-wing" viewBox="0 0 300 120" preserveAspectRatio="none"><path d="M300 0 L0 84 L36 98 L300 34Z" fill="#fff"/></svg>';
+  function wing(id, a, b) {
+    return '<svg class="md-wing" viewBox="0 0 400 220" preserveAspectRatio="xMaxYMax slice"><defs><linearGradient id="' + id + '" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="' + a + '"/><stop offset="1" stop-color="#fff" stop-opacity="' + b + '"/></linearGradient></defs>' +
+      '<path d="M400 -10 L150 120 Q92 150 40 170 Q96 176 150 168 L400 62Z" fill="url(#' + id + ')"/>' +
+      '<path d="M400 -10 L360 -10 L120 124 Q150 118 190 98 L400 -6Z" fill="#fff" fill-opacity=".22"/></svg>';
+  }
+
+  var CHIP = '<svg class="md-abs md-chip" viewBox="0 0 56 44" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="1.3"><rect x="1" y="1" width="54" height="42" rx="9"/><path d="M1 15h14c5 0 5 4 5 7s0 7-5 7H1M55 15H41c-5 0-5 4-5 7s0 7 5 7h14M20 1v10M36 1v10M20 33v10M36 33v10M20 22h16"/></svg>';
+  var ORBS = '<svg class="md-abs md-orbs" viewBox="0 0 78 50"><circle cx="26" cy="25" r="24" fill="rgba(0,0,0,.35)" stroke="rgba(255,255,255,.55)"/><circle cx="52" cy="25" r="24" fill="rgba(255,255,255,.28)" stroke="rgba(255,255,255,.55)"/></svg>';
+  var PLANE = '<svg class="md-plane" viewBox="0 0 24 24" fill="#fff"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>';
+  var ARROW = '<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><polyline points="13 5 20 12 13 19"/></svg>';
 
   function esc(x) { return String(x).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
 
@@ -77,7 +96,7 @@
     var cur = o.tiers[o.idx], nx = (!o.isVip && o.idx < 4) ? o.tiers[o.idx + 1] : null;
     var tierName = o.isVip ? 'VIP' : cur.name;
 
-    var prog;
+    var prog = '';
     if (nx) {
       var base = cur.pts, pct = Math.min(100, Math.round((o.pts - base) / (nx.pts - base) * 100));
       prog = '<div class="md-bar"><div style="width:' + pct + '%"></div></div><div class="md-sm">' + (nx.pts - o.pts).toLocaleString() + ' points to ' + esc(nx.name) + '</div>';
@@ -88,26 +107,29 @@
     }
     if (last && last.r.pointsEarned) prog += '<div class="md-sm">+' + Number(last.r.pointsEarned).toLocaleString() + ' points on your last trip</div>';
 
-    var member = '<div class="md-card md-member"><div class="md-logo">Meridian Air</div><div class="md-tag">EVERY LONGITUDE</div><div class="md-chip"></div>' +
-      '<div class="md-name">' + esc(o.name) + '</div><div class="md-tier">' + esc(tierName.toLowerCase()) + '<br>member</div></div>';
+    var member = '<div class="md-card md-member"><div class="md-in md-logo">Meridian Air</div><div class="md-abs md-tag">EVERY LONGITUDE</div>' + CHIP +
+      '<div class="md-abs md-tier">' + esc(tierName.toLowerCase()) + '<br>member</div><div class="md-abs md-name">' + esc(o.name) + '</div>' + ORBS + '</div>';
 
-    var points = '<div class="md-card md-sky">' + WING + '<div class="md-label">Total Points Earned</div><div class="md-big">' + Number(o.pts).toLocaleString() + '</div>' + prog + '</div>';
+    var points = '<div class="md-card md-sky">' + wing('mdg1', '.75', '.15') + '<div class="md-in"><div class="md-label">Total Points Earned</div><div class="md-big">' + Number(o.pts).toLocaleString() + '</div>' + prog + '</div></div>';
 
     var ticket, dep, arr;
     if (next) {
       var r = next.r, t = next.t, fa = maFindAirport(r.from), ta = maFindAirport(r.to);
       var plus = t.arrDayOffset > 0 ? ' +' + t.arrDayOffset + 'd' : '';
       var when = next.dep.getTime() > now ? 'Departs in ' + until(next.dep.getTime() - now) : 'Departing now';
-      ticket = '<div class="md-card md-sunset">' + WING + '<div class="md-t1">Next Flight</div><div class="md-t2">' +
+      ticket = '<div class="md-card md-sunset">' + wing('mdg2', '.6', '.1') + '<div class="md-in"><div class="md-t1">Ticket Details</div><div class="md-t2">' +
         esc(next.dep.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })) + '<br>' +
-        esc(r.flightNumber || '') + ' · Ref ' + esc(r.code) + '<br>' + esc(when) + '</div><a class="md-btn" href="find.html">Manage booking →</a></div>';
-      dep = '<div class="md-card md-dep"><div class="md-code">' + esc(fa ? fa.code : r.from) + '</div><div class="md-city"><span>' + esc(fa ? fa.city : '') + '</span><span class="md-time">' + maFormatTime(t.depMinutes) + '</span></div></div>';
-      arr = '<div class="md-card md-arr"><div class="md-code">' + esc(ta ? ta.code : r.to) + '</div><div class="md-city"><span>' + esc(ta ? ta.city + ', ' + ta.country : '') + '</span><span class="md-time">' + (t.arrMinutes != null ? maFormatTime(t.arrMinutes) + plus : '') + '</span></div></div>';
+        esc(r.flightNumber || '') + ' · Ref ' + esc(r.code) + '<br>' + esc(when) + '</div></div>' +
+        '<div class="md-abs md-dots">···</div><div class="md-title">Meridian<br>Air</div><a class="md-go" href="find.html" aria-label="Manage booking">' + ARROW + '</a></div>';
+      dep = '<div class="md-card md-dep"><div class="md-in md-code">' + esc(fa ? fa.code : r.from) + '</div><div class="md-city"><span>' + esc(fa ? fa.city : '') + '</span><span class="md-time">' + maFormatTime(t.depMinutes) + '</span></div></div>';
+      arr = '<div class="md-card md-arr"><div class="md-in md-code">' + esc(ta ? ta.code : r.to) + '</div><div class="md-city"><span>' + esc(ta ? ta.city + ', ' + ta.country : '') + '</span><span class="md-time">' + (t.arrMinutes != null ? maFormatTime(t.arrMinutes) + plus : '') + '</span></div></div>';
     } else {
-      ticket = '<div class="md-card md-sunset">' + WING + '<div class="md-t1">Next Flight</div><div class="md-t2">No upcoming flights yet.</div><a class="md-btn" href="index.html">Book a flight →</a></div>';
-      dep = '<div class="md-card md-dep"><div class="md-code">—</div><div class="md-city"><span>Where to next?</span></div></div>';
-      arr = '<div class="md-card md-arr"><div class="md-code">—</div><div class="md-city"><span>Book to see your trip</span></div></div>';
+      ticket = '<div class="md-card md-sunset">' + wing('mdg2', '.6', '.1') + '<div class="md-in"><div class="md-t1">Ticket Details</div><div class="md-t2">No upcoming flights yet.</div></div>' +
+        '<div class="md-abs md-dots">···</div><div class="md-title">Meridian<br>Air</div><a class="md-go" href="index.html" aria-label="Book a flight">' + ARROW + '</a></div>';
+      dep = '<div class="md-card md-dep"><div class="md-in md-code">—</div><div class="md-city"><span>Where to next?</span></div></div>';
+      arr = '<div class="md-card md-arr"><div class="md-in md-code">—</div><div class="md-city"><span>Book to see your trip</span></div></div>';
     }
-    return '<div class="md"><div class="md-col">' + member + ticket + '</div><div class="md-col">' + points + dep + arr + '</div></div>';
+    var route = '<div class="md-route">' + dep + arr + (next ? '<div class="md-path"></div>' + PLANE : '') + '</div>';
+    return '<div class="md"><div class="md-col">' + member + ticket + '</div><div class="md-col">' + points + route + '</div></div>';
   };
 })();
