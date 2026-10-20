@@ -99,8 +99,9 @@ input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,92,173,.12);ba
    db[email]={name:name,hash:await hash(pw),created:Date.now(),vip:vipEmail,points:0,tier:vipEmail?'VIP':LOWEST_TIER};
    localStorage.setItem(USERS,JSON.stringify(db));
    localStorage.setItem(SESSION,JSON.stringify({email:email,name:name,vip:vipEmail,points:0,tier:vipEmail?'VIP':LOWEST_TIER}));
-   say('Account created. Welcome, '+name+'. Redirecting...',true);
-   setTimeout(goHome,700);
+   if(vipEmail){alert('You\u2019re invited, '+name+'!\n\nWelcome to Meridian Air VIP. Your VIP membership is active, including a '+10+'% discount on bookings.')}
+   say(vipEmail?'Account created. You are invited to VIP, '+name+'! Redirecting...':'Account created. Welcome, '+name+'. Redirecting...',true);
+   setTimeout(goHome,vipEmail?900:700);
   }else{
    var u=db[email];
    if(!u||u.hash!==await hash(pw)){return say('Incorrect email or password.')}
