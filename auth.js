@@ -25,24 +25,6 @@
     var pts = Math.max(0, Number(s.points || 0));
     var isVip = !!s.vip || pts >= VIP_POINTS;
 
-    if (isVip) {
-      var g = document.createElement('style');
-      g.textContent =
-        ':root{--ink:#4A3708;--ink-soft:#8A6516;--paper:#FFF9E8;--paper-dim:#F5E6B8;' +
-        '--brass:#C99A32;--brass-dim:#E5C36B;--slate:#7A6330;--hairline:#EBDCB0;' +
-        '--navy:#3D2D08;--blue:#C99A32}' +
-        '.board{background:#2A1F05 !important}' +
-        '.logo svg circle{stroke:#B88624}' +
-        '.logo svg path:first-of-type{stroke:#B88624}' +
-        '.ma-auth a,.ma-auth button{color:#8A6516}' +
-        '.ma-auth a:hover,.ma-auth button:hover{color:#4A3708}' +
-        '.ma-auth .ma-hi{color:#4A3708}' +
-        '.ma-auth .ma-points{color:#b88624}' +
-        '.ma-auth .ma-cta{background:#B88624;color:#fff}' +
-        '.ma-auth .ma-cta:hover{background:#8A6516;color:#fff}';
-      document.head.appendChild(g);
-    }
-
     var hi = document.createElement('span');
     hi.className = 'ma-hi';
     hi.textContent = 'Hi, ' + (s.name || 'member');
