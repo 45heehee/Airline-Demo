@@ -14,8 +14,8 @@
     '.ma-auth .ma-cta{color:#fff;background:#0A2A43;border-radius:4px;padding:9px 16px;font-weight:600}' +
     '.ma-auth .ma-cta:hover{background:#11486B;color:#fff}' +
     '.ma-auth .ma-hi{color:#0A2A43;font-weight:600}' +
-    '.ma-auth .ma-vip{background:linear-gradient(135deg,#e5c36b,#b88624);color:#fff;border-radius:999px;padding:3px 9px;font-size:10px;letter-spacing:.12em;font-weight:700}' +
-    '.ma-auth .ma-points{color:#b88624;font-weight:700}';
+    '.ma-auth .ma-vip{background:linear-gradient(135deg,#12B8C8,#11486B);color:#fff;border-radius:999px;padding:3px 9px;font-size:10px;letter-spacing:.12em;font-weight:700}' +
+    '.ma-auth .ma-points{color:#11486B;font-weight:700}';
   document.head.appendChild(css);
 
   var box = document.createElement('div');
