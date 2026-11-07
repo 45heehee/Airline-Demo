@@ -64,6 +64,16 @@
   .pax-item .s { color: var(--slate); font-size: 12px; }
   .hidden { display: none; }
 
+  .miles { margin-top: 18px; background: var(--paper-dim); border: 1px solid var(--hairline); border-radius: 8px; padding: 18px; }
+  .miles-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+  .miles-head h3 { font-size: 17px; }
+  .miles-badge { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); background: #fff; border: 1px solid var(--hairline); border-radius: 999px; padding: 3px 10px; }
+  .miles-total { font-family: Georgia, serif; font-size: 34px; color: var(--ink); line-height: 1.2; }
+  .miles-total small { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 13px; color: var(--slate); margin-left: 6px; }
+  .miles-note { font-size: 12px; color: var(--slate); line-height: 1.5; margin: 6px 0 12px; }
+  .miles-item { display: flex; justify-content: space-between; gap: 10px; background: #fff; border: 1px solid var(--hairline); border-radius: 6px; padding: 9px 12px; margin-bottom: 8px; font-size: 14px; }
+  .miles-item .m { font-weight: 600; }
+
   .cancelled-banner { background: #FDECEA; border: 1px solid var(--err); color: var(--err); border-radius: 6px; padding: 14px 16px; font-size: 14px; line-height: 1.5; }
   .cancelled-banner strong { font-family: "Courier New", monospace; letter-spacing: 0.08em; }
 
@@ -158,13 +168,22 @@
     const people = res.passengerDetails || [];
     const seats = Array.isArray(res.seats) && res.seats.length ? res.seats : (res.seat ? [res.seat] : []);
     let paxHtml = '';
+    let milesItems = '';
+    const milesEach = Math.round((res.price || 0) * 5);
     for (let i = 0; i < n; i++) {
       const p = people[i];
       const name = p ? [p.title, p.first, p.last].filter(Boolean).join(' ') : 'Passenger ' + (i + 1);
       paxHtml += '<div class="pax-item"><span>' + esc(name) + '</span><span class="s">' + (seats[i] ? 'Seat ' + esc(seats[i]) : 'Seat at check-in') + '</span></div>';
+      milesItems += '<div class="miles-item"><span>' + esc(name) + '</span><span class="m">+' + milesEach.toLocaleString() + ' miles</span></div>';
     }
     const total = (res.price || 0) * n;
     const pay = res.payment && res.payment.last4 ? esc(res.payment.brand || 'Card') + ' ending ' + esc(res.payment.last4) : '—';
+    const milesHtml = milesEach > 0 ?
+      '<div class="miles">' +
+      '<div class="miles-head"><h3>Your estimated miles</h3><span class="miles-badge">Meridian Rewards</span></div>' +
+      '<div class="miles-total">' + (milesEach * n).toLocaleString() + '<small>miles for this trip</small></div>' +
+      '<p class="miles-note">Estimate at 5 miles per $1 of fare. Demo only: miles are not saved to an account and have no real value.</p>' +
+      milesItems + '</div>' : '';
     resultEl.innerHTML =
       '<div class="kicker">Your booking</div>' +
       '<div class="ref">' + esc(res.code) + '</div>' +
@@ -181,6 +200,7 @@
       (res.contact && res.contact.email ? '<div class="row"><span>Confirmation sent to</span><strong>' + esc(res.contact.email) + '</strong></div>' : '') +
       '</div>' +
       '<div class="pax"><h3>Passengers</h3>' + paxHtml + '</div>' +
+      milesHtml +
       '<div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;"><a class="btn" href="index.html">Book another flight</a>' +
       '<button type="button" class="btn btn-danger" id="cancel-btn">Cancel booking</button></div>';
     resultEl.classList.remove('hidden');
