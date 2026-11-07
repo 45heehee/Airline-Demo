@@ -35,6 +35,8 @@
 
   .wrap { max-width: 820px; margin: 0 auto; padding: 28px 24px 70px; display: grid; gap: 20px; }
   .panel { background: #fff; border: 1px solid var(--hairline); border-radius: 8px; padding: 22px; }
+  .panel h2 { font-size: 21px; margin-bottom: 4px; }
+  .panel .sub { font-size: 13px; color: var(--slate); margin-bottom: 14px; line-height: 1.5; }
   .kicker { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--slate); margin-bottom: 12px; }
 
   .find-form { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
@@ -50,23 +52,46 @@
   .msg.show { display: block; }
   .note { margin-top: 12px; font-size: 12px; color: var(--slate); line-height: 1.5; }
 
+  .stack { display: grid; gap: 20px; }
+
+  .trip-hero { background: linear-gradient(135deg, #0B3D2E 0%, #145A45 60%, #0F7C86 100%); color: #fff; border-radius: 8px; padding: 34px 26px 26px; }
+  .trip-hero .pill { display: inline-block; font-family: "Courier New", monospace; letter-spacing: 0.12em; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.35); border-radius: 999px; padding: 4px 12px; font-size: 12px; margin-bottom: 14px; }
+  .trip-hero h2 { font-size: clamp(28px, 5vw, 40px); color: #fff; margin-bottom: 6px; }
+  .trip-hero p { font-size: 14px; color: #E4F7F9; }
+  .trip-hero .legs { display: flex; align-items: center; gap: 14px; margin-top: 18px; }
+  .trip-hero .legs .c { font-family: Georgia, serif; font-size: 30px; }
+  .trip-hero .legs .n { font-size: 12px; color: #E4F7F9; }
+  .trip-hero .legs .a { color: #74D9E3; font-size: 22px; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .tile { background: var(--paper-dim); border: 1px solid var(--hairline); border-radius: 8px; padding: 14px; }
+  .tile strong { display: block; font-size: 14px; margin-bottom: 4px; }
+  .tile span { font-size: 12px; color: var(--slate); line-height: 1.4; display: block; }
+
   .route { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
   .code { font-family: Georgia, serif; font-size: 34px; }
   .city { font-size: 12px; color: var(--slate); }
   .arrow { color: var(--brass); font-size: 22px; }
-  .ref { display: inline-block; font-family: "Courier New", monospace; letter-spacing: 0.12em; background: var(--paper-dim); border-radius: 4px; padding: 4px 10px; font-size: 13px; margin-bottom: 14px; }
   .rows { display: grid; gap: 10px; margin-top: 14px; }
   .row { display: flex; justify-content: space-between; gap: 14px; border-bottom: 1px solid var(--hairline); padding-bottom: 9px; font-size: 14px; }
   .row span:first-child { color: var(--slate); }
-  .pax { margin-top: 16px; }
-  .pax h3 { font-size: 17px; margin-bottom: 8px; }
   .pax-item { display: flex; justify-content: space-between; gap: 10px; background: var(--paper); border: 1px solid var(--hairline); border-radius: 6px; padding: 9px 12px; margin-bottom: 8px; font-size: 14px; }
   .pax-item .s { color: var(--slate); font-size: 12px; }
   .hidden { display: none; }
 
-  .miles { margin-top: 18px; background: var(--paper-dim); border: 1px solid var(--hairline); border-radius: 8px; padding: 18px; }
+  details.opt { border-bottom: 1px solid var(--hairline); }
+  details.opt:last-of-type { border-bottom: 0; }
+  details.opt summary { cursor: pointer; padding: 14px 2px; font-size: 14px; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 10px; }
+  details.opt summary::-webkit-details-marker { display: none; }
+  details.opt summary::after { content: "+"; color: var(--brass); font-size: 18px; line-height: 1; }
+  details.opt[open] summary::after { content: "−"; }
+  details.opt .body { padding: 0 2px 14px; font-size: 13px; color: var(--slate); line-height: 1.6; }
+  details.opt .body .row { color: var(--ink); }
+  .cancel-row { padding-top: 16px; }
+
+  .miles { background: var(--paper-dim); border: 1px solid var(--hairline); border-radius: 8px; padding: 18px; }
   .miles-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
-  .miles-head h3 { font-size: 17px; }
+  .miles-head h2 { font-size: 21px; margin: 0; }
   .miles-badge { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); background: #fff; border: 1px solid var(--hairline); border-radius: 999px; padding: 3px 10px; }
   .miles-total { font-family: Georgia, serif; font-size: 34px; color: var(--ink); line-height: 1.2; }
   .miles-total small { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 13px; color: var(--slate); margin-left: 6px; }
@@ -121,7 +146,7 @@
     <div class="note">Demo note: bookings are stored in this browser only, so a booking number works on the device and browser where it was made.</div>
   </section>
 
-  <section class="panel hidden" id="result"></section>
+  <div class="stack hidden" id="result"></div>
 </main>
 
 <footer>Meridian Air — demo site for illustration only · Not a real airline</footer>
@@ -167,6 +192,8 @@
     const n = (res.passengerDetails || []).length || maPassengerCount(res.passengers);
     const people = res.passengerDetails || [];
     const seats = Array.isArray(res.seats) && res.seats.length ? res.seats : (res.seat ? [res.seat] : []);
+    const fromCode = esc(f ? f.code : res.from), fromCity = esc(f ? f.city : '');
+    const toCode = esc(t ? t.code : res.to), toCity = esc(t ? t.city : '');
     let paxHtml = '';
     let milesItems = '';
     const milesEach = Math.round((res.price || 0) * 5);
@@ -177,32 +204,63 @@
       milesItems += '<div class="miles-item"><span>' + esc(name) + '</span><span class="m">+' + milesEach.toLocaleString() + ' miles</span></div>';
     }
     const total = (res.price || 0) * n;
+    const taxes = Math.round(total * 0.13);
     const pay = res.payment && res.payment.last4 ? esc(res.payment.brand || 'Card') + ' ending ' + esc(res.payment.last4) : '—';
-    const milesHtml = milesEach > 0 ?
-      '<div class="miles">' +
-      '<div class="miles-head"><h3>Your estimated miles</h3><span class="miles-badge">Meridian Rewards</span></div>' +
-      '<div class="miles-total">' + (milesEach * n).toLocaleString() + '<small>miles for this trip</small></div>' +
-      '<p class="miles-note">Estimate at 5 miles per $1 of fare. Demo only: miles are not saved to an account and have no real value.</p>' +
-      milesItems + '</div>' : '';
-    resultEl.innerHTML =
-      '<div class="kicker">Your booking</div>' +
-      '<div class="ref">' + esc(res.code) + '</div>' +
-      '<div class="route"><div><div class="code">' + esc(f ? f.code : res.from) + '</div><div class="city">' + esc(f ? f.city : '') + '</div></div>' +
+    const email = res.contact && res.contact.email ? esc(res.contact.email) : 'your email address';
+
+    const heroHtml =
+      '<section class="trip-hero"><span class="pill">Booking ' + esc(res.code) + '</span>' +
+      '<h2>Welcome aboard</h2><p>Everything for your trip, in one place.</p>' +
+      '<div class="legs"><div><div class="c">' + fromCode + '</div><div class="n">' + fromCity + '</div></div>' +
+      '<div class="a">→</div>' +
+      '<div><div class="c">' + toCode + '</div><div class="n">' + toCity + '</div></div></div></section>';
+
+    const extrasHtml =
+      '<section class="panel"><h2>Extra options</h2><p class="sub">Make the trip your own. Demo only: these are shown for illustration and cannot be added yet.</p>' +
+      '<div class="tiles">' +
+      '<div class="tile"><strong>Select a seat</strong><span>Choose where you sit.</span></div>' +
+      '<div class="tile"><strong>Add baggage</strong><span>Extra checked bags.</span></div>' +
+      '<div class="tile"><strong>Pick a meal</strong><span>Special meals on request.</span></div>' +
+      '<div class="tile"><strong>Lounge access</strong><span>Relax before departure.</span></div>' +
+      '</div></section>';
+
+    const flightHtml =
+      '<section class="panel"><h2>Flight details</h2><p class="sub">Your itinerary at a glance.</p>' +
+      '<div class="route"><div><div class="code">' + fromCode + '</div><div class="city">' + fromCity + '</div></div>' +
       '<div class="arrow">→</div>' +
-      '<div style="text-align:right"><div class="code">' + esc(t ? t.code : res.to) + '</div><div class="city">' + esc(t ? t.city : '') + '</div></div></div>' +
+      '<div style="text-align:right"><div class="code">' + toCode + '</div><div class="city">' + toCity + '</div></div></div>' +
       '<div class="rows">' +
       '<div class="row"><span>Date</span><strong>' + esc(maFormatDate(res.depart)) + '</strong></div>' +
       '<div class="row"><span>Flight</span><strong>' + esc(res.flightNumber || '—') + '</strong></div>' +
       '<div class="row"><span>Cabin</span><strong>' + esc(cabinLabels[res.cabin] || res.cabin || '—') + '</strong></div>' +
       '<div class="row"><span>Passengers</span><strong>' + n + '</strong></div>' +
-      '<div class="row"><span>Fare (before taxes)</span><strong>$' + total.toLocaleString() + '</strong></div>' +
-      '<div class="row"><span>Paid with</span><strong>' + pay + '</strong></div>' +
-      (res.contact && res.contact.email ? '<div class="row"><span>Confirmation sent to</span><strong>' + esc(res.contact.email) + '</strong></div>' : '') +
-      '</div>' +
-      '<div class="pax"><h3>Passengers</h3>' + paxHtml + '</div>' +
-      milesHtml +
-      '<div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;"><a class="btn" href="index.html">Book another flight</a>' +
-      '<button type="button" class="btn btn-danger" id="cancel-btn">Cancel booking</button></div>';
+      '</div></section>';
+
+    const readyHtml =
+      '<section class="panel"><h2>Get ready for your trip</h2><p class="sub">Check that every traveller carries a valid passport or ID, plus any visa the destination needs.</p>' +
+      paxHtml + '</section>';
+
+    const manageHtml =
+      '<section class="panel"><h2>Manage my booking</h2><p class="sub">Total fare before taxes: $' + total.toLocaleString() + '</p>' +
+      '<details class="opt"><summary>View price details</summary><div class="body">' +
+      '<div class="row"><span>Fare (' + n + ' passenger' + (n === 1 ? '' : 's') + ')</span><strong>$' + total.toLocaleString() + '</strong></div>' +
+      '<div class="row"><span>Estimated taxes</span><strong>$' + taxes.toLocaleString() + '</strong></div>' +
+      '<div class="row"><span>Total</span><strong>$' + (total + taxes).toLocaleString() + '</strong></div>' +
+      '<div class="row"><span>Paid with</span><strong>' + pay + '</strong></div></div></details>' +
+      '<details class="opt"><summary>View ticket conditions</summary><div class="body">This is a demo booking. In a real booking, fare rules for changes, refunds and baggage would be listed here.</div></details>' +
+      '<details class="opt"><summary>Request an invoice</summary><div class="body">Demo only: a real invoice would be emailed to ' + email + '.</div></details>' +
+      '<details class="opt"><summary>Change my flight</summary><div class="body">Demo only: changes are not available yet. You can cancel this booking below and book a new flight.</div></details>' +
+      '<div class="cancel-row" style="display:flex;gap:12px;flex-wrap:wrap;"><a class="btn" href="index.html">Book another flight</a>' +
+      '<button type="button" class="btn btn-danger" id="cancel-btn">Cancel booking</button></div></section>';
+
+    const milesHtml = milesEach > 0 ?
+      '<section class="miles">' +
+      '<div class="miles-head"><h2>Your estimated miles</h2><span class="miles-badge">Meridian Rewards</span></div>' +
+      '<div class="miles-total">' + (milesEach * n).toLocaleString() + '<small>miles for this trip</small></div>' +
+      '<p class="miles-note">Estimate at 5 miles per $1 of fare. Demo only: miles are not saved to an account and have no real value.</p>' +
+      milesItems + '</section>' : '';
+
+    resultEl.innerHTML = heroHtml + extrasHtml + flightHtml + readyHtml + manageHtml + milesHtml;
     resultEl.classList.remove('hidden');
 
     document.getElementById('cancel-btn').addEventListener('click', function () {
@@ -220,8 +278,8 @@
   function showCancelled(code, total, pay) {
     const refund = total ? ' A refund of $' + Math.round(total * 1.13).toLocaleString() + ' (fare plus taxes) would be returned to ' + pay + ' within 5–7 business days. This is a demo, so no real payment was made.' : '';
     resultEl.innerHTML =
-      '<div class="cancelled-banner">Booking <strong>' + esc(code) + '</strong> has been cancelled.' + refund + '</div>' +
-      '<div style="margin-top:18px;"><a class="btn" href="index.html">Book another flight</a></div>';
+      '<section class="panel"><div class="cancelled-banner">Booking <strong>' + esc(code) + '</strong> has been cancelled.' + refund + '</div>' +
+      '<div style="margin-top:18px;"><a class="btn" href="index.html">Book another flight</a></div></section>';
     resultEl.classList.remove('hidden');
   }
 
