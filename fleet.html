@@ -4,6 +4,27 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Our Fleet — Meridian Air</title>
+<meta name="description" content="Meridian Air's fleet of 25 aircraft: nine Airbus and sixteen Boeing types, from the short-haul 737 to the long-range A350F and double-deck A380." />
+<meta name="theme-color" content="#0B3D2E" />
+<link rel="canonical" href="https://45heehee.github.io/Airline-Demo/fleet.html" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Meridian Air" />
+<meta property="og:title" content="Our Fleet — Meridian Air" />
+<meta property="og:description" content="Nine Airbus and sixteen Boeing types, from the 737 to the A380 and A350F. Demo airline site." />
+<meta property="og:url" content="https://45heehee.github.io/Airline-Demo/fleet.html" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Our Fleet — Meridian Air" />
+<meta name="twitter:description" content="Nine Airbus and sixteen Boeing types, from the 737 to the A380 and A350F. Demo airline site." />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Meridian Air", "item": "https://45heehee.github.io/Airline-Demo/" },
+    { "@type": "ListItem", "position": 2, "name": "Our Fleet", "item": "https://45heehee.github.io/Airline-Demo/fleet.html" }
+  ]
+}
+</script>
 <style>
   :root {
   --ink: #0B3D2E;
@@ -12,6 +33,7 @@
   --paper-dim: #DDF4F7;
   --brass: #12B8C8;
   --brass-dim: #74D9E3;
+  --brass-text: #0A6F7B;
   --slate: #4F6B62;
   --hairline: #C6E7EE;
 }
@@ -29,6 +51,26 @@
     font-family: Georgia, 'Times New Roman', serif;
     font-weight: 400;
   }
+
+  :focus-visible {
+    outline: 2px solid var(--brass-text);
+    outline-offset: 2px;
+  }
+
+  .skip-link {
+    position: absolute;
+    left: 12px;
+    top: -60px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    z-index: 100;
+    text-decoration: none;
+  }
+
+  .skip-link:focus { top: 12px; outline-color: var(--brass); }
 
   /* ---------- Header (shared) ---------- */
   header {
@@ -62,7 +104,7 @@
   .logo-text .tag {
     font-size: 9.5px;
     letter-spacing: 0.18em;
-    color: var(--brass);
+    color: var(--brass-text);
     text-transform: uppercase;
     margin-top: 2px;
   }
@@ -177,7 +219,7 @@
 
   .aircraft-info .role {
     font-size: 11.5px;
-    color: var(--brass);
+    color: var(--brass-text);
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
@@ -201,9 +243,11 @@
 </head>
 <body>
 
+<a class="skip-link" href="#main">Skip to main content</a>
+
 <header>
-  <a class="logo" href="index.html">
-    <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+  <a class="logo" href="index.html" aria-label="Meridian Air home">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true" focusable="false">
       <circle cx="13" cy="13" r="12" stroke="#0E2238" stroke-width="1"/>
       <path d="M13 1 V25 M1 13 H25" stroke="#0E2238" stroke-width="0.6" opacity="0.4"/>
       <path d="M13 4 C 18 8, 18 18, 13 22 C 8 18, 8 8, 13 4 Z" stroke="#B8924A" stroke-width="1.1" fill="none"/>
@@ -213,12 +257,16 @@
       <span class="tag">Est. 1962 · Every Longitude</span>
     </span>
   </a>
-  <nav>
-    <a href="fleet.html" class="active">Our Fleet</a>
-    <a href="#">International</a>
-    <a href="#">Ultra-Long-Range</a>
+  <nav aria-label="Primary">
+    <a href="find.html">Find Your Flight</a>
+    <a href="fleet.html" class="active" aria-current="page">Our Fleet</a>
+    <a href="international.html">International</a>
+    <a href="destinations.html">Destinations</a>
+    <a href="ultra-long-range.html">Ultra-Long-Range</a>
   </nav>
 </header>
+
+<main id="main">
 
 <section class="page-hero">
   <div class="eyebrow">Aircraft &amp; equipment</div>
@@ -227,9 +275,9 @@
 </section>
 
 <!-- ========== AIRBUS ========== -->
-<section class="manufacturer">
+<section class="manufacturer" aria-labelledby="airbus-heading">
   <div class="manufacturer-header">
-    <h2>Airbus</h2>
+    <h2 id="airbus-heading">Airbus</h2>
     <span class="count">9 TYPES IN SERVICE</span>
   </div>
 
@@ -238,7 +286,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="a380.png" alt="Airbus A380" width="563" height="280" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">A380</div>
+        <h3 class="model">A380</h3>
         <div class="role">Flagship double-deck widebody</div>
       </div>
     </div>
@@ -246,7 +294,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="a320.png" alt="Airbus A320" width="612" height="197" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">A320</div>
+        <h3 class="model">A320</h3>
         <div class="role">Short to medium-haul narrowbody</div>
       </div>
     </div>
@@ -254,7 +302,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="a330.png" alt="Airbus A330-900neo" width="500" height="151" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">A330-900neo</div>
+        <h3 class="model">A330-900neo</h3>
         <div class="role">Medium to long-haul widebody</div>
       </div>
     </div>
@@ -262,7 +310,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="a330.png" alt="Airbus A330-800neo" width="500" height="151" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">A330-800neo</div>
+        <h3 class="model">A330-800neo</h3>
         <div class="role">Long, thin-route widebody</div>
       </div>
     </div>
@@ -270,7 +318,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="a350-900.png" alt="Airbus A350-900" width="1480" height="800" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">A350-900</div>
+        <h3 class="model">A350-900</h3>
         <div class="role">Long-haul widebody</div>
       </div>
     </div>
@@ -278,7 +326,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="a350-900.png" alt="Airbus A350-900ULR" width="1480" height="800" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">A350-900ULR</div>
+        <h3 class="model">A350-900ULR</h3>
         <div class="role">Ultra-long-range widebody</div>
       </div>
     </div>
@@ -286,7 +334,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="a350-900.png" alt="Airbus A350-1000" width="1480" height="800" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">A350-1000</div>
+        <h3 class="model">A350-1000</h3>
         <div class="role">Long-haul widebody, stretched</div>
       </div>
     </div>
@@ -294,7 +342,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="a350-900.png" alt="Airbus A350-1000ULR" width="1480" height="800" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">A350-1000ULR</div>
+        <h3 class="model">A350-1000ULR</h3>
         <div class="role">Ultra-long-range widebody, stretched</div>
       </div>
     </div>
@@ -302,7 +350,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="a350-900.png" alt="Airbus A350F" width="1480" height="800" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">A350F</div>
+        <h3 class="model">A350F</h3>
         <div class="role">Freighter</div>
       </div>
     </div>
@@ -311,9 +359,9 @@
 </section>
 
 <!-- ========== BOEING ========== -->
-<section class="manufacturer">
+<section class="manufacturer" aria-labelledby="boeing-heading">
   <div class="manufacturer-header">
-    <h2>Boeing</h2>
+    <h2 id="boeing-heading">Boeing</h2>
     <span class="count">16 TYPES IN SERVICE</span>
   </div>
 
@@ -322,7 +370,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="b777-200.png" alt="Boeing 777-200LR" width="290" height="104" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">777-200LR</div>
+        <h3 class="model">777-200LR</h3>
         <div class="role">Ultra-long-range widebody</div>
       </div>
     </div>
@@ -330,7 +378,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="b777-200.png" alt="Boeing 777-200ER" width="290" height="104" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">777-200ER</div>
+        <h3 class="model">777-200ER</h3>
         <div class="role">Long-range widebody</div>
       </div>
     </div>
@@ -338,7 +386,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="b787-9.png" alt="Boeing 787-8" width="660" height="200" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">787-8</div>
+        <h3 class="model">787-8</h3>
         <div class="role">Long-haul widebody</div>
       </div>
     </div>
@@ -346,7 +394,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="b787-9.png" alt="Boeing 787-9" width="660" height="200" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">787-9</div>
+        <h3 class="model">787-9</h3>
         <div class="role">Long-haul widebody, stretched</div>
       </div>
     </div>
@@ -354,7 +402,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="b787-sketch.png" alt="Boeing 787-10" width="509" height="164" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">787-10</div>
+        <h3 class="model">787-10</h3>
         <div class="role">Long-haul widebody, longest 787</div>
       </div>
     </div>
@@ -362,7 +410,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="b777-300er.png" alt="Boeing 777-300ER" width="1024" height="288" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">777-300ER</div>
+        <h3 class="model">777-300ER</h3>
         <div class="role">Long-range widebody, 4-door layout</div>
       </div>
     </div>
@@ -370,7 +418,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="b777-9.png" alt="Boeing 777-9" width="1018" height="228" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">777-9</div>
+        <h3 class="model">777-9</h3>
         <div class="role">Next-generation widebody, 5-door layout</div>
       </div>
     </div>
@@ -378,7 +426,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="b737-base.png" alt="Boeing 737-600" width="1200" height="398" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">737-600</div>
+        <h3 class="model">737-600</h3>
         <div class="role">Short-haul narrowbody</div>
       </div>
     </div>
@@ -386,7 +434,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="b737-base.png" alt="Boeing 737-700" width="1200" height="398" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">737-700</div>
+        <h3 class="model">737-700</h3>
         <div class="role">Short-haul narrowbody</div>
       </div>
     </div>
@@ -394,7 +442,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="b737-base.png" alt="Boeing 737-800" width="1200" height="398" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">737-800</div>
+        <h3 class="model">737-800</h3>
         <div class="role">Short to medium-haul narrowbody</div>
       </div>
     </div>
@@ -402,7 +450,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="b737-base.png" alt="Boeing 737-900" width="1200" height="398" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">737-900</div>
+        <h3 class="model">737-900</h3>
         <div class="role">Short to medium-haul narrowbody</div>
       </div>
     </div>
@@ -410,7 +458,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="b737-900er.png" alt="Boeing 737-900ER" width="405" height="124" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">737-900ER</div>
+        <h3 class="model">737-900ER</h3>
         <div class="role">Medium-haul narrowbody, extended range</div>
       </div>
     </div>
@@ -418,7 +466,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="b737-base.png" alt="Boeing 737 MAX 8" width="1200" height="398" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">737 MAX 8</div>
+        <h3 class="model">737 MAX 8</h3>
         <div class="role">Short to medium-haul narrowbody</div>
       </div>
     </div>
@@ -426,7 +474,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="b737-base.png" alt="Boeing 737 MAX 8-200" width="1200" height="398" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">737 MAX 8-200</div>
+        <h3 class="model">737 MAX 8-200</h3>
         <div class="role">High-density short-haul narrowbody</div>
       </div>
     </div>
@@ -434,7 +482,7 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="b737-base.png" alt="Boeing 737 MAX 9" width="1200" height="398" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">737 MAX 9</div>
+        <h3 class="model">737 MAX 9</h3>
         <div class="role">Medium-haul narrowbody, stretched</div>
       </div>
     </div>
@@ -442,13 +490,15 @@
     <div class="aircraft-card">
       <div class="aircraft-image"><img src="b737-base.png" alt="Boeing 737 MAX 10" width="1200" height="398" loading="lazy" decoding="async"></div>
       <div class="aircraft-info">
-        <div class="model">737 MAX 10</div>
+        <h3 class="model">737 MAX 10</h3>
         <div class="role">Medium-haul narrowbody, longest MAX</div>
       </div>
     </div>
 
   </div>
 </section>
+
+</main>
 
 <footer>
   Meridian Air — demo site for illustration only · Aircraft images are for visual reference only
