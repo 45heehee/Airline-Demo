@@ -3,7 +3,37 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Our Destinations — Meridian Air</title>
+<title>Our Destinations — Meridian Air International Network</title>
+<meta name="description" content="Explore the Meridian Air international network: 100+ destinations across Europe, the Middle East, Africa, Asia, Oceania and the Americas. Browse signature gateways and the full destination directory by region." />
+<meta name="theme-color" content="#0B3D2E" />
+<link rel="canonical" href="https://45heehee.github.io/Airline-Demo/international.html" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Meridian Air" />
+<meta property="og:title" content="Our Destinations — Meridian Air" />
+<meta property="og:description" content="Browse every Meridian Air destination by region, from flagship capitals to rising commercial centers." />
+<meta property="og:url" content="https://45heehee.github.io/Airline-Demo/international.html" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Our Destinations — Meridian Air" />
+<meta name="twitter:description" content="Browse every Meridian Air destination by region." />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Our Destinations — Meridian Air",
+  "url": "https://45heehee.github.io/Airline-Demo/international.html",
+  "description": "The Meridian Air international destination network, grouped by region.",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Meridian Air (demo site)",
+    "url": "https://45heehee.github.io/Airline-Demo/"
+  },
+  "about": {
+    "@type": "Airline",
+    "name": "Meridian Air",
+    "slogan": "Every Longitude"
+  }
+}
+</script>
 <style>
   :root {
     --ink: #0B3D2E;
@@ -12,6 +42,7 @@
     --paper-dim: #DDF4F7;
     --brass: #12B8C8;
     --brass-dim: #74D9E3;
+    --brass-text: #0A6B76; /* darker teal for text on light backgrounds (AA contrast) */
     --slate: #4F6B62;
     --hairline: #C6E7EE;
     --white: #ffffff;
@@ -35,6 +66,27 @@
 
   a { color: inherit; text-decoration: none; }
   img { max-width: 100%; display: block; }
+
+  /* ── accessibility helpers ── */
+  .skip-link {
+    position: absolute;
+    left: 16px;
+    top: -60px;
+    z-index: 100;
+    background: var(--ink);
+    color: var(--white);
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  .skip-link:focus { top: 12px; }
+
+  :focus-visible {
+    outline: 3px solid var(--brass-text);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  .hero :focus-visible { outline-color: var(--brass-dim); }
 
   .container {
     max-width: 1180px;
@@ -76,7 +128,7 @@
   .logo-text .tag {
     font-size: 9.5px;
     letter-spacing: 0.18em;
-    color: var(--brass);
+    color: var(--brass-text);
     text-transform: uppercase;
     margin-top: 2px;
   }
@@ -88,9 +140,10 @@
     color: var(--slate);
   }
 
-  nav a { color: var(--slate); text-decoration: none; }
+  nav a { color: var(--slate); text-decoration: none; padding: 10px 0; }
   nav a:hover,
   nav a.active { color: var(--ink); }
+  nav a.active { text-decoration: underline; text-underline-offset: 6px; text-decoration-color: var(--brass-text); }
 
   .hero {
     background:
@@ -137,7 +190,7 @@
   }
 
   .hero p {
-    color: rgba(255,255,255,0.86);
+    color: rgba(255,255,255,0.9);
     max-width: 620px;
     font-size: 15px;
   }
@@ -170,7 +223,7 @@
     font-size: 11px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.72);
+    color: rgba(255,255,255,0.85);
   }
 
   /* ── map panel ── */
@@ -264,6 +317,8 @@
     font-size: 14px;
   }
 
+  .eyebrow-dark { color: var(--brass-text); }
+
   .region-tabs {
     display: flex;
     gap: 10px;
@@ -276,7 +331,8 @@
     background: var(--white);
     color: var(--slate);
     border-radius: 999px;
-    padding: 9px 15px;
+    padding: 9px 16px;
+    min-height: 44px;
     font-size: 12.5px;
     cursor: pointer;
     transition: 0.18s ease;
@@ -284,10 +340,12 @@
 
   .region-btn:hover,
   .region-btn.active {
-    border-color: var(--brass);
+    border-color: var(--brass-text);
     background: #eafcfd;
     color: var(--ink);
   }
+
+  .region-btn.active { font-weight: 700; }
 
   .feature-grid {
     display: grid;
@@ -352,7 +410,7 @@
   .destination-airport {
     font-size: 13px;
     line-height: 1.5;
-    color: rgba(255,255,255,0.88);
+    color: rgba(255,255,255,0.92);
   }
 
   /* ── directory ── */
@@ -360,6 +418,7 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 18px;
+    align-items: start;
   }
 
   .region-card {
@@ -379,7 +438,7 @@
     font-size: 11px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--brass);
+    color: var(--brass-text);
     margin-bottom: 16px;
   }
 
@@ -387,6 +446,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    list-style: none;
   }
 
   .city-pill {
@@ -433,7 +493,7 @@
   footer {
     text-align: center;
     padding: 34px 20px 40px;
-    font-size: 11.5px;
+    font-size: 12px;
     color: var(--slate);
     border-top: 1px solid var(--hairline);
   }
@@ -448,8 +508,9 @@
   }
 
   @media (max-width: 760px) {
-    nav { display: none; }
-    header { padding: 18px 20px; }
+    /* keep navigation reachable on phones instead of hiding it */
+    header { padding: 14px 20px; flex-wrap: wrap; gap: 6px 16px; }
+    nav { gap: 18px; flex-wrap: wrap; width: 100%; }
     .hero { padding: 58px 0 42px; }
     .hero-grid,
     .feature-grid,
@@ -459,13 +520,23 @@
     }
     .container { padding: 0 18px; }
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+    .destination-card:hover { transform: none; }
+  }
 </style>
 </head>
 <body>
 
+<a class="skip-link" href="#main">Skip to main content</a>
+
 <header>
-  <a class="logo" href="index.html">
-    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+  <a class="logo" href="index.html" aria-label="Meridian Air home">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true" focusable="false">
       <circle cx="13" cy="13" r="12" stroke="#0A2A43" stroke-width="1"/>
       <path d="M13 1 V25 M1 13 H25" stroke="#0A2A43" stroke-width="0.6" opacity="0.4"/>
       <path d="M13 4 C 18 8, 18 18, 13 22 C 8 18, 8 8, 13 4 Z" stroke="#12B8C8" stroke-width="1.1" fill="none"/>
@@ -476,19 +547,21 @@
     </span>
   </a>
 
-  <nav>
+  <nav aria-label="Main navigation">
     <a href="index.html">Book</a>
     <a href="fleet.html">Our Fleet</a>
-    <a href="international.html" class="active">International</a>
+    <a href="international.html" class="active" aria-current="page">International</a>
     <a href="results.html">Results</a>
   </nav>
 </header>
 
-<section class="hero">
+<main id="main">
+
+<section class="hero" aria-labelledby="page-title">
   <div class="container hero-grid">
     <div>
       <div class="eyebrow">Meridian Air Network</div>
-      <h1>Our Destinations</h1>
+      <h1 id="page-title">Our Destinations</h1>
       <p>
         From flagship capitals to rising commercial centers, Meridian Air links travelers
         across Europe, the Middle East, Africa, Asia, Oceania, and the Americas through
@@ -516,16 +589,18 @@
         <img
           class="map-bg-image"
           src="worldmap.png"
-          alt="World map showing Meridian Air international coverage"
+          alt="World map with Meridian Air hubs marked in New York, London, Paris, Dubai, Johannesburg, Delhi, Tokyo, Singapore, Sydney and São Paulo"
           width="760"
           height="390"
           loading="eager"
+          fetchpriority="high"
+          decoding="async"
         />
         <svg
           class="map-svg-overlay"
           viewBox="0 0 760 390"
-          role="img"
-          aria-label="Meridian Air destination dots overlaid on world map"
+          aria-hidden="true"
+          focusable="false"
         >
           <g stroke="rgba(116,217,227,0.45)" stroke-width="1.4" fill="none">
             <path d="M152 140 C 248 122, 310 126, 372 146"/>
@@ -541,18 +616,18 @@
   </div>
 </section>
 
-<section class="network-strip">
+<section class="network-strip" aria-label="Network at a glance">
   <div class="container">
     <div class="network-grid" id="network-grid"></div>
   </div>
 </section>
 
-<section class="section">
+<section class="section" aria-labelledby="featured-title">
   <div class="container">
     <div class="section-head">
       <div>
-        <div class="eyebrow" style="color: var(--brass);">Featured gateways</div>
-        <h2>Signature destinations</h2>
+        <div class="eyebrow eyebrow-dark">Featured gateways</div>
+        <h2 id="featured-title">Signature destinations</h2>
       </div>
       <p>
         Explore a selection of Meridian Air cities spanning finance, culture, technology,
@@ -564,12 +639,12 @@
   </div>
 </section>
 
-<section class="section" style="padding-top: 10px;">
+<section class="section" style="padding-top: 10px;" aria-labelledby="directory-title">
   <div class="container">
     <div class="section-head">
       <div>
-        <div class="eyebrow" style="color: var(--brass);">Browse by region</div>
-        <h2>Destination directory</h2>
+        <div class="eyebrow eyebrow-dark">Browse by region</div>
+        <h2 id="directory-title">Destination directory</h2>
       </div>
       <p>
         Every region below is populated from the Meridian Air airport data in your booking
@@ -577,10 +652,12 @@
       </p>
     </div>
 
-    <div class="region-tabs" id="region-tabs"></div>
-    <div class="directory" id="directory"></div>
+    <div class="region-tabs" id="region-tabs" role="group" aria-label="Filter destinations by region"></div>
+    <div class="directory" id="directory" aria-live="polite"></div>
   </div>
 </section>
+
+</main>
 
 <footer>
   Meridian Air — demo site for illustration only · International network shown for demonstration purposes
@@ -789,7 +866,7 @@
       <article class="destination-card" style="--bg:${featureThemes[dest.code] || 'linear-gradient(135deg,#7ab8d6,#163650)'}">
         <div class="destination-content">
           <div class="destination-region">${dest.region}</div>
-          <div class="destination-city">${dest.city}</div>
+          <h3 class="destination-city">${dest.city}</h3>
           <div class="destination-airport">${dest.airport}<br>${dest.code} · ${dest.country}</div>
         </div>
       </article>
@@ -800,15 +877,19 @@
     const el = document.getElementById('region-tabs');
     if (!el) return;
     el.innerHTML = ['All', ...regions].map(tab => `
-      <button class="region-btn ${tab === active ? 'active' : ''}" data-region="${tab}">
+      <button type="button" class="region-btn ${tab === active ? 'active' : ''}" data-region="${tab}" aria-pressed="${tab === active}">
         ${tab}
       </button>
     `).join('');
 
     el.querySelectorAll('.region-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        renderTabs(btn.dataset.region);
-        renderDirectory(btn.dataset.region);
+        const region = btn.dataset.region;
+        renderTabs(region);
+        renderDirectory(region);
+        /* keep keyboard focus on the chosen filter after re-render */
+        const again = document.querySelector('.region-btn.active');
+        if (again) again.focus();
       });
     });
   }
@@ -820,12 +901,12 @@
     el.innerHTML = showRegions.map(region => {
       const cities = grouped[region] || [];
       return `
-        <section class="region-card">
+        <section class="region-card" aria-label="${region} destinations">
           <h3>${region}</h3>
           <div class="region-count">${cities.length} destination${cities.length !== 1 ? 's' : ''}</div>
-          <div class="city-list">
-            ${cities.map(c => `<span class="city-pill">${c.city} · ${c.code}</span>`).join('')}
-          </div>
+          <ul class="city-list">
+            ${cities.map(c => `<li class="city-pill">${c.city} · ${c.code}</li>`).join('')}
+          </ul>
         </section>
       `;
     }).join('');
