@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://45heehee.github.io/Airline-Demo/sitemap.xml

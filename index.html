@@ -5,6 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Meridian Air — Every Longitude</title>
 <meta name="description" content="Meridian Air demo airline site: search flights, find your booking, explore our fleet and international routes." />
+<meta name="theme-color" content="#0B3D2E" />
+<link rel="canonical" href="https://45heehee.github.io/Airline-Demo/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Meridian Air" />
+<meta property="og:title" content="Meridian Air — Every Longitude" />
+<meta property="og:description" content="Search flights, find your booking, explore our fleet and international routes. Demo airline site." />
+<meta property="og:url" content="https://45heehee.github.io/Airline-Demo/" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Meridian Air — Every Longitude" />
+<meta name="twitter:description" content="Search flights, find your booking, explore our fleet and international routes. Demo airline site." />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Airline",
+  "name": "Meridian Air",
+  "slogan": "Every Longitude",
+  "url": "https://45heehee.github.io/Airline-Demo/",
+  "description": "Fictional demo airline website for illustration only."
+}
+</script>
 <style>
   :root {
     --ink: #0B3D2E;
@@ -13,6 +33,7 @@
     --paper-dim: #DDF4F7;
     --brass: #12B8C8;
     --brass-dim: #74D9E3;
+    --brass-text: #0A6F7B;
     --slate: #4F6B62;
     --hairline: #C6E7EE;
   }
@@ -29,6 +50,26 @@
     font-family: Georgia, 'Times New Roman', serif;
     font-weight: 400;
   }
+
+  :focus-visible {
+    outline: 2px solid var(--brass-text);
+    outline-offset: 2px;
+  }
+
+  .skip-link {
+    position: absolute;
+    left: 12px;
+    top: -60px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    z-index: 100;
+    text-decoration: none;
+  }
+
+  .skip-link:focus { top: 12px; outline-color: var(--brass); }
 
   header {
     display: flex;
@@ -61,7 +102,7 @@
   .logo-text .tag {
     font-size: 9.5px;
     letter-spacing: 0.18em;
-    color: var(--brass);
+    color: var(--brass-text);
     text-transform: uppercase;
     margin-top: 2px;
   }
@@ -155,7 +196,7 @@
 
   .board-row .status.on-time { color: #8FD19E; }
   .board-row .status.boarding { color: #FFFFFF; }
-  .board-row .status.departed { color: #7C8CA0; }
+  .board-row .status.departed { color: #A9B7C8; }
 
   .flap {
     display: inline-block;
@@ -196,10 +237,12 @@
   .ticket + .ticket { margin-top: 20px; }
 
   .ticket-label {
+    font-family: inherit;
+    font-weight: 400;
     font-size: 10.5px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--brass);
+    color: var(--brass-text);
     margin-bottom: 16px;
     display: flex;
     align-items: center;
@@ -246,17 +289,18 @@
     font-size: 14px;
     color: var(--ink);
     border: none;
-    border-bottom: 1.5px solid var(--hairline);
+    border-bottom: 1.5px solid var(--slate);
     background: transparent;
     padding: 6px 2px;
   }
 
   .field input.code-input { text-transform: uppercase; letter-spacing: 0.1em; }
 
-  .field select:focus,
-  .field input:focus {
-    outline: none;
-    border-bottom-color: var(--brass);
+  .field select:focus-visible,
+  .field input:focus-visible {
+    outline: 2px solid var(--brass-text);
+    outline-offset: 2px;
+    border-bottom-color: var(--brass-text);
   }
 
   .search-btn {
@@ -269,12 +313,12 @@
     border: none;
     border-radius: 4px;
     padding: 12px 22px;
+    min-height: 44px;
     cursor: pointer;
     white-space: nowrap;
   }
 
   .search-btn:hover { background: var(--ink-soft); }
-  .search-btn:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
 
   .search-note {
     margin-top: 16px;
@@ -333,11 +377,11 @@
     transition: border-color 0.15s ease;
   }
 
-  .route-card:hover { border-color: var(--brass); }
+  .route-card:hover { border-color: var(--brass-text); }
 
   .route-card .role {
     font-size: 11px;
-    color: var(--brass);
+    color: var(--brass-text);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     margin-bottom: 8px;
@@ -371,9 +415,11 @@
 </head>
 <body>
 
+<a class="skip-link" href="#main">Skip to main content</a>
+
 <header>
-  <a class="logo" href="index.html">
-    <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+  <a class="logo" href="index.html" aria-label="Meridian Air home">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true" focusable="false">
       <circle cx="13" cy="13" r="12" stroke="#0E2238" stroke-width="1"/>
       <path d="M13 1 V25 M1 13 H25" stroke="#0E2238" stroke-width="0.6" opacity="0.4"/>
       <path d="M13 4 C 18 8, 18 18, 13 22 C 8 18, 8 8, 13 4 Z" stroke="#B8924A" stroke-width="1.1" fill="none"/>
@@ -383,24 +429,24 @@
       <span class="tag">Est. 1962 · Every Longitude</span>
     </span>
   </a>
-    <nav>
+  <nav aria-label="Primary">
   <a href="find.html">Find Your Flight</a>
   <a href="fleet.html">Our Fleet</a>
   <a href="international.html">International</a>
   <a href="destinations.html">Destinations</a>
   <a href="ultra-long-range.html">Ultra-Long-Range</a>
-    </nav>
+  </nav>
 </header>
 
-<main>
+<main id="main">
 <section class="hero">
   <div class="eyebrow">Meridian Air</div>
   <h1>Every longitude has a gate, a crew, and a way home.</h1>
   <p class="sub">Twenty-five aircraft, six continents, one departure board that never stops turning.</p>
 
   <div class="board-wrap">
-    <div class="board">
-      <div class="board-header">
+    <div class="board" role="group" aria-label="Sample departure board">
+      <div class="board-header" aria-hidden="true">
         <span>Flight</span>
         <span>Destination</span>
         <span>Gate</span>
@@ -443,8 +489,8 @@
 
 <div class="ticket-wrap">
   <div class="ticket">
-    <div class="ticket-label">Search flights</div>
-    <form class="search-form" id="search-form">
+    <h2 class="ticket-label" id="search-heading">Search flights</h2>
+    <form class="search-form" id="search-form" aria-labelledby="search-heading">
       <div class="field">
         <label for="from">From</label>
         <input type="text" id="from" name="from" placeholder="City or airport" required />
@@ -476,8 +522,8 @@
   </div>
 
   <div class="ticket">
-    <div class="ticket-label">Find your flight</div>
-    <form class="find-form" id="find-form">
+    <h2 class="ticket-label" id="find-heading">Find your flight</h2>
+    <form class="find-form" id="find-form" aria-labelledby="find-heading">
       <div class="field">
         <label for="booking-code">Booking number</label>
         <input type="text" id="booking-code" class="code-input" placeholder="e.g. MA7K3Q9X" maxlength="8" autocomplete="off" spellcheck="false" required />
@@ -487,9 +533,9 @@
   </div>
 </div>
 
-<section class="routes">
+<section class="routes" aria-labelledby="routes-heading">
   <div class="routes-header">
-    <h2>Where to next</h2>
+    <h2 id="routes-heading">Where to next</h2>
     <span class="count">3 WAYS TO EXPLORE</span>
   </div>
 
